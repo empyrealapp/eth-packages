@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68", "setuptools_scm[toml]>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eth-rpc"
+requires-python = ">=3.10"
+dynamic = ["version"]
+dependencies = [
+    "eth_abi",
+    "eth_account",
+    "eth_hash",
+    "eth_typing",
+    "eth_utils",
+    "httpx",
+    "pydantic",
+    "pytz",
+    "websockets",
+]
+
+# Enables the usage of setuptools_scm
+[tool.setuptools_scm]
+root = "../../"
+
+[project.optional-dependencies]
+lint = [
+    "mypy",
+    "ruff",
+]
+test = [
+    "pytest==7.4.1",
+    "pytest-cov==4.1.0",
+    "coverage[toml]==7.3.1",
+]
+build = [
+    "build[virtualenv]==1.0.3",
+]
+dev = [
+    "tox",
+    "eth-rpc[lint]",
+    "eth-rpc[test]",
+    "eth-rpc[build]",
+]
