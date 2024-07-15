@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import Annotated
 
 from eth_typing import HexAddress
+from pydantic import BaseModel
 
 from eth_rpc.types import METHOD
 from eth_rpc.types import Name, NoArgs, primitives
@@ -9,15 +10,17 @@ from eth_rpc.contract import ContractFunc
 from eth_typeshed.erc20 import ERC20
 
 
+class GetReservesResponse(BaseModel):
+    reserve0: Annotated[primitives.uint112, Name("_reserve0")]
+    reserve1: Annotated[primitives.uint112, Name("_reserve1")]
+    timestamp: Annotated[primitives.uint32, Name("_blockTimestampLast")]
+
+
 class UniswapV2Pair(ERC20):
     get_reserves: Annotated[
         ContractFunc[
             NoArgs,
-            tuple[
-                Annotated[primitives.uint112, Name("_reserve0")],
-                Annotated[primitives.uint112, Name("_reserve1")],
-                Annotated[primitives.uint32, Name("_blockTimestampLast")],
-            ],
+            GetReservesResponse,
         ],
         Name("getReserves"),
     ] = METHOD
