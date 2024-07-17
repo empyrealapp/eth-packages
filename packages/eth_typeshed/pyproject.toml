@@ -7,20 +7,15 @@ name = "eth-typeshed-py"
 requires-python = ">=3.10"
 dynamic = ["version"]
 dependencies = [
-    "eth-rpc-py",
+    "eth_rpc_py",
 ]
 
 # Enables the usage of setuptools_scm
 [tool.setuptools_scm]
-root = "../../"
 version_scheme = "guess-next-dev"
 local_scheme = "no-local-version"
 
 [project.optional-dependencies]
-lint = [
-    "mypy",
-    "ruff",
-]
 test = [
     "pytest==7.4.1",
     "pytest-cov==4.1.0",
@@ -31,9 +26,9 @@ build = [
 ]
 dev = [
     "tox",
-    "eth-typeshed[lint]",
-    "eth-typeshed[test]",
-    "eth-typeshed[build]",
+    "eth-typeshed-py[lint]",
+    "eth-typeshed-py[test]",
+    "eth-typeshed-py[build]",
 ]
 
 [tool.pytest.ini_options]

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "setuptools_scm[toml]>=8"]
+requires = ["setuptools>=68", "setuptools_scm[toml]>=8", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -20,15 +20,10 @@ dependencies = [
 
 # Enables the usage of setuptools_scm
 [tool.setuptools_scm]
-root = "../../"
 version_scheme = "guess-next-dev"
 local_scheme = "no-local-version"
 
 [project.optional-dependencies]
-lint = [
-    "mypy",
-    "ruff",
-]
 test = [
     "pytest==7.4.1",
     "pytest-cov==4.1.0",
@@ -39,9 +34,9 @@ build = [
 ]
 dev = [
     "tox",
-    "eth-rpc[lint]",
-    "eth-rpc[test]",
-    "eth-rpc[build]",
+    "eth-rpc-py[lint]",
+    "eth-rpc-py[test]",
+    "eth-rpc-py[build]",
 ]
 
 [tool.pytest.ini_options]
