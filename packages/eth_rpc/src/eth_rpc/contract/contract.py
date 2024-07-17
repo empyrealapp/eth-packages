@@ -1,39 +1,44 @@
-from copy import deepcopy
 from collections.abc import Awaitable
+from copy import deepcopy
 from typing import (
     Annotated,
     ClassVar,
     Literal,
     Optional,
     TypeVar,
-    get_origin,
     get_args,
+    get_origin,
     get_type_hints,
     overload,
 )
 
 from eth_hash.auto import keccak as keccak_256
-from eth_typing import HexAddress, HexStr, Primitives
-from pydantic import BaseModel, Field, PrivateAttr
-
 from eth_rpc.types import (
     BLOCK_STRINGS,
     ContractMethod,
-    MaybeAwaitable,
     GetCodeArgs,
     GetStorageArgs,
     HexInteger,
-    Network as NetworkType,
+    MaybeAwaitable,
 )
+from eth_rpc.types import Network as NetworkType
+from eth_typing import HexAddress, HexStr, Primitives
+from pydantic import BaseModel, Field, PrivateAttr
+
 from .._request import Request
 from .._transport import _force_get_default_network
 from ..function import FuncSignature
-from ..utils import to_hex_str, run
+from ..utils import run, to_hex_str
 from .function import ContractFunc
 
 T = TypeVar(
     "T",
-    bound=tuple | BaseModel | Primitives | list[Primitives] | tuple[Primitives, ...] | HexAddress,
+    bound=tuple
+    | BaseModel
+    | Primitives
+    | list[Primitives]
+    | tuple[Primitives, ...]
+    | HexAddress,
 )
 U = TypeVar("U")
 
@@ -73,7 +78,10 @@ class Contract(BaseModel, Request):
         del_keys = []
 
         cls_annotations = get_type_hints(cls, include_extras=True)
-        annotations = {key: cls_annotations[key] for key in (cls_annotations.keys() - get_type_hints(Contract).keys())}
+        annotations = {
+            key: cls_annotations[key]
+            for key in (cls_annotations.keys() - get_type_hints(Contract).keys())
+        }
         cls._func_sigs = cls.__get_parent_func_sigs()
 
         for key, annotation in annotations.items():
@@ -82,7 +90,10 @@ class Contract(BaseModel, Request):
             if get_origin(annotation) is Annotated:
                 annotation_args = get_args(annotation)
                 for annotation in annotation_args:
-                    if annotation is ContractMethod or get_origin(annotation) is ContractFunc:
+                    if (
+                        annotation is ContractMethod
+                        or get_origin(annotation) is ContractFunc
+                    ):
                         cls._func_sigs[key] = cls_annotations[key]
                         del_keys.append(key)
                         break
@@ -114,7 +125,9 @@ class Contract(BaseModel, Request):
         if func not in self.functions:
             self.functions.append(ContractFunc(func=func, contract=self))
 
-    async def _get_storage_at(self, slot: int | HexStr, block_number="latest", sync: bool = False):
+    async def _get_storage_at(
+        self, slot: int | HexStr, block_number="latest", sync: bool = False
+    ):
         if sync:
             return self._rpc().get_storage_at.sync(
                 GetStorageArgs(
@@ -132,10 +145,14 @@ class Contract(BaseModel, Request):
         )
 
     @overload
-    def get_storage_at(self, *, sync: Literal[True], slot: int | HexStr, block_number="latest") -> HexStr: ...
+    def get_storage_at(
+        self, *, sync: Literal[True], slot: int | HexStr, block_number="latest"
+    ) -> HexStr: ...
 
     @overload
-    def get_storage_at(self, *, slot: int | HexStr, block_number="latest") -> Awaitable[HexStr]: ...
+    def get_storage_at(
+        self, *, slot: int | HexStr, block_number="latest"
+    ) -> Awaitable[HexStr]: ...
 
     def get_storage_at(
         self, *, slot: int | HexStr, block_number="latest", sync: bool = False
@@ -174,13 +191,21 @@ class Contract(BaseModel, Request):
             return self._rpc().get_code.sync(
                 GetCodeArgs(
                     address=self.address,
-                    block_number=(HexInteger(block_number) if isinstance(block_number, int) else block_number),
+                    block_number=(
+                        HexInteger(block_number)
+                        if isinstance(block_number, int)
+                        else block_number
+                    ),
                 )
             )
         return await self._rpc().get_code(
             GetCodeArgs(
                 address=self.address,
-                block_number=(HexInteger(block_number) if isinstance(block_number, int) else block_number),
+                block_number=(
+                    HexInteger(block_number)
+                    if isinstance(block_number, int)
+                    else block_number
+                ),
             )
         )
 
@@ -251,4 +276,6 @@ class ContractSync(Contract):
         block_number: int | BLOCK_STRINGS | None = None,
         block_hash: HexStr | None = None,
     ) -> HexStr:
-        return super().get_code(block_number=block_number, block_hash=block_hash, sync=self.SYNC)
+        return super().get_code(
+            block_number=block_number, block_hash=block_hash, sync=self.SYNC
+        )

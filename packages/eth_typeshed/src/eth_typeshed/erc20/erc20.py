@@ -1,23 +1,19 @@
 from typing import Annotated, Optional
 
-from eth_typing import HexAddress, HexStr
-from pydantic import PrivateAttr
-
 from eth_rpc import ContractFunc
 from eth_rpc.types import METHOD, Name, NoArgs, primitives
 from eth_rpc.utils import to_32byte_hex
+from eth_typing import HexAddress, HexStr
+from pydantic import PrivateAttr
+
 from .._base import ProtocolBase
+from .constants import ADMIN_SLOT, EIP1967_IMPLEMENTATION_SLOT, OZ_IMPLEMENTATION_SLOT
 from .types import (
+    ApproveRequest,
     OwnerRequest,
     OwnerSpenderRequest,
-    ApproveRequest,
-    TransferRequest,
     TransferFromRequest,
-)
-from .constants import (
-    EIP1967_IMPLEMENTATION_SLOT,
-    OZ_IMPLEMENTATION_SLOT,
-    ADMIN_SLOT,
+    TransferRequest,
 )
 
 
@@ -157,7 +153,9 @@ class ERC20(ERC20Metadata):
             }
         return {}
 
-    def allowance_state_diff(self, owner: HexAddress, spender: HexAddress, amount: int) -> Optional[dict]:
+    def allowance_state_diff(
+        self, owner: HexAddress, spender: HexAddress, amount: int
+    ) -> Optional[dict]:
         slot = self.get_allowance_slot(owner, spender)
         if slot:
             return {

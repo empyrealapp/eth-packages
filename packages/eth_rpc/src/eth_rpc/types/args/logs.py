@@ -1,10 +1,9 @@
 from typing import Any
 
+from eth_rpc.types import BlockReference
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
-
-from eth_rpc.types import BlockReference
 
 
 class LogsParams(BaseModel):
@@ -24,4 +23,6 @@ class LogsArgs(BaseModel):
     params: LogsParams
 
     def model_dump(self, exclude_none=True, by_alias=True, **kwargs) -> dict[str, Any]:
-        return super().model_dump(exclude_none=exclude_none, by_alias=by_alias, **kwargs)
+        return super().model_dump(
+            exclude_none=exclude_none, by_alias=by_alias, **kwargs
+        )

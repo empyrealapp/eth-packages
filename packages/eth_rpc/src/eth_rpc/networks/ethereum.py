@@ -1,6 +1,5 @@
-from pydantic.networks import Url
-
 from eth_rpc.types import BlockExplorer, Network, Rpcs, RpcUrl
+from pydantic.networks import Url
 
 
 class Ethereum(Network):

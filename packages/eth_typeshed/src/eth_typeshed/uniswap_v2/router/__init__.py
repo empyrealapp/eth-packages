@@ -3,10 +3,10 @@ from .types import (
     AddLiquidityETHRequest,
     AddLiquidityRequest,
     AddLiquidityResponse,
-    RemoveLiquidityRequest,
-    RemoveLiquidityResponse,
     RemoveLiquidityETHRequest,
     RemoveLiquidityETHResponse,
+    RemoveLiquidityRequest,
+    RemoveLiquidityResponse,
 )
 
 __all__ = [

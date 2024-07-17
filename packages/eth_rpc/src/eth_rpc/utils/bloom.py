@@ -57,7 +57,9 @@ class BloomFilter(numbers.Number):
 
     def _combine(self, other):
         if not isinstance(other, (int, BloomFilter)):
-            raise TypeError("The `or` operator is only supported for other `BloomFilter` instances")
+            raise TypeError(
+                "The `or` operator is only supported for other `BloomFilter` instances"
+            )
         return BloomFilter(int(self) | int(other))
 
     def __or__(self, other):
@@ -68,7 +70,9 @@ class BloomFilter(numbers.Number):
 
     def _icombine(self, other):
         if not isinstance(other, (int, BloomFilter)):
-            raise TypeError("The `or` operator is only supported for other `BloomFilter` instances")
+            raise TypeError(
+                "The `or` operator is only supported for other `BloomFilter` instances"
+            )
         self.value |= int(other)
         return self
 

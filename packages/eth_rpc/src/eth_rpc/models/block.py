@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import Optional
 
-from eth_typing import HexStr, HexAddress
+from eth_rpc.types import HexInteger
+from eth_typing import HexAddress, HexStr
 from pydantic import Field, field_validator
 
-from eth_rpc.types import HexInteger
-from .transaction import Transaction
 from ..utils import RPCModel, load_datetime_string
+from .transaction import Transaction
 
 
 class Block(RPCModel):
@@ -32,4 +32,6 @@ class Block(RPCModel):
     transactions_root: HexStr
     uncles: list[HexStr] = Field(default_factory=list)
 
-    normalize_timestamp = field_validator("timestamp", mode="before")(load_datetime_string)
+    normalize_timestamp = field_validator("timestamp", mode="before")(
+        load_datetime_string
+    )

@@ -1,11 +1,11 @@
 from .erc20 import ERC20, ERC20BytesMetadata
 from .events import TransferEvent, TransferEventType
 from .types import (
+    ApproveRequest,
     OwnerRequest,
     OwnerSpenderRequest,
-    ApproveRequest,
-    TransferRequest,
     TransferFromRequest,
+    TransferRequest,
 )
 
 __all__ = [

@@ -1,15 +1,15 @@
-from .pool import UniswapV3Pool, Slot0, Tick, ProcessedTick
 from .events import (
-    V3PoolCreatedEventType,
-    V3SwapEventType,
     V3PoolCreatedEvent,
+    V3PoolCreatedEventType,
     V3SwapEvent,
+    V3SwapEventType,
 )
-from .factory import UniswapV3Factory, GetPoolRequest
+from .factory import GetPoolRequest, UniswapV3Factory
 from .nonfungible_position_manager import (
-    NonfungiblePositionManager,
     NONFUNGIBLE_POSITION_MANAGER_ADDRESS,
+    NonfungiblePositionManager,
 )
+from .pool import ProcessedTick, Slot0, Tick, UniswapV3Pool
 
 __all__ = [
     "NONFUNGIBLE_POSITION_MANAGER_ADDRESS",

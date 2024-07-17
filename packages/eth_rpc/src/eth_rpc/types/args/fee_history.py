@@ -1,6 +1,5 @@
-from pydantic import BaseModel
-
 from eth_rpc.types import BlockReference
+from pydantic import BaseModel
 
 
 class FeeHistoryArgs(BaseModel):

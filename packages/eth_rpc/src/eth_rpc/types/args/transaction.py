@@ -1,7 +1,6 @@
+from eth_rpc.types import BlockReference, HexInteger
 from eth_typing import HexStr
 from pydantic import BaseModel
-
-from eth_rpc.types import BlockReference, HexInteger
 
 
 class TransactionRequest(BaseModel):

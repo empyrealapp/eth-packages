@@ -1,12 +1,12 @@
 from inspect import isclass
-from typing import Generic, NamedTuple, TypeVar, get_args, get_origin
 from types import GenericAlias
+from typing import Generic, NamedTuple, TypeVar, get_args, get_origin
 
-from pydantic import BaseModel
-from pydantic.fields import FieldInfo
 from eth_abi import decode, encode
 from eth_hash.auto import keccak as keccak_256
 from eth_typing import HexAddress, HexStr, Primitives
+from pydantic import BaseModel
+from pydantic.fields import FieldInfo
 
 from ._request import Request
 from .types import Name, NoArgs
@@ -14,7 +14,12 @@ from .utils import is_annotation
 
 T = TypeVar(
     "T",
-    bound=tuple | BaseModel | Primitives | list[Primitives] | tuple[Primitives, ...] | HexAddress,
+    bound=tuple
+    | BaseModel
+    | Primitives
+    | list[Primitives]
+    | tuple[Primitives, ...]
+    | HexAddress,
 )
 U = TypeVar("U")
 
@@ -26,7 +31,9 @@ def map_name(name):
 
 
 # TODO: this needs a massive overhaul
-def convert_base_model(base: type[BaseModel], with_name: bool = False, as_tuple: bool = False):
+def convert_base_model(
+    base: type[BaseModel], with_name: bool = False, as_tuple: bool = False
+):
     lst = []
     for key, field_info in base.model_fields.items():
         lst.append(convert_field_info(key, field_info, with_name=with_name))
@@ -68,7 +75,7 @@ def convert(type, with_name: bool = False):
 
     # if it's a list or a tuple
     if isinstance(type, GenericAlias):
-        if get_origin(type) in [list, 'list']:
+        if get_origin(type) in [list, "list"]:
             list_type = get_args(type)[0]
             converted_list_type = convert(list_type)
             # if the list type is a tuple:
@@ -98,7 +105,11 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
         inputs, _ = self.__pydantic_generic_metadata__["args"]
         if inputs is NoArgs:
             return []
-        if type(inputs) is not GenericAlias and isclass(inputs) and issubclass(inputs, BaseModel):
+        if (
+            type(inputs) is not GenericAlias
+            and isclass(inputs)
+            and issubclass(inputs, BaseModel)
+        ):
             converted_inputs = convert_base_model(inputs)
         else:
             converted_inputs = convert(inputs)
@@ -126,7 +137,11 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
         if is_annotation(outputs):
             outputs = get_args(outputs)[0]
 
-        if isclass(outputs) and not isinstance(outputs, GenericAlias) and issubclass(outputs, BaseModel):
+        if (
+            isclass(outputs)
+            and not isinstance(outputs, GenericAlias)
+            and issubclass(outputs, BaseModel)
+        ):
             converted_outputs = convert_base_model(outputs)
         else:
             converted_outputs = convert(outputs)
@@ -138,7 +153,9 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
     def encode_call(self, *, inputs: T) -> HexStr:
         identifier = self.get_identifier()
         if isinstance(inputs, BaseModel):
-            input_data = encode(self.get_inputs(), list(inputs.model_dump().values())).hex()
+            input_data = encode(
+                self.get_inputs(), list(inputs.model_dump().values())
+            ).hex()
         elif not isinstance(inputs, tuple):
             input_data = encode(self.get_inputs(), [inputs]).hex()
         else:
@@ -155,9 +172,15 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
 
         # NOTE: https://github.com/pydantic/pydantic/discussions/5970
         # TODO: this is discussed to see if its a bug or not.  Annotations are a class but can't be checked as a subclass
-        if isclass(self._output) and not isinstance(self._output, GenericAlias) and issubclass(self._output, BaseModel):
+        if (
+            isclass(self._output)
+            and not isinstance(self._output, GenericAlias)
+            and issubclass(self._output, BaseModel)
+        ):
             init_dict = {}
-            for (key, field_info), val in zip(self._output.model_fields.items(), decoded_output):
+            for (key, field_info), val in zip(
+                self._output.model_fields.items(), decoded_output
+            ):
                 init_dict[field_info.alias or key] = val
             return self._output(**init_dict)  # type: ignore
         return decoded_output

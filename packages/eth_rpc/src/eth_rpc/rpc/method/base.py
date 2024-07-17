@@ -1,15 +1,14 @@
 import asyncio
 import itertools
-from json import JSONDecodeError
 import time
+from json import JSONDecodeError
 from typing import TYPE_CHECKING, Generic, Optional, TypeVar
 
 import httpx
-from pydantic import BaseModel, ConfigDict, PrivateAttr
-
-from eth_rpc.types import HexInt, HexStr, Network
 from eth_rpc._response import RPCResponse
 from eth_rpc.exceptions import RPCDecodeError
+from eth_rpc.types import HexInt, HexStr, Network
+from pydantic import BaseModel, ConfigDict, PrivateAttr
 
 if TYPE_CHECKING:
     from ..core import RPC

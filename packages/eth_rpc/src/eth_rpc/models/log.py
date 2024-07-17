@@ -1,11 +1,10 @@
-from typing import TypeVar, Generic
-
-from eth_typing import HexAddress, HexStr
-from pydantic import BaseModel, ConfigDict
-from pydantic.alias_generators import to_camel
+from typing import Generic, TypeVar
 
 from eth_rpc.types import HexInteger, Network
 from eth_rpc.utils import RPCModel
+from eth_typing import HexAddress, HexStr
+from pydantic import BaseModel, ConfigDict
+from pydantic.alias_generators import to_camel
 
 T = TypeVar("T", bound=BaseModel)
 

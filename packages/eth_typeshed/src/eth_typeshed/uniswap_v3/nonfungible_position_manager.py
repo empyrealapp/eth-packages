@@ -1,15 +1,17 @@
 from typing import Annotated
 
-from eth_typing import HexAddress, HexStr
-
 from eth_rpc import ContractFunc
 from eth_rpc.types import METHOD, Name, primitives
 from eth_typeshed.erc20 import OwnerRequest
 from eth_typeshed.multicall import multicall
+from eth_typing import HexAddress, HexStr
+
 from .._base import ProtocolBase
 from .position import OwnerTokenRequest, Position
 
-NONFUNGIBLE_POSITION_MANAGER_ADDRESS = HexAddress(HexStr("0xC36442b4a4522E871399CD717aBDD847Ab11FE88"))
+NONFUNGIBLE_POSITION_MANAGER_ADDRESS = HexAddress(
+    HexStr("0xC36442b4a4522E871399CD717aBDD847Ab11FE88")
+)
 
 
 class NonfungiblePositionManager(ProtocolBase):
@@ -48,4 +50,6 @@ class NonfungiblePositionManager(ProtocolBase):
 
     async def get_all_positions(self, owner: HexAddress) -> list[Position]:
         indices = await self.get_all_indices(owner)
-        return await multicall.execute(*[self.positions(primitives.uint256(index)) for index in indices])
+        return await multicall.execute(
+            *[self.positions(primitives.uint256(index)) for index in indices]
+        )

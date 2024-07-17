@@ -1,6 +1,5 @@
-from typing import Any, Annotated, Literal, get_args
+from typing import Annotated, Any, Literal, get_args
 
-from pydantic_core import core_schema
 from pydantic import (
     BaseModel,
     GetCoreSchemaHandler,
@@ -8,6 +7,7 @@ from pydantic import (
     ValidationInfo,
 )
 from pydantic.functional_serializers import WrapSerializer
+from pydantic_core import core_schema
 
 BLOCK_STRINGS = Literal["latest", "earliest", "pending", "safe", "finalized"]
 
@@ -17,7 +17,9 @@ class Empty(BaseModel): ...
 
 class HexInt(int):
     @classmethod
-    def __get_pydantic_core_schema__(cls, source_type: Any, handler: GetCoreSchemaHandler) -> core_schema.CoreSchema:
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
         return core_schema.with_info_after_validator_function(
             function=cls.validate,
             schema=handler(int | str),

@@ -1,18 +1,7 @@
-from copy import deepcopy
 from collections.abc import Awaitable
+from copy import deepcopy
 from dataclasses import dataclass
-from typing import (
-    Any,
-    Generic,
-    Literal,
-    Optional,
-    TypeVar,
-    cast,
-    overload,
-)
-
-from eth_typing import HexAddress, HexStr, Primitives
-from pydantic import BaseModel
+from typing import Any, Generic, Literal, Optional, TypeVar, cast, overload
 
 from eth_rpc.models import AccessListResponse
 from eth_rpc.types import (
@@ -22,9 +11,12 @@ from eth_rpc.types import (
     EthCallParams,
     HexInteger,
     MaybeAwaitable,
-    Network as NetworkType,
-    RPCResponseModel,
 )
+from eth_rpc.types import Network as NetworkType
+from eth_rpc.types import RPCResponseModel
+from eth_typing import HexAddress, HexStr, Primitives
+from pydantic import BaseModel
+
 from .._transport import _force_get_global_rpc
 from ..block import Block
 from ..constants import ADDRESS_ZERO
@@ -33,14 +25,18 @@ from ..rpc.core import RPC
 from ..transaction import PreparedTransaction
 from ..utils import run
 from ..wallet import BaseWallet
-
 from .eth_response import EthResponse
 
 # from .contract import Contract
 
 T = TypeVar(
     "T",
-    bound=tuple | BaseModel | Primitives | list[Primitives] | tuple[Primitives, ...] | HexAddress,
+    bound=tuple
+    | BaseModel
+    | Primitives
+    | list[Primitives]
+    | tuple[Primitives, ...]
+    | HexAddress,
 )
 U = TypeVar("U")
 
@@ -152,7 +148,9 @@ class ContractFunc(Generic[T, U]):
         block_number: HexInteger | Literal["latest", "pending"] = "latest",
         sync: bool = False,
     ) -> MaybeAwaitable[HexInteger]:
-        return run(self._estimate_gas, from_=from_, block_number=block_number, sync=sync)
+        return run(
+            self._estimate_gas, from_=from_, block_number=block_number, sync=sync
+        )
 
     async def _access_list(
         self,
@@ -235,7 +233,9 @@ class ContractFunc(Generic[T, U]):
         #       to have a few different return types for the same function
         if self.contract.code_override:
             contract_state = state_diff.get(self.address, {})
-            state_diff[self.address] = {"code": self.contract.code_override} | contract_state
+            state_diff[self.address] = {
+                "code": self.contract.code_override
+            } | contract_state
         # TODO: make this handle sync or async
         if sync:
             response = self._rpc().eth_call.sync(
@@ -246,7 +246,11 @@ class ContractFunc(Generic[T, U]):
                         value=HexInteger(value),
                         data=self.data,
                     ),
-                    block_number=(HexInteger(block_number) if isinstance(block_number, int) else block_number),
+                    block_number=(
+                        HexInteger(block_number)
+                        if isinstance(block_number, int)
+                        else block_number
+                    ),
                     state_override_set=state_diff,
                 )
             )
@@ -259,7 +263,11 @@ class ContractFunc(Generic[T, U]):
                         value=HexInteger(value),
                         data=self.data,
                     ),
-                    block_number=(HexInteger(block_number) if isinstance(block_number, int) else block_number),
+                    block_number=(
+                        HexInteger(block_number)
+                        if isinstance(block_number, int)
+                        else block_number
+                    ),
                     state_override_set=state_diff,
                 )
             )
@@ -395,7 +403,9 @@ class ContractFunc(Generic[T, U]):
         gas = await self._estimate_gas(sync=sync)
         if use_access_list:
             if sync:
-                access_list_response = self.access_list(sender=wallet.address, sync=True)
+                access_list_response = self.access_list(
+                    sender=wallet.address, sync=True
+                )
             else:
                 access_list_response = await self.access_list(sender=wallet.address)
             access_list = access_list_response.access_list
@@ -405,15 +415,21 @@ class ContractFunc(Generic[T, U]):
         chain_id = rpc.chain_id
 
         if sync:
-            max_priority_fee_per_gas = max_priority_fee_per_gas or Block.priority_fee().sync
+            max_priority_fee_per_gas = (
+                max_priority_fee_per_gas or Block.priority_fee().sync
+            )
             base_fee_per_gas = Block.pending().sync.base_fee_per_gas
         else:
-            max_priority_fee_per_gas = max_priority_fee_per_gas or await Block.priority_fee()
+            max_priority_fee_per_gas = (
+                max_priority_fee_per_gas or await Block.priority_fee()
+            )
             # TODO: fix pending()
             base_fee_per_gas = Block.pending().sync.base_fee_per_gas
 
         assert base_fee_per_gas, "block is earlier than London Hard Fork"
-        max_fee_per_gas = max_fee_per_gas or (2 * base_fee_per_gas + max_priority_fee_per_gas)
+        max_fee_per_gas = max_fee_per_gas or (
+            2 * base_fee_per_gas + max_priority_fee_per_gas
+        )
 
         return PreparedTransaction(
             data=self.data,
@@ -556,7 +572,9 @@ class ContractFunc(Generic[T, U]):
             sync=sync,
         )
 
-    def _encode_block_number(self, block_number: int | Literal["latest", "pending"] = "pending"):
+    def _encode_block_number(
+        self, block_number: int | Literal["latest", "pending"] = "pending"
+    ):
         if isinstance(block_number, int):
             return hex(block_number)
         return block_number
@@ -571,7 +589,9 @@ class ContractFuncSync(ContractFunc[T, U]):
         from_: Optional[HexAddress] = None,
         block_number: HexInteger | Literal["latest", "pending"] = "latest",
     ) -> HexInteger:
-        return super().estimate_gas(from_=from_, block_number=block_number, sync=self.SYNC)
+        return super().estimate_gas(
+            from_=from_, block_number=block_number, sync=self.SYNC
+        )
 
     def access_list(  # type: ignore
         self,

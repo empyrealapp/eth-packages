@@ -1,7 +1,6 @@
-from eth_typing import HexStr
-
 from eth_rpc.types import HexInteger
 from eth_rpc.utils import RPCModel
+from eth_typing import HexStr
 
 
 class Account(RPCModel):

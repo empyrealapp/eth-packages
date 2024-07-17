@@ -1,11 +1,9 @@
-from abc import ABC, abstractmethod
 import secrets
+from abc import ABC, abstractmethod
 from typing import Literal, Optional
 
 from eth_account import Account
 from eth_account.account import LocalAccount
-from eth_typing import HexAddress, HexStr
-
 from eth_rpc.types import (
     BLOCK_STRINGS,
     CallWithBlockArgs,
@@ -14,8 +12,10 @@ from eth_rpc.types import (
     RawTransaction,
     SignedTransaction,
 )
-from ._transport import _force_get_global_rpc
+from eth_typing import HexAddress, HexStr
+
 from ._request import Request
+from ._transport import _force_get_global_rpc
 from .block import Block
 from .transaction import PreparedTransaction
 from .types import HexInteger, RPCResponseModel
@@ -29,7 +29,11 @@ class BaseWallet(Request, ABC):
             self._rpc().get_tx_count,
             GetAccountArgs(
                 address=self.address,
-                block_number=HexInteger(block_number) if isinstance(block_number, int) else block_number,
+                block_number=(
+                    HexInteger(block_number)
+                    if isinstance(block_number, int)
+                    else block_number
+                ),
             ),
         )
 
@@ -37,7 +41,9 @@ class BaseWallet(Request, ABC):
     def sign_transaction(self, tx) -> SignedTransaction: ...
 
     @abstractmethod
-    def send_raw_transaction(self, tx: HexStr) -> RPCResponseModel[RawTransaction, HexStr]: ...
+    def send_raw_transaction(
+        self, tx: HexStr
+    ) -> RPCResponseModel[RawTransaction, HexStr]: ...
 
 
 class MockWallet(BaseWallet):
@@ -77,7 +83,9 @@ class PrivateKeyWallet(BaseWallet):
             v=signed_tx.v,
         )
 
-    def send_raw_transaction(self, tx: HexStr) -> RPCResponseModel[RawTransaction, HexStr]:
+    def send_raw_transaction(
+        self, tx: HexStr
+    ) -> RPCResponseModel[RawTransaction, HexStr]:
         return RPCResponseModel(
             self._rpc().send_raw_tx,
             RawTransaction(
@@ -124,7 +132,9 @@ class PrivateKeyWallet(BaseWallet):
         max_priority_fee_per_gas = max_priority_fee_per_gas or Block.priority_fee().sync
         base_fee_per_gas = Block.pending().sync.base_fee_per_gas
         assert base_fee_per_gas, "block is earlier than London Hard Fork"
-        max_fee_per_gas = max_fee_per_gas or (2 * base_fee_per_gas + max_priority_fee_per_gas)
+        max_fee_per_gas = max_fee_per_gas or (
+            2 * base_fee_per_gas + max_priority_fee_per_gas
+        )
 
         return PreparedTransaction(
             data=data,

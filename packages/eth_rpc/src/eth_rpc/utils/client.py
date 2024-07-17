@@ -1,10 +1,10 @@
 from collections.abc import Coroutine
 from typing import Any, Literal, overload
 
-import requests
-from requests import Response
 import httpx
+import requests
 from httpx import Response as AsyncResponse
+from requests import Response
 
 from .dual_async import DualAsync, run
 
@@ -21,9 +21,13 @@ class HTTPClient(DualAsync):
     def get(self, url, *args, sync: Literal[True], **kwargs) -> Response: ...
 
     @overload
-    def get(self, url, *args, sync: Literal[False] = ..., **kwargs) -> Coroutine[Any, Any, AsyncResponse]: ...
+    def get(
+        self, url, *args, sync: Literal[False] = ..., **kwargs
+    ) -> Coroutine[Any, Any, AsyncResponse]: ...
 
-    def get(self, url, *args, sync: bool = False, **kwargs) -> Coroutine[Any, Any, AsyncResponse] | Response:
+    def get(
+        self, url, *args, sync: bool = False, **kwargs
+    ) -> Coroutine[Any, Any, AsyncResponse] | Response:
         return run(self._request, "GET", url, *args, sync=sync, **kwargs)
 
     # PUT
@@ -31,9 +35,13 @@ class HTTPClient(DualAsync):
     def put(self, url, *args, sync: Literal[True], **kwargs) -> Response: ...
 
     @overload
-    def put(self, url, *args, sync: Literal[False] = ..., **kwargs) -> Coroutine[Any, Any, AsyncResponse]: ...
+    def put(
+        self, url, *args, sync: Literal[False] = ..., **kwargs
+    ) -> Coroutine[Any, Any, AsyncResponse]: ...
 
-    def put(self, url, *args, sync: bool = False, **kwargs) -> Coroutine[Any, Any, AsyncResponse] | Response:
+    def put(
+        self, url, *args, sync: bool = False, **kwargs
+    ) -> Coroutine[Any, Any, AsyncResponse] | Response:
         return run(self._request, "PUT", url, *args, sync=sync, **kwargs)
 
     # POST
@@ -41,9 +49,13 @@ class HTTPClient(DualAsync):
     def post(self, url, *args, sync: Literal[True], **kwargs) -> Response: ...
 
     @overload
-    def post(self, url, *args, sync: Literal[False] = ..., **kwargs) -> Coroutine[Any, Any, AsyncResponse]: ...
+    def post(
+        self, url, *args, sync: Literal[False] = ..., **kwargs
+    ) -> Coroutine[Any, Any, AsyncResponse]: ...
 
-    def post(self, url, *args, sync: bool = False, **kwargs) -> Coroutine[Any, Any, AsyncResponse] | Response:
+    def post(
+        self, url, *args, sync: bool = False, **kwargs
+    ) -> Coroutine[Any, Any, AsyncResponse] | Response:
         return run(self._request, "POST", url, *args, sync=sync, **kwargs)
 
     # DELETE
@@ -51,7 +63,11 @@ class HTTPClient(DualAsync):
     def delete(self, url, *args, sync: Literal[True], **kwargs) -> Response: ...
 
     @overload
-    def delete(self, url, *args, sync: Literal[False] = ..., **kwargs) -> Coroutine[Any, Any, AsyncResponse]: ...
+    def delete(
+        self, url, *args, sync: Literal[False] = ..., **kwargs
+    ) -> Coroutine[Any, Any, AsyncResponse]: ...
 
-    def delete(self, url, *args, sync: bool = False, **kwargs) -> Coroutine[Any, Any, AsyncResponse] | Response:
+    def delete(
+        self, url, *args, sync: bool = False, **kwargs
+    ) -> Coroutine[Any, Any, AsyncResponse] | Response:
         return run(self._request, "DELETE", url, *args, sync=sync, **kwargs)

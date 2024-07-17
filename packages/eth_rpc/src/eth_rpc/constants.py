@@ -3,7 +3,6 @@ from contextvars import ContextVar
 
 from eth_typing import HexAddress, HexStr
 
-
 ADDRESS_ZERO = HexAddress(HexStr("0x0000000000000000000000000000000000000000"))
 ADDRESS_DEAD = HexAddress(HexStr("0x000000000000000000000000000000000000dEaD"))
 

@@ -1,7 +1,7 @@
 from typing import Optional
 
 from eth_typing import HexStr
-from eth_utils import to_hex, to_bytes
+from eth_utils import to_bytes, to_hex
 
 
 def hex_to_int(v: None | int | str) -> Optional[int]:

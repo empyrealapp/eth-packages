@@ -1,5 +1,5 @@
 from eth_typing import HexAddress, HexStr
-from pydantic import BaseModel, AnyHttpUrl
+from pydantic import AnyHttpUrl, BaseModel
 from pydantic.networks import AnyWebsocketUrl, Url
 
 # from pydantic._internal._model_construction import ModelMetaclass
@@ -31,9 +31,15 @@ class Network(BaseModel):
     rpc: Rpcs
     block_explorer: BlockExplorer
     alchemy_str: str | None = None
-    multicall3: HexAddress | None = HexAddress(HexStr("0xca11bde05977b3631167028862be2a173976ca11"))
-    ens_registry: HexAddress | None = HexAddress(HexStr("0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e"))
-    ens_universal_resolver: HexAddress | None = HexAddress(HexStr("0xce01f8eee7E479C928F8919abD53E553a36CeF67"))
+    multicall3: HexAddress | None = HexAddress(
+        HexStr("0xca11bde05977b3631167028862be2a173976ca11")
+    )
+    ens_registry: HexAddress | None = HexAddress(
+        HexStr("0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e")
+    )
+    ens_universal_resolver: HexAddress | None = HexAddress(
+        HexStr("0xce01f8eee7E479C928F8919abD53E553a36CeF67")
+    )
     apprx_block_time: float = 12.0
 
     def set(

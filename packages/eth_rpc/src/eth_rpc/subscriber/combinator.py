@@ -1,9 +1,9 @@
 from collections.abc import AsyncIterator
 
-from pydantic import BaseModel
-
 from eth_rpc.models import EventData
 from eth_rpc.utils import acombine
+from pydantic import BaseModel
+
 from ..event import Event
 
 

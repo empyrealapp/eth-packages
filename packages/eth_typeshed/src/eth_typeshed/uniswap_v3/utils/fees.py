@@ -1,4 +1,5 @@
 from eth_rpc.types import primitives
+
 from ..constants import Q128, Q256
 
 ZERO = 0
@@ -39,15 +40,23 @@ def get_fees(
     tick_upper_fee_growth_above_1 = ZERO
 
     if tick_current >= tick_upper:
-        tick_upper_fee_growth_above_0 = sub_in_256(fee_growth_global_0, tick_upper_fee_growth_outside_0)
-        tick_upper_fee_growth_above_1 = sub_in_256(fee_growth_global_1, tick_upper_fee_growth_outside_1)
+        tick_upper_fee_growth_above_0 = sub_in_256(
+            fee_growth_global_0, tick_upper_fee_growth_outside_0
+        )
+        tick_upper_fee_growth_above_1 = sub_in_256(
+            fee_growth_global_1, tick_upper_fee_growth_outside_1
+        )
     else:
         tick_upper_fee_growth_above_0 = tick_upper_fee_growth_outside_0
         tick_upper_fee_growth_above_1 = tick_upper_fee_growth_outside_1
 
     if tick_current < tick_lower:
-        tick_lower_fee_growth_below_0 = sub_in_256(fee_growth_global_0, tick_lower_fee_growth_outside_0)
-        tick_lower_fee_growth_below_1 = sub_in_256(fee_growth_global_1, tick_lower_fee_growth_outside_1)
+        tick_lower_fee_growth_below_0 = sub_in_256(
+            fee_growth_global_0, tick_lower_fee_growth_outside_0
+        )
+        tick_lower_fee_growth_below_1 = sub_in_256(
+            fee_growth_global_1, tick_lower_fee_growth_outside_1
+        )
     else:
         tick_lower_fee_growth_below_0 = tick_lower_fee_growth_outside_0
         tick_lower_fee_growth_below_1 = tick_lower_fee_growth_outside_1
@@ -64,7 +73,11 @@ def get_fees(
     fee_growth_inside_last_0 = fee_growth_inside0
     fee_growth_inside_last_1 = fee_growth_inside1
 
-    uncollected_fees_0 = (liquidity * sub_in_256(fr_t1_0, fee_growth_inside_last_0)) // Q128
-    uncollected_fees_1 = (liquidity * sub_in_256(fr_t1_1, fee_growth_inside_last_1)) // Q128
+    uncollected_fees_0 = (
+        liquidity * sub_in_256(fr_t1_0, fee_growth_inside_last_0)
+    ) // Q128
+    uncollected_fees_1 = (
+        liquidity * sub_in_256(fr_t1_1, fee_growth_inside_last_1)
+    ) // Q128
 
     return uncollected_fees_0, uncollected_fees_1

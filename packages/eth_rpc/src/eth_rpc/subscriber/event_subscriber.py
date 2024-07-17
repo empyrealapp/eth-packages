@@ -1,27 +1,28 @@
 import asyncio
-from collections.abc import AsyncIterator
-from contextvars import ContextVar
 import json
 import re
+from collections.abc import AsyncIterator
+from contextvars import ContextVar
 from typing import Generic, Optional, Protocol, TypeVar
 
+from eth_rpc import Block
+from eth_rpc.models import EventData, Log
+from eth_rpc.types import LogsArgs, LogsParams
+from eth_rpc.types import Network as NetworkType
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel
 from websockets.exceptions import ConnectionClosedError
-from websockets.legacy.client import connect, WebSocketClientProtocol
+from websockets.legacy.client import WebSocketClientProtocol, connect
 
-from eth_rpc import Block
-from eth_rpc.models import Log, EventData
-from eth_rpc.types import LogsArgs, LogsParams, Network as NetworkType
 from .._request import Request
 from .._transport import _force_get_global_rpc
 from ..constants import DEFAULT_CONTEXT, DEFAULT_EVENT
 from ..event import Event
 from ..types import (
     BLOCK_STRINGS,
-    SubscriptionResponse,
-    JsonResponseWssResponse,
     EvmDataDict,
+    JsonResponseWssResponse,
+    SubscriptionResponse,
 )
 
 T = TypeVar("T", bound=BaseModel)
@@ -194,7 +195,9 @@ class EventSubscriber(Request):
                     addresses,
                     [event.get_topic0 for event in self.events],
                 )
-                subscription_response: SubscriptionResponse = json.loads(await w3_connection.recv())
+                subscription_response: SubscriptionResponse = json.loads(
+                    await w3_connection.recv()
+                )
                 if not subscription_response["result"]:
                     raise ValueError(subscription_response)
             except Exception as e:
@@ -313,7 +316,11 @@ class EventSubscriber(Request):
         return self.__aiter__()
 
     async def __aiter__(self) -> AsyncIterator[EventData]:
-        if not (self._start_block is not None and self._end_block is not None and self._addresses is not None):
+        if not (
+            self._start_block is not None
+            and self._end_block is not None
+            and self._addresses is not None
+        ):
             raise ValueError("Must set blocks first.")
         start_block = await Block.convert(self._start_block)
         end_block = await Block.convert(self._end_block)

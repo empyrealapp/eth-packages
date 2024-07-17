@@ -1,6 +1,5 @@
+from eth_rpc.types import HexInt, HexInteger
 from pydantic import BaseModel
-
-from eth_rpc.types import HexInteger, HexInt
 
 
 def test_hex_int() -> None:

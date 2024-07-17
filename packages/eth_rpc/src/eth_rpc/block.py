@@ -1,24 +1,25 @@
 import asyncio
+import json
+import zlib
 from collections.abc import AsyncIterator
 from contextvars import ContextVar
 from datetime import datetime, timezone
-import json
 from typing import Literal
-from typing_extensions import Self
-import zlib
 
-from eth_typing import HexStr
-from websockets.exceptions import ConnectionClosedError
-from websockets.legacy.client import connect
-from websockets.exceptions import ConnectionClosedOK
-
+from eth_rpc.models import Block as BlockModel
+from eth_rpc.models import FeeHistory
 from eth_rpc.types.args import (
     BlockNumberArg,
     FeeHistoryArgs,
-    GetBlockByNumberArgs,
     GetBlockByHashArgs,
+    GetBlockByNumberArgs,
 )
-from eth_rpc.models import Block as BlockModel, FeeHistory
+from eth_typing import HexStr
+from typing_extensions import Self
+from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
+from websockets.legacy.client import connect
+
+from ._request import Request
 from .constants import DEFAULT_EVENT
 from .transaction import Transaction
 from .types import (
@@ -29,7 +30,6 @@ from .types import (
     NoArgs,
     RPCResponseModel,
 )
-from ._request import Request
 from .utils import BloomFilter
 
 SUBSCRIPTION_TYPE = Literal["newHeads", "newPendingTransactions"]
@@ -65,7 +65,9 @@ class Block(BlockModel, Request):
         )
 
     @classmethod
-    def get_block_transaction_count(cls, block_number: HexInteger) -> RPCResponseModel[BlockNumberArg, int]:
+    def get_block_transaction_count(
+        cls, block_number: HexInteger
+    ) -> RPCResponseModel[BlockNumberArg, int]:
         return RPCResponseModel(
             cls._rpc().get_block_tx_count_by_number,
             BlockNumberArg(
@@ -82,7 +84,11 @@ class Block(BlockModel, Request):
         return RPCResponseModel(
             cls._rpc().get_block_by_number,
             GetBlockByNumberArgs(
-                block_number=HexInteger(block_number) if isinstance(block_number, int) else block_number,
+                block_number=(
+                    HexInteger(block_number)
+                    if isinstance(block_number, int)
+                    else block_number
+                ),
                 with_tx_data=with_tx_data,
             ),
         )
@@ -115,7 +121,9 @@ class Block(BlockModel, Request):
             seconds_diff = day_diff * 24 * 3600
             block_number = await cls[Network].get_number()  # type: ignore
             if not low:
-                low = int(max(block_number - (seconds_diff / (apprx_block_time * 0.8)), 0))
+                low = int(
+                    max(block_number - (seconds_diff / (apprx_block_time * 0.8)), 0)
+                )
             if not high:
                 high = int(
                     min(
@@ -147,11 +155,15 @@ class Block(BlockModel, Request):
         return await cls[Network].load_by_number(high)  # type: ignore
 
     @classmethod
-    def latest(cls, with_tx_data: bool = False) -> RPCResponseModel[GetBlockByNumberArgs, "Block"]:
+    def latest(
+        cls, with_tx_data: bool = False
+    ) -> RPCResponseModel[GetBlockByNumberArgs, "Block"]:
         return cls.load_by_number("latest", with_tx_data=with_tx_data)
 
     @classmethod
-    def pending(cls, with_tx_data: bool = False) -> RPCResponseModel[GetBlockByNumberArgs, "Block"]:
+    def pending(
+        cls, with_tx_data: bool = False
+    ) -> RPCResponseModel[GetBlockByNumberArgs, "Block"]:
         return cls.load_by_number("pending", with_tx_data=with_tx_data)
 
     @classmethod
@@ -214,7 +226,9 @@ class Block(BlockModel, Request):
     ):
         internal_queue: asyncio.Queue = asyncio.Queue()
         flush_queue: bool = True
-        async for block in cls._listen(with_tx_data=with_tx_data, subscription_type=subscription_type):
+        async for block in cls._listen(
+            with_tx_data=with_tx_data, subscription_type=subscription_type
+        ):
             if publish_blocks.is_set():
                 if flush_queue:
                     while not internal_queue.empty():
@@ -240,7 +254,9 @@ class Block(BlockModel, Request):
             params: list
             params = [subscription_type]
 
-            await w3_connection.send(json.dumps({"id": 1, "method": "eth_subscribe", "params": params}))
+            await w3_connection.send(
+                json.dumps({"id": 1, "method": "eth_subscribe", "params": params})
+            )
             subscription_response = await w3_connection.recv()
             if not (subscription_id := json.loads(subscription_response).get("result")):
                 raise ValueError(subscription_response)
@@ -248,7 +264,9 @@ class Block(BlockModel, Request):
 
             while True:
                 try:
-                    raw_message = await asyncio.wait_for(w3_connection.recv(), timeout=60)
+                    raw_message = await asyncio.wait_for(
+                        w3_connection.recv(), timeout=60
+                    )
                     message_json = json.loads(raw_message)
                     result = message_json["params"]["result"]
 
@@ -256,7 +274,9 @@ class Block(BlockModel, Request):
                         if not with_tx_data:
                             block_ = Block(**result)
                         else:
-                            block_ = await cls.load_by_hash(result["hash"], with_tx_data=with_tx_data)
+                            block_ = await cls.load_by_hash(
+                                result["hash"], with_tx_data=with_tx_data
+                            )
                         yield block_
                     else:
                         yield Transaction(**result)

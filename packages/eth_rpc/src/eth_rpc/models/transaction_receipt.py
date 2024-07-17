@@ -1,11 +1,11 @@
 from typing import Optional
 
+from eth_rpc.types import HexInteger
+from eth_rpc.utils import BloomFilter
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
-from eth_rpc.types import HexInteger
-from eth_rpc.utils import BloomFilter
 from .log import Log
 
 

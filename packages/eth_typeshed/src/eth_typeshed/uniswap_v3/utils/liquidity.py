@@ -39,11 +39,15 @@ def liquidity_to_token_amounts(liquidity, sqrt_price_x96, tick_low, tick_high):
     amount1 = 0
 
     if current_tick < tick_low:
-        amount0 = math.floor(liquidity * ((sqrt_ratio_b - sqrt_ratio_a) / (sqrt_ratio_a * sqrt_ratio_b)))
+        amount0 = math.floor(
+            liquidity * ((sqrt_ratio_b - sqrt_ratio_a) / (sqrt_ratio_a * sqrt_ratio_b))
+        )
     elif current_tick >= tick_high:
         amount1 = math.floor(liquidity * (sqrt_ratio_b - sqrt_ratio_a))
     elif tick_low <= current_tick < tick_high:
-        amount0 = math.floor(liquidity * ((sqrt_ratio_b - sqrt_price) / (sqrt_price * sqrt_ratio_b)))
+        amount0 = math.floor(
+            liquidity * ((sqrt_ratio_b - sqrt_price) / (sqrt_price * sqrt_ratio_b))
+        )
         amount1 = math.floor(liquidity * (sqrt_price - sqrt_ratio_a))
 
     return [amount0, amount1]

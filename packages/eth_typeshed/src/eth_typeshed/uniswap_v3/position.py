@@ -1,16 +1,15 @@
 import asyncio
 from typing import Annotated
 
-from pydantic import BaseModel, PrivateAttr
-from eth_typing import HexAddress
-
 from eth_rpc.types import Name, primitives
-
 from eth_typeshed.constants import Factories
 from eth_typeshed.erc20 import ERC20
-from .factory import UniswapV3Factory, GetPoolRequest
+from eth_typing import HexAddress
+from pydantic import BaseModel, PrivateAttr
+
+from .factory import GetPoolRequest, UniswapV3Factory
 from .pool import UniswapV3Pool
-from .utils import liquidity_to_token_amounts, get_fees
+from .utils import get_fees, liquidity_to_token_amounts
 
 
 class OwnerTokenRequest(BaseModel):

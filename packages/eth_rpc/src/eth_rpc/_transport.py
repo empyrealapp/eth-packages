@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict
 
-from .rpc.base import BaseRPC
 from .networks import Ethereum, get_network_by_chain_id
+from .rpc.base import BaseRPC
 from .types import Network
 
 if TYPE_CHECKING:

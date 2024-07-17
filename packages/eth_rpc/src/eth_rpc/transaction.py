@@ -1,26 +1,23 @@
 import asyncio
-from collections.abc import AsyncIterator
 import json
 import logging
+from collections.abc import AsyncIterator
 from typing import Optional, TypeVar, cast
 
-from pydantic import BaseModel, ConfigDict
-from pydantic.alias_generators import to_camel
-from eth_typing import HexAddress, HexStr
-from websockets.exceptions import ConnectionClosedError
-from websockets.legacy.client import connect, WebSocketClientProtocol
-
+from eth_rpc.models import AccessList, PendingTransaction
+from eth_rpc.models import Transaction as TransactionModel
+from eth_rpc.models import TransactionReceipt as TransactionReceiptModel
 from eth_rpc.types.args import (
-    TransactionRequest,
     GetTransactionByBlockHash,
     GetTransactionByBlockNumber,
+    TransactionRequest,
 )
-from eth_rpc.models import (
-    AccessList,
-    PendingTransaction,
-    Transaction as TransactionModel,
-    TransactionReceipt as TransactionReceiptModel,
-)
+from eth_typing import HexAddress, HexStr
+from pydantic import BaseModel, ConfigDict
+from pydantic.alias_generators import to_camel
+from websockets.exceptions import ConnectionClosedError
+from websockets.legacy.client import WebSocketClientProtocol, connect
+
 from ._request import Request
 from ._transport import _force_get_global_rpc
 from .types import (
@@ -57,12 +54,16 @@ class PreparedTransaction(BaseModel):
     chain_id: int
 
     def model_dump(self, *args, exclude_none=True, by_alias=True, **kwargs):
-        return super().model_dump(*args, exclude_none=exclude_none, by_alias=by_alias, **kwargs)
+        return super().model_dump(
+            *args, exclude_none=exclude_none, by_alias=by_alias, **kwargs
+        )
 
 
 class TransactionReceipt(TransactionReceiptModel, Request):
     @classmethod
-    def get_by_hash(cls, tx_hash: HexStr) -> RPCResponseModel[TransactionRequest, Optional["TransactionReceipt"]]:
+    def get_by_hash(
+        cls, tx_hash: HexStr
+    ) -> RPCResponseModel[TransactionRequest, Optional["TransactionReceipt"]]:
         return RPCResponseModel(
             cls._rpc().get_tx_receipt,
             TransactionRequest(
@@ -108,7 +109,9 @@ class AlchemyReceiptsResponse(BaseModel):
 
 class Transaction(TransactionModel, Request):
     @classmethod
-    def get_by_hash(cls, tx_hash: HexStr) -> RPCResponseModel[TransactionRequest, Optional["Transaction"]]:
+    def get_by_hash(
+        cls, tx_hash: HexStr
+    ) -> RPCResponseModel[TransactionRequest, Optional["Transaction"]]:
         return RPCResponseModel(
             cls._rpc().get_tx_by_hash,
             TransactionRequest(
@@ -117,7 +120,9 @@ class Transaction(TransactionModel, Request):
         )
 
     @classmethod
-    def get_pending_by_hash(cls, tx_hash: HexStr) -> RPCResponseModel[TransactionRequest, PendingTransaction]:
+    def get_pending_by_hash(
+        cls, tx_hash: HexStr
+    ) -> RPCResponseModel[TransactionRequest, PendingTransaction]:
         return RPCResponseModel(
             cls._rpc().get_pending_tx_by_hash,
             TransactionRequest(
@@ -126,7 +131,9 @@ class Transaction(TransactionModel, Request):
         )
 
     @classmethod
-    def get_receipt_by_hash(cls, tx_hash: HexStr) -> RPCResponseModel[TransactionRequest, "Transaction"]:
+    def get_receipt_by_hash(
+        cls, tx_hash: HexStr
+    ) -> RPCResponseModel[TransactionRequest, "Transaction"]:
         return RPCResponseModel(
             cls._rpc().get_tx_receipt,
             TransactionRequest(
@@ -140,7 +147,9 @@ class Transaction(TransactionModel, Request):
         transaction_index: int,
         block_hash: HexStr | None = None,
         block_number: int | BLOCK_STRINGS | None = None,
-    ) -> RPCResponseModel[GetTransactionByBlockHash | GetTransactionByBlockNumber, "Transaction"]:
+    ) -> RPCResponseModel[
+        GetTransactionByBlockHash | GetTransactionByBlockNumber, "Transaction"
+    ]:
         if block_hash is None and block_number is None:
             raise ValueError("Must provide either block_hash or block_number")
         if block_hash:
@@ -155,7 +164,11 @@ class Transaction(TransactionModel, Request):
         return RPCResponseModel(
             cls._rpc().get_tx_by_block_number,
             GetTransactionByBlockNumber(
-                block_number=HexInteger(block_number) if isinstance(block_number, int) else block_number,
+                block_number=(
+                    HexInteger(block_number)
+                    if isinstance(block_number, int)
+                    else block_number
+                ),
                 index=HexInteger(transaction_index),
             ),
         )
@@ -180,7 +193,9 @@ class Transaction(TransactionModel, Request):
                 await cls._send_subscription_request(
                     w3_connection,
                 )
-                subscription_response: SubscriptionResponse = json.loads(await w3_connection.recv())
+                subscription_response: SubscriptionResponse = json.loads(
+                    await w3_connection.recv()
+                )
                 if not subscription_response["result"]:
                     raise ValueError(subscription_response)
             except Exception as e:

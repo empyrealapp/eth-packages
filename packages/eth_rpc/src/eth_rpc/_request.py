@@ -1,7 +1,9 @@
 from typing import TYPE_CHECKING, ClassVar
 
-from eth_rpc.types.args import TraceArgs, EthCallParams
-from .types import BlockReference, Network as NetworkType
+from eth_rpc.types.args import EthCallParams, TraceArgs
+
+from .types import BlockReference
+from .types import Network as NetworkType
 
 if TYPE_CHECKING:
     from .rpc.core import RPC
@@ -40,7 +42,9 @@ class Request:
         response = _force_get_global_rpc(network)
         return response
 
-    def _get_debug_tracecall(self, address, data, block_number: BlockReference = "latest"):
+    def _get_debug_tracecall(
+        self, address, data, block_number: BlockReference = "latest"
+    ):
         return self._rpc().debug_tracecall.sync(
             TraceArgs(
                 params=EthCallParams(

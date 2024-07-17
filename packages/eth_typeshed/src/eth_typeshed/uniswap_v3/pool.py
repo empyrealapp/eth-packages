@@ -1,28 +1,32 @@
 import asyncio
+import math
 from collections.abc import Iterable
 from decimal import Decimal
-import math
 from typing import Annotated, cast
 
+from eth_rpc.contract import ContractFunc
+from eth_rpc.types import METHOD, Name, NoArgs, primitives
+from eth_typeshed._base import ProtocolBase
+from eth_typeshed.multicall import multicall
 from eth_typing import HexAddress
 from pydantic import BaseModel, Field, PrivateAttr
 
-from eth_rpc.types import METHOD, Name, NoArgs, primitives
-from eth_rpc.contract import ContractFunc
-from eth_typeshed._base import ProtocolBase
-from eth_typeshed.multicall import multicall
 from ..erc20 import ERC20
-from .events import V3MintEvent, V3SwapEvent, V3SwapEventType
 from .constants import MIN_TICK, Q192
-from .utils import tick_to_price, tick_from_bitmap
+from .events import V3MintEvent, V3SwapEvent, V3SwapEventType
+from .utils import tick_from_bitmap, tick_to_price
 
 
 class Slot0(BaseModel):
     sqrt_price: primitives.uint160 = Field(serialization_alias="sqrtPriceX96")
     tick: primitives.int24
     observation_index: primitives.uint16 = Field(serialization_alias="observationIndex")
-    observation_cardinality: primitives.uint16 = Field(serialization_alias="observationCardinality")
-    observation_cardinality_next: primitives.uint16 = Field(serialization_alias="observationCardinality")
+    observation_cardinality: primitives.uint16 = Field(
+        serialization_alias="observationCardinality"
+    )
+    observation_cardinality_next: primitives.uint16 = Field(
+        serialization_alias="observationCardinality"
+    )
     fee_protocol: primitives.uint8 = Field(serialization_alias="feeProtocol")
     unlocked: bool
 
@@ -33,7 +37,9 @@ class Tick(BaseModel):
     fee_growth_outside0: Annotated[primitives.uint256, Name("feeGrowthOutside0X128")]
     fee_growth_outside1: Annotated[primitives.uint256, Name("feeGrowthOutside1X128")]
     tick_cumulative_outside: Annotated[primitives.int56, Name("tickCumulativeOutside")]
-    seconds_per_liquidity_outside: Annotated[primitives.uint160, Name("secondsPerLiquidityOutsideX128")]
+    seconds_per_liquidity_outside: Annotated[
+        primitives.uint160, Name("secondsPerLiquidityOutsideX128")
+    ]
     seconds_outside: Annotated[primitives.uint32, Name("secondsOutside")]
     initialized: bool  # liquidity_net > 0
 
@@ -54,11 +60,18 @@ class ProcessedTick(BaseModel):
 
     @property
     def price0(self):
-        return tick_to_price(self.index, self.token0.get_decimals(), self.token1.get_decimals())
+        return tick_to_price(
+            self.index, self.token0.get_decimals(), self.token1.get_decimals()
+        )
 
     @property
     def price1(self):
-        return tick_to_price(self.index, self.token0.get_decimals(), self.token1.get_decimals()) ** -1
+        return (
+            tick_to_price(
+                self.index, self.token0.get_decimals(), self.token1.get_decimals()
+            )
+            ** -1
+        )
 
     def __repr__(self):
         return f"<ProcessedTick index={self.index}>"
@@ -83,8 +96,12 @@ class UniswapV3Pool(ProtocolBase):
         ContractFunc[NoArgs, primitives.int24],
         Name("tickSpacing"),
     ] = METHOD
-    fee_growth_global0: Annotated[ContractFunc[NoArgs, primitives.uint256], Name("feeGrowthGlobal0X128")] = METHOD
-    fee_growth_global1: Annotated[ContractFunc[NoArgs, primitives.uint256], Name("feeGrowthGlobal1X128")] = METHOD
+    fee_growth_global0: Annotated[
+        ContractFunc[NoArgs, primitives.uint256], Name("feeGrowthGlobal0X128")
+    ] = METHOD
+    fee_growth_global1: Annotated[
+        ContractFunc[NoArgs, primitives.uint256], Name("feeGrowthGlobal1X128")
+    ] = METHOD
 
     async def get_price(self, token0: bool = True):
         slot0 = await self.slot0().get()
@@ -107,7 +124,11 @@ class UniswapV3Pool(ProtocolBase):
         token0: bool = True,
     ) -> Decimal:
         num = Decimal(sqrt_price_x96 * sqrt_price_x96)
-        price1 = (num / Q192) * (Decimal(10) ** token0_decimals) / (Decimal(10) ** token1_decimals)
+        price1 = (
+            (num / Q192)
+            * (Decimal(10) ** token0_decimals)
+            / (Decimal(10) ** token1_decimals)
+        )
         price0 = Decimal(1) / price1
 
         return price0 if token0 else price1
@@ -132,10 +153,14 @@ class UniswapV3Pool(ProtocolBase):
             self._tick_spacing = await self.tick_spacing().get()
         return self._tick_spacing
 
-    async def get_swaps(self, start_block, end_block) -> dict[int, list[V3SwapEventType]]:
+    async def get_swaps(
+        self, start_block, end_block
+    ) -> dict[int, list[V3SwapEventType]]:
         ticks: dict[int, list[V3SwapEventType]] = {}
         tick_values = await self.all_tick_values()
-        async for event in V3SwapEvent.set_filter(addresses=[self.address]).backfill(start_block, end_block):
+        async for event in V3SwapEvent.set_filter(addresses=[self.address]).backfill(
+            start_block, end_block
+        ):
             tick = event.event.tick
             closest_tick = max(t for t in tick_values if t <= tick)
             if tick in ticks:
@@ -209,7 +234,12 @@ class UniswapV3Pool(ProtocolBase):
     async def get_initialized_ticks(self) -> list[int]:
         min_bitmap, max_bitmap = await self.bitmap_range()
         tick_spacing = await self.get_tick_spacing()
-        bitmaps = await multicall.execute(*[self.tick_bitmap(primitives.int16(idx)) for idx in range(min_bitmap, max_bitmap + 1)])
+        bitmaps = await multicall.execute(
+            *[
+                self.tick_bitmap(primitives.int16(idx))
+                for idx in range(min_bitmap, max_bitmap + 1)
+            ]
+        )
         initialized_ticks = []
         for idx, row in zip(range(min_bitmap, max_bitmap + 1), bitmaps):
             initialized_ticks.extend(tick_from_bitmap(idx, row, tick_spacing))

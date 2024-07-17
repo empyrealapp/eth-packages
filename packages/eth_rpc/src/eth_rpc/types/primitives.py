@@ -1,6 +1,5 @@
 from typing import NewType
 
-
 int8 = NewType("int8", int)
 int16 = NewType("int16", int)
 int24 = NewType("int24", int)

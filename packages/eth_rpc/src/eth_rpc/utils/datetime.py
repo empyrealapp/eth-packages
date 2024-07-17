@@ -1,6 +1,7 @@
-from datetime import datetime
-import pytz
 import re
+from datetime import datetime
+
+import pytz
 
 
 def convert_datetime_to_iso_8601(dt: datetime) -> str:

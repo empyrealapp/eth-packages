@@ -1,21 +1,21 @@
 # flake8: noqa
 
 from .account import GetAccountArgs
-from .eth_call import EthCallArgs, EthCallParams, CallWithBlockArgs
-from .fee_history import FeeHistoryArgs
 from .block import (
-    AlchemyParams,
     AlchemyBlockReceipt,
+    AlchemyParams,
     BlockNumberArg,
     GetBlockByHashArgs,
     GetBlockByNumberArgs,
 )
+from .eth_call import CallWithBlockArgs, EthCallArgs, EthCallParams
+from .fee_history import FeeHistoryArgs
 from .logs import LogsArgs, LogsParams
+from .storage import GetCodeArgs, GetStorageArgs
+from .tracer import TraceArgs, TracerConfig
 from .transaction import (
-    TransactionRequest,
     GetTransactionByBlockHash,
     GetTransactionByBlockNumber,
     RawTransaction,
+    TransactionRequest,
 )
-from .storage import GetStorageArgs, GetCodeArgs
-from .tracer import TraceArgs, TracerConfig

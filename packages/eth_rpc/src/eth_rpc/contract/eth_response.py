@@ -9,7 +9,12 @@ from ..function import FuncSignature
 
 T = TypeVar(
     "T",
-    bound=tuple | BaseModel | Primitives | list[Primitives] | tuple[Primitives, ...] | HexAddress,
+    bound=tuple
+    | BaseModel
+    | Primitives
+    | list[Primitives]
+    | tuple[Primitives, ...]
+    | HexAddress,
 )
 U = TypeVar("U")
 
@@ -32,7 +37,10 @@ class EthResponse(Generic[T, U]):
         if isinstance(decoded_result, tuple):
             return dict(
                 zip(
-                    [(output_name or str(idx)) for idx, output_name in enumerate(self.func.get_output_name())],
+                    [
+                        (output_name or str(idx))
+                        for idx, output_name in enumerate(self.func.get_output_name())
+                    ],
                     decoded_result,
                 )
             )

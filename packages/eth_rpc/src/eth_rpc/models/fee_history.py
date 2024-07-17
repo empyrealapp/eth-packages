@@ -1,7 +1,6 @@
+from eth_rpc.types import HexInteger
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
-
-from eth_rpc.types import HexInteger
 
 
 class FeeHistory(BaseModel):

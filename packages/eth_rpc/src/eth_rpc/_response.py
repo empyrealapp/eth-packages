@@ -1,9 +1,8 @@
 from typing import Generic, Optional, TypeVar
 
-from pydantic import BaseModel, Field
-
 from eth_rpc.types import Network
 from eth_rpc.utils import RPCModel
+from pydantic import BaseModel, Field
 
 T = TypeVar("T")
 

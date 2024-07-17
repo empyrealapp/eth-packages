@@ -1,24 +1,18 @@
 import asyncio
-from collections.abc import AsyncIterator
 import json
+from collections.abc import AsyncIterator
 from typing import TypeVar
 
-from websockets.exceptions import ConnectionClosedError
-from websockets.legacy.client import connect
-from websockets.exceptions import ConnectionClosedOK
-
-from eth_rpc.types import (
-    HexInt,
-    LogsArgs,
-    LogsParams,
-    Network as NetworkType,
-)
 from eth_rpc.models import Log as LogModel
+from eth_rpc.types import HexInt, LogsArgs, LogsParams
+from eth_rpc.types import Network as NetworkType
+from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
+from websockets.legacy.client import connect
 
+from ._request import Request
 from .block import Block
 from .constants import DEFAULT_EVENT
 from .types import RPCResponseModel
-from ._request import Request
 
 T = TypeVar("T")
 
@@ -76,7 +70,9 @@ class Log(Request, LogModel):
             network = cls._network
             params = ["logs", {}]
 
-            await w3_connection.send(json.dumps({"id": 1, "method": "eth_subscribe", "params": params}))
+            await w3_connection.send(
+                json.dumps({"id": 1, "method": "eth_subscribe", "params": params})
+            )
             subscription_response = await w3_connection.recv()
             if not (subscription_id := json.loads(subscription_response).get("result")):
                 raise ValueError(subscription_response)
@@ -84,7 +80,9 @@ class Log(Request, LogModel):
 
             while True:
                 try:
-                    raw_message = await asyncio.wait_for(w3_connection.recv(), timeout=60)
+                    raw_message = await asyncio.wait_for(
+                        w3_connection.recv(), timeout=60
+                    )
                     message_json = json.loads(raw_message)
                     result = message_json["params"]["result"]
 

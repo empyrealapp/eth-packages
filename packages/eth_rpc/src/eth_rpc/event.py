@@ -1,11 +1,11 @@
 import asyncio
-from copy import deepcopy
-from functools import cached_property
 import json
 import logging
 import re
-from typing import Any, AsyncIterator, Generic, Literal, Optional, TypeVar, get_args
+from copy import deepcopy
+from functools import cached_property
 from types import GenericAlias
+from typing import Any, AsyncIterator, Generic, Literal, Optional, TypeVar, get_args
 
 from eth_abi import decode
 from eth_abi.exceptions import InsufficientDataBytes
@@ -13,24 +13,24 @@ from eth_typing import HexAddress, HexStr
 from eth_utils import event_signature_to_log_topic
 from pydantic import BaseModel, computed_field
 from websockets.exceptions import ConnectionClosedError
-from websockets.legacy.client import connect, WebSocketClientProtocol
+from websockets.legacy.client import WebSocketClientProtocol, connect
 
-from .block import Block
-from .exceptions import LogResponseExceededError, LogDecodeError
 from ._request import Request
 from ._transport import _force_get_default_network, get_current_network
-from .models import Log, EventData
+from .block import Block
+from .exceptions import LogDecodeError, LogResponseExceededError
+from .models import EventData, Log
 from .types import (
     BLOCK_STRINGS,
-    Name,
-    Indexed,
-    SubscriptionResponse,
-    JsonResponseWssResponse,
     EvmDataDict,
-    Network,
-    RPCResponseModel,
+    Indexed,
+    JsonResponseWssResponse,
     LogsArgs,
     LogsParams,
+    Name,
+    Network,
+    RPCResponseModel,
+    SubscriptionResponse,
 )
 from .utils import is_annotation
 
@@ -128,7 +128,9 @@ class Event(Request, BaseModel, Generic[T]):
                 self.addresses_filter.append(address)
 
     def remove_address(self, address: HexAddress):
-        self.addresses_filter = [_address for _address in self.addresses_filter if _address != address]
+        self.addresses_filter = [
+            _address for _address in self.addresses_filter if _address != address
+        ]
 
     @staticmethod
     def process_value(type_name, v: str):
@@ -164,24 +166,34 @@ class Event(Request, BaseModel, Generic[T]):
         EventType, *_ = self.__pydantic_generic_metadata__["args"]
         indexed = self.get_indexed()
         try:
-            indexed_dict = {name: self.process_value(type_, topics[i + 1]) for i, (name, type_) in enumerate(indexed)}
+            indexed_dict = {
+                name: self.process_value(type_, topics[i + 1])
+                for i, (name, type_) in enumerate(indexed)
+            }
         except IndexError:
             raise LogDecodeError("Mismatched Indexed values")
 
         unindexed = self.get_unindexed()
         try:
-            unindexed_values = decode([type_ for (_, type_) in unindexed], bytes.fromhex(data[2:]))
+            unindexed_values = decode(
+                [type_ for (_, type_) in unindexed], bytes.fromhex(data[2:])
+            )
         except InsufficientDataBytes:
             raise LogDecodeError("Mismatched Unindexed values")
 
-        return EventType(**indexed_dict | {name: val for (name, _), val in zip(unindexed, unindexed_values)})
+        return EventType(
+            **indexed_dict
+            | {name: val for (name, _), val in zip(unindexed, unindexed_values)}
+        )
 
     @computed_field  # type: ignore[misc]
     @cached_property
     def get_topic0(self) -> HexStr:
         inputs, *_ = self.__pydantic_generic_metadata__["args"]
         input_types = inputs.model_fields
-        converted_inputs = ",".join([convert(field.annotation) for name, field in input_types.items()])
+        converted_inputs = ",".join(
+            [convert(field.annotation) for name, field in input_types.items()]
+        )
         event_signature = f"{self.name}({converted_inputs})"
         return HexStr("0x" + event_signature_to_log_topic(event_signature).hex())
 
@@ -283,7 +295,9 @@ class Event(Request, BaseModel, Generic[T]):
             message = err.args[0]
             if "Log response size exceeded." in message:
                 boundaries = re.findall("0x[0-9a-f]+", message)
-                raise LogResponseExceededError(err.args[0], int(boundaries[0], 16), int(boundaries[1], 16))
+                raise LogResponseExceededError(
+                    err.args[0], int(boundaries[0], 16), int(boundaries[1], 16)
+                )
             raise err
 
         for result in response:
@@ -434,7 +448,9 @@ class AsyncSubscribeCallable(BaseModel):
                         *topics,
                     ],
                 )
-                subscription_response: SubscriptionResponse = json.loads(await w3_connection.recv())
+                subscription_response: SubscriptionResponse = json.loads(
+                    await w3_connection.recv()
+                )
                 if not subscription_response["result"]:
                     raise ValueError(subscription_response)
             except Exception as e:

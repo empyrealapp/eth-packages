@@ -1,5 +1,5 @@
-from eth_typeshed.multicall import multicall
 from eth_rpc.types import BLOCK_STRINGS
+from eth_typeshed.multicall import multicall
 
 
 async def try_execute_with_setters(

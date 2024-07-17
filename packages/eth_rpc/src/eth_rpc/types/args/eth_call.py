@@ -4,7 +4,7 @@ from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
-from .. import HexInteger, BlockReference
+from .. import BlockReference, HexInteger
 
 
 class StateOverride(BaseModel):
@@ -21,7 +21,9 @@ class StateOverride(BaseModel):
     state_diff: Optional[dict[HexStr, HexStr]] = None
 
     def model_dump(self, exclude_none=True, by_alias=True, **kwargs) -> dict[str, Any]:
-        return super().model_dump(exclude_none=exclude_none, by_alias=by_alias, **kwargs)
+        return super().model_dump(
+            exclude_none=exclude_none, by_alias=by_alias, **kwargs
+        )
 
 
 class EthCallParams(BaseModel):
@@ -55,9 +57,16 @@ class EthCallArgs(BaseModel):
 
     def model_dump(self, **kwargs) -> dict[str, Any]:
         params = self.params.model_dump(exclude_none=True, by_alias=True)
-        block_number = hex(self.block_number) if isinstance(self.block_number, int) else self.block_number
+        block_number = (
+            hex(self.block_number)
+            if isinstance(self.block_number, int)
+            else self.block_number
+        )
         if self.state_override_set:
-            state_override = {key: value.model_dump() for key, value in self.state_override_set.items()}
+            state_override = {
+                key: value.model_dump()
+                for key, value in self.state_override_set.items()
+            }
             return {
                 "params": params,
                 "blockNumber": block_number,
@@ -77,4 +86,6 @@ class CallWithBlockArgs(BaseModel):
     block_number: BlockReference | None
 
     def model_dump(self, exclude_none=True, by_alias=True, **kwargs) -> dict[str, Any]:
-        return super().model_dump(exclude_none=exclude_none, by_alias=by_alias, **kwargs)
+        return super().model_dump(
+            exclude_none=exclude_none, by_alias=by_alias, **kwargs
+        )

@@ -1,9 +1,8 @@
 import itertools
 
 import httpx
-from pydantic import BaseModel, ConfigDict, Field
-
 from eth_rpc.types import Network
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class BaseRPC(BaseModel):

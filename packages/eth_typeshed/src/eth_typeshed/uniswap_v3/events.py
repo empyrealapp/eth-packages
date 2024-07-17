@@ -1,9 +1,8 @@
 from typing import Annotated
 
-from pydantic import BaseModel
-
-from eth_rpc.types import Indexed, primitives
 from eth_rpc.event import Event
+from eth_rpc.types import Indexed, primitives
+from pydantic import BaseModel
 
 
 class V3PoolCreatedEventType(BaseModel):

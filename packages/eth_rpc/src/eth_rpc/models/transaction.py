@@ -1,10 +1,10 @@
 from typing import Optional
 
+from eth_rpc.types import HexInteger
 from eth_typing import HexStr
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
-from eth_rpc.types import HexInteger
 from .access_list import AccessList
 
 

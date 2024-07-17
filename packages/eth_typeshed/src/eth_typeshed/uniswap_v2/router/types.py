@@ -1,10 +1,9 @@
 from typing import Annotated
 
-from eth_typing import HexAddress
-from pydantic import BaseModel
-
 from eth_rpc.function import Name
 from eth_rpc.types import primitives
+from eth_typing import HexAddress
+from pydantic import BaseModel
 
 
 class AddLiquidityRequest(BaseModel):
