@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict
 
 from .rpc.base import BaseRPC
-from .networks import Ethereum
+from .networks import Ethereum, get_network_by_chain_id
 from .types import Network
 
 if TYPE_CHECKING:
@@ -91,3 +91,20 @@ def set_alchemy_key(alchemy_key, network=Ethereum):
             )
         ]
     )
+
+
+def configure_rpc_from_env():
+    chain_id = int(os.getenv("CHAIN_ID", 1))
+    alchemy_key = os.getenv("ALCHEMY_KEY")
+
+    if not alchemy_key:
+        raise EnvironmentError(
+            "No Alchemy key set. Please set the ALCHEMY_KEY environment variable."
+        )
+
+    network = get_network_by_chain_id(chain_id)
+    if not network:
+        raise ValueError(f"Unsupported chain ID: {chain_id}")
+
+    set_alchemy_key(alchemy_key, network=network)
+    set_default_network(network)
