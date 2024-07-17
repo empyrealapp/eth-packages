@@ -13,6 +13,8 @@ dependencies = [
 # Enables the usage of setuptools_scm
 [tool.setuptools_scm]
 root = "../../"
+version_scheme = "guess-next-dev"
+local_scheme = "no-local-version"
 
 [project.optional-dependencies]
 lint = [
