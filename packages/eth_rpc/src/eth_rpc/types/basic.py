@@ -1,7 +1,11 @@
 from typing import Annotated, Any, Literal, get_args
 
-from pydantic import (BaseModel, GetCoreSchemaHandler,
-                      SerializerFunctionWrapHandler, ValidationInfo)
+from pydantic import (
+    BaseModel,
+    GetCoreSchemaHandler,
+    SerializerFunctionWrapHandler,
+    ValidationInfo,
+)
 from pydantic.functional_serializers import WrapSerializer
 from pydantic_core import core_schema
 

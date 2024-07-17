@@ -5,8 +5,7 @@ import re
 from copy import deepcopy
 from functools import cached_property
 from types import GenericAlias
-from typing import (Any, AsyncIterator, Generic, Literal, Optional, TypeVar,
-                    get_args)
+from typing import Any, AsyncIterator, Generic, Literal, Optional, TypeVar, get_args
 
 from eth_abi import decode
 from eth_abi.exceptions import InsufficientDataBytes
@@ -21,9 +20,18 @@ from ._transport import _force_get_default_network, get_current_network
 from .block import Block
 from .exceptions import LogDecodeError, LogResponseExceededError
 from .models import EventData, Log
-from .types import (BLOCK_STRINGS, EvmDataDict, Indexed,
-                    JsonResponseWssResponse, LogsArgs, LogsParams, Name,
-                    Network, RPCResponseModel, SubscriptionResponse)
+from .types import (
+    BLOCK_STRINGS,
+    EvmDataDict,
+    Indexed,
+    JsonResponseWssResponse,
+    LogsArgs,
+    LogsParams,
+    Name,
+    Network,
+    RPCResponseModel,
+    SubscriptionResponse,
+)
 from .utils import is_annotation
 
 T = TypeVar("T", bound=BaseModel)

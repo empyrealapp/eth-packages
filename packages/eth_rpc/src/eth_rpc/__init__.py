@@ -1,7 +1,12 @@
 from . import constants, types
-from ._transport import (configure_rpc_from_env, get_current_network,
-                         set_alchemy_key, set_default_network, set_rpc_timeout,
-                         set_transport)
+from ._transport import (
+    configure_rpc_from_env,
+    get_current_network,
+    set_alchemy_key,
+    set_default_network,
+    set_rpc_timeout,
+    set_transport,
+)
 from .account import Account
 from .block import Block
 from .contract import Contract, ContractFunc, EthResponse, FuncSignature

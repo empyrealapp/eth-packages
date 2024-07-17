@@ -2,17 +2,34 @@ import inspect
 from typing import Any, ClassVar
 
 from eth_rpc.block import Block
-from eth_rpc.models import (AccessListResponse, Account, FeeHistory, Log,
-                            PendingTransaction)
-from eth_rpc.transaction import (AlchemyReceiptsResponse, Transaction,
-                                 TransactionReceipt)
-from eth_rpc.types import (AlchemyBlockReceipt, BlockNumberArg,
-                           CallWithBlockArgs, Empty, EthCallArgs,
-                           FeeHistoryArgs, GetAccountArgs, GetBlockByHashArgs,
-                           GetBlockByNumberArgs, GetCodeArgs, GetStorageArgs,
-                           GetTransactionByBlockHash,
-                           GetTransactionByBlockNumber, HexInteger, LogsArgs,
-                           RawTransaction, TraceArgs, TransactionRequest)
+from eth_rpc.models import (
+    AccessListResponse,
+    Account,
+    FeeHistory,
+    Log,
+    PendingTransaction,
+)
+from eth_rpc.transaction import AlchemyReceiptsResponse, Transaction, TransactionReceipt
+from eth_rpc.types import (
+    AlchemyBlockReceipt,
+    BlockNumberArg,
+    CallWithBlockArgs,
+    Empty,
+    EthCallArgs,
+    FeeHistoryArgs,
+    GetAccountArgs,
+    GetBlockByHashArgs,
+    GetBlockByNumberArgs,
+    GetCodeArgs,
+    GetStorageArgs,
+    GetTransactionByBlockHash,
+    GetTransactionByBlockNumber,
+    HexInteger,
+    LogsArgs,
+    RawTransaction,
+    TraceArgs,
+    TransactionRequest,
+)
 from eth_typing import HexStr
 from pydantic import Field
 
