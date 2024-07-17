@@ -3,11 +3,11 @@ requires = ["setuptools>=68", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "eth-typeshed"
+name = "eth-typeshed-py"
 requires-python = ">=3.10"
 dynamic = ["version"]
 dependencies = [
-    "eth_rpc",
+    "eth_rpc_py",
 ]
 
 # Enables the usage of setuptools_scm
