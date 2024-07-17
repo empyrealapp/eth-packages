@@ -1,3 +1,4 @@
+import os
 from contextvars import ContextVar
 from typing import TYPE_CHECKING
 

@@ -1,7 +1,8 @@
 from typing import Annotated, NamedTuple  # noqa: D100
 
-from eth_rpc import ContractFunc
-from eth_rpc.types import METHOD, Name, NoArgs, primitives
+from eth_rpc import ContractFunc, get_current_network
+from eth_rpc.networks import Arbitrum, Ethereum
+from eth_rpc.types import METHOD, Name, Network, NoArgs, primitives
 from eth_typing import HexAddress, HexStr
 
 from .._base import ProtocolBase

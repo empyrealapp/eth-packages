@@ -7,7 +7,7 @@ name = "eth-typeshed-py"
 requires-python = ">=3.10"
 dynamic = ["version"]
 dependencies = [
-    "eth_rpc_py",
+    "eth-rpc-py",
 ]
 
 # Enables the usage of setuptools_scm
