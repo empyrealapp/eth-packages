@@ -4,14 +4,8 @@ from dataclasses import dataclass
 from typing import Any, Generic, Literal, Optional, TypeVar, cast, overload
 
 from eth_rpc.models import AccessListResponse
-from eth_rpc.types import (
-    BLOCK_STRINGS,
-    CallWithBlockArgs,
-    EthCallArgs,
-    EthCallParams,
-    HexInteger,
-    MaybeAwaitable,
-)
+from eth_rpc.types import (BLOCK_STRINGS, CallWithBlockArgs, EthCallArgs,
+                           EthCallParams, HexInteger, MaybeAwaitable)
 from eth_rpc.types import Network as NetworkType
 from eth_rpc.types import RPCResponseModel
 from eth_typing import HexAddress, HexStr, Primitives

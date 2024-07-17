@@ -3,7 +3,8 @@ from typing import Annotated, Any, Generic, Literal, TypeVar, overload
 
 from eth_abi.exceptions import InsufficientDataBytes
 from eth_rpc import ContractFunc
-from eth_rpc.types import BLOCK_STRINGS, METHOD, MaybeAwaitable, Name, primitives
+from eth_rpc.types import (BLOCK_STRINGS, METHOD, MaybeAwaitable, Name,
+                           primitives)
 from eth_rpc.utils import handle_maybe_awaitable, run
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, Field

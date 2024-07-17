@@ -4,14 +4,8 @@ from typing import Literal, Optional
 
 from eth_account import Account
 from eth_account.account import LocalAccount
-from eth_rpc.types import (
-    BLOCK_STRINGS,
-    CallWithBlockArgs,
-    EthCallParams,
-    GetAccountArgs,
-    RawTransaction,
-    SignedTransaction,
-)
+from eth_rpc.types import (BLOCK_STRINGS, CallWithBlockArgs, EthCallParams,
+                           GetAccountArgs, RawTransaction, SignedTransaction)
 from eth_typing import HexAddress, HexStr
 
 from ._request import Request

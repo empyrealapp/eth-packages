@@ -8,12 +8,8 @@ from typing import Literal
 
 from eth_rpc.models import Block as BlockModel
 from eth_rpc.models import FeeHistory
-from eth_rpc.types.args import (
-    BlockNumberArg,
-    FeeHistoryArgs,
-    GetBlockByHashArgs,
-    GetBlockByNumberArgs,
-)
+from eth_rpc.types.args import (BlockNumberArg, FeeHistoryArgs,
+                                GetBlockByHashArgs, GetBlockByNumberArgs)
 from eth_typing import HexStr
 from typing_extensions import Self
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
@@ -22,14 +18,8 @@ from websockets.legacy.client import connect
 from ._request import Request
 from .constants import DEFAULT_EVENT
 from .transaction import Transaction
-from .types import (
-    BLOCK_STRINGS,
-    BlockReference,
-    Empty,
-    HexInteger,
-    NoArgs,
-    RPCResponseModel,
-)
+from .types import (BLOCK_STRINGS, BlockReference, Empty, HexInteger, NoArgs,
+                    RPCResponseModel)
 from .utils import BloomFilter
 
 SUBSCRIPTION_TYPE = Literal["newHeads", "newPendingTransactions"]

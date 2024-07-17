@@ -1,26 +1,11 @@
 from collections.abc import Awaitable
 from copy import deepcopy
-from typing import (
-    Annotated,
-    ClassVar,
-    Literal,
-    Optional,
-    TypeVar,
-    get_args,
-    get_origin,
-    get_type_hints,
-    overload,
-)
+from typing import (Annotated, ClassVar, Literal, Optional, TypeVar, get_args,
+                    get_origin, get_type_hints, overload)
 
 from eth_hash.auto import keccak as keccak_256
-from eth_rpc.types import (
-    BLOCK_STRINGS,
-    ContractMethod,
-    GetCodeArgs,
-    GetStorageArgs,
-    HexInteger,
-    MaybeAwaitable,
-)
+from eth_rpc.types import (BLOCK_STRINGS, ContractMethod, GetCodeArgs,
+                           GetStorageArgs, HexInteger, MaybeAwaitable)
 from eth_rpc.types import Network as NetworkType
 from eth_typing import HexAddress, HexStr, Primitives
 from pydantic import BaseModel, Field, PrivateAttr

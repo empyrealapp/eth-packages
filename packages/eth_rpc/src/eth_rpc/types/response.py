@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING, Generator, Generic, NewType, Optional, TypeVar
+from typing import (TYPE_CHECKING, Generator, Generic, NewType, Optional,
+                    TypeVar)
 
 if TYPE_CHECKING:
     from eth_rpc.rpc.method import RPCMethod

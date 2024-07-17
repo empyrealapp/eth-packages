@@ -7,11 +7,9 @@ from typing import Optional, TypeVar, cast
 from eth_rpc.models import AccessList, PendingTransaction
 from eth_rpc.models import Transaction as TransactionModel
 from eth_rpc.models import TransactionReceipt as TransactionReceiptModel
-from eth_rpc.types.args import (
-    GetTransactionByBlockHash,
-    GetTransactionByBlockNumber,
-    TransactionRequest,
-)
+from eth_rpc.types.args import (GetTransactionByBlockHash,
+                                GetTransactionByBlockNumber,
+                                TransactionRequest)
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
@@ -20,15 +18,9 @@ from websockets.legacy.client import WebSocketClientProtocol, connect
 
 from ._request import Request
 from ._transport import _force_get_global_rpc
-from .types import (
-    BLOCK_STRINGS,
-    AlchemyBlockReceipt,
-    AlchemyParams,
-    HexInteger,
-    JsonPendingWssResponse,
-    RPCResponseModel,
-    SubscriptionResponse,
-)
+from .types import (BLOCK_STRINGS, AlchemyBlockReceipt, AlchemyParams,
+                    HexInteger, JsonPendingWssResponse, RPCResponseModel,
+                    SubscriptionResponse)
 
 T = TypeVar("T")
 

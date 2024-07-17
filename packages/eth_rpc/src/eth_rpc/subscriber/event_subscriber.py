@@ -18,12 +18,8 @@ from .._request import Request
 from .._transport import _force_get_global_rpc
 from ..constants import DEFAULT_CONTEXT, DEFAULT_EVENT
 from ..event import Event
-from ..types import (
-    BLOCK_STRINGS,
-    EvmDataDict,
-    JsonResponseWssResponse,
-    SubscriptionResponse,
-)
+from ..types import (BLOCK_STRINGS, EvmDataDict, JsonResponseWssResponse,
+                     SubscriptionResponse)
 
 T = TypeVar("T", bound=BaseModel)
 
