@@ -32,7 +32,8 @@ jobs:
 
       - name: Build Package
         run: |
-          tox
+          tox -e lint
+          tox -e test_all
           tox -e build_eth_rpc
           tox -e build_eth_typeshed
 
