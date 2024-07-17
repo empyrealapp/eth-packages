@@ -4,7 +4,7 @@ from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
-from .. import BlockReference, HexInteger
+from ..basic import BlockReference, HexInteger
 
 
 class StateOverride(BaseModel):

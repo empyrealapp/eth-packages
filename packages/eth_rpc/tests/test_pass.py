@@ -1,4 +1,4 @@
-from eth_rpc.types import HexInt, HexInteger
+from eth_rpc.types.basic import HexInt, HexInteger
 from pydantic import BaseModel
 
 

@@ -1,4 +1,3 @@
-from . import constants, types
 from ._transport import (
     configure_rpc_from_env,
     get_current_network,
@@ -32,8 +31,6 @@ __all__ = [
     "Log",
     "Transaction",
     "TransactionReceipt",
-    "constants",
-    "types",
     "configure_rpc_from_env",
     "get_current_network",
     "set_alchemy_key",

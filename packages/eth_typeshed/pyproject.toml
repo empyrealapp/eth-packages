@@ -33,3 +33,6 @@ dev = [
     "eth-typeshed[test]",
     "eth-typeshed[build]",
 ]
+
+[tool.pytest.ini_options]
+python_paths = ["src"]

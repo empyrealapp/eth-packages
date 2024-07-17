@@ -41,3 +41,6 @@ dev = [
     "eth-rpc[test]",
     "eth-rpc[build]",
 ]
+
+[tool.pytest.ini_options]
+python_paths = ["src"]

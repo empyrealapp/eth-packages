@@ -1,9 +1,10 @@
 from typing import Any, Optional
 
-from eth_rpc.types import BLOCK_STRINGS, HexInteger
 from eth_typing import HexStr
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
+
+from ..basic import BLOCK_STRINGS, HexInteger
 
 
 class GetBlockByHashArgs(BaseModel):

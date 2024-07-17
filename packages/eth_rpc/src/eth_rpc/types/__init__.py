@@ -5,9 +5,9 @@ from typing import Any, NewType, Optional, TypedDict, TypeVar, Union
 from eth_typing import HexAddress, HexStr, TypeStr
 from pydantic import BaseModel, Field
 
-from .args import AlchemyParams  # noqa: F401
 from .args import (
     AlchemyBlockReceipt,
+    AlchemyParams,
     BlockNumberArg,
     CallWithBlockArgs,
     EthCallArgs,
@@ -26,8 +26,7 @@ from .args import (
     TraceArgs,
     TransactionRequest,
 )
-from .basic import HexInt  # noqa: F401
-from .basic import BLOCK_STRINGS, BlockReference, Empty, HexInteger
+from .basic import BLOCK_STRINGS, BlockReference, Empty, HexInt, HexInteger
 from .event import Indexed, Name
 from .network import BlockExplorer, Network, Rpcs, RpcUrl
 from .response import NoArgs, RPCResponseModel

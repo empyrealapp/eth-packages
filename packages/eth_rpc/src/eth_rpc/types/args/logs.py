@@ -1,9 +1,10 @@
 from typing import Any
 
-from eth_rpc.types import BlockReference
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
+
+from ..basic import BlockReference
 
 
 class LogsParams(BaseModel):
