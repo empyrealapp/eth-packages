@@ -1,0 +1,44 @@
+from typing import ClassVar
+
+from eth_typing import ChecksumAddress, HexAddress
+from eth_utils import to_checksum_address
+from pydantic import BaseModel, Field, PrivateAttr
+
+from eth_rpc import get_current_network
+from eth_rpc.types import Network
+from eth_typeshed.uniswap_v2 import GetPairRequest, UniswapV2Factory
+from .pair import V2Pair
+
+
+class V2Factory(BaseModel):
+    pairs: ClassVar[dict[tuple[Network, ChecksumAddress, ChecksumAddress], "ChecksumAddress"]] = Field({})
+    _network: ClassVar[Network | None] = None
+
+    _contract: UniswapV2Factory = PrivateAttr()
+    address: HexAddress
+
+    def __class_getitem__(cls, network: Network):
+        cls._network = network
+
+    def model_post_init(self, __context):
+        self._contract = UniswapV2Factory(address=self.address)
+
+    @classmethod
+    async def load_pair(cls, token0: HexAddress, token1: HexAddress) -> "V2Pair":
+        network: Network = cls._network or get_current_network()
+        token0 = to_checksum_address(token0)
+        token1 = to_checksum_address(token1)
+        key = (network, token0, token1)
+
+        if key not in cls.pairs:
+            pair_address: HexAddress = await cls._contract.get_pair(
+                GetPairRequest(
+                    token_a=token0,
+                    token_b=token1,
+                )
+            )
+            cls.pairs[key] = to_checksum_address(pair_address)
+
+        return V2Pair.load(
+            pair_address=cls.pairs[key],
+        )
