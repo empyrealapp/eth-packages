@@ -32,7 +32,7 @@ build = [
 ]
 dev = [
     "tox",
-    "eth-streams[lint]",
-    "eth-streams[test]",
-    "eth-streams[build]",
+    "eth-streams-py[lint]",
+    "eth-streams-py[test]",
+    "eth-streams-py[build]",
 ]
