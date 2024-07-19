@@ -166,7 +166,7 @@ class DexPairHelper(BaseModel):
                         (
                             UniswapV2Pair(address=pair.pair_address).get_reserves(),
                             lambda result, pair=pair: (
-                                pair.set_reserves(result[0], result[1])
+                                pair.set_reserves(result.reserve0, result.reserve1)
                             ),
                         )
                     )
