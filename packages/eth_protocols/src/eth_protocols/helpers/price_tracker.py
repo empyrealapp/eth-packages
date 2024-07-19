@@ -2,20 +2,16 @@ import asyncio
 from decimal import Decimal
 from typing import ClassVar, Optional
 
-from eth_typing import HexAddress, HexStr
-from pydantic import BaseModel, Field, PrivateAttr
-
-from eth_rpc import EventSubscriber, EventData
-from eth_typeshed.constants import Tokens
-from eth_typeshed.chainlink.eth_usd_feed import (
-    ETHUSDPriceFeed,
-    ChainlinkPriceOracle,
-)
-from eth_typeshed.uniswap_v2 import V2SyncEvent, V2SyncEventType
-from eth_typeshed.uniswap_v3 import V3SwapEvent, V3SwapEventType
+from eth_protocols.logger import logger
 from eth_protocols.uniswap_v2.pair import V2Pair
 from eth_protocols.uniswap_v3.pool import V3Pool
-from eth_protocols.logger import logger
+from eth_rpc import EventData, EventSubscriber
+from eth_typeshed.chainlink.eth_usd_feed import ChainlinkPriceOracle, ETHUSDPriceFeed
+from eth_typeshed.constants import Tokens
+from eth_typeshed.uniswap_v2 import V2SyncEvent, V2SyncEventType
+from eth_typeshed.uniswap_v3 import V3SwapEvent, V3SwapEventType
+from eth_typing import HexAddress, HexStr
+from pydantic import BaseModel, Field, PrivateAttr
 
 
 class TokenPriceInUSD:
@@ -34,7 +30,9 @@ class EthPriceProvider(BaseModel):
 
     async def refresh_price(self, block_number: int | None = None):
         if block_number:
-            latest_round_data = (await self.feed.latest_round_data().get(block_number=block_number))[1]
+            latest_round_data = (
+                await self.feed.latest_round_data().get(block_number=block_number)
+            )[1]
         else:
             latest_round_data = (await self.feed.latest_round_data().get())[1]
 
@@ -51,7 +49,9 @@ class PriceTracker(BaseModel):
     pair_address_to_pairs: dict[HexAddress, V2Pair | V3Pool] = Field(
         default_factory=dict
     )
-    _eth_price_provider: EthPriceProvider = PrivateAttr(default_factory=EthPriceProvider)
+    _eth_price_provider: EthPriceProvider = PrivateAttr(
+        default_factory=EthPriceProvider
+    )
 
     stables: list[HexAddress] = [
         Tokens.Ethereum.USDC,
@@ -75,7 +75,7 @@ class PriceTracker(BaseModel):
 
     def update_pairs(self, pairs: dict[HexAddress, list[V2Pair | V3Pool]]):
         if not pairs:
-          return
+            return
         for k, pairs_list in pairs.items():
             k = self.to_lowercase_hex(k)
             tmp_pairs = []

@@ -15,7 +15,9 @@ class EthCallVertex(Vertex[Any, U], Generic[ArgType, ResponseType, U]):
     args: ArgType
 
     @final
-    async def transform(self, envelope: Envelope[Any]) -> AsyncIterator[tuple[Topic[U], U]]:
+    async def transform(
+        self, envelope: Envelope[Any]
+    ) -> AsyncIterator[tuple[Topic[U], U]]:
         result = await self.func(self.args)
         if await self.conditions(envelope, result):
             response = await self.modify(envelope, result)

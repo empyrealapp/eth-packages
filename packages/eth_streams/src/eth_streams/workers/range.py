@@ -1,9 +1,8 @@
 import asyncio
 from collections.abc import AsyncIterator
 
+from eth_streams.types import Source, StreamEvents, Topic
 from pydantic import Field
-
-from eth_streams.types import StreamEvents, Source, Topic
 
 
 class Range(Source[int]):

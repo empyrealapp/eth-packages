@@ -1,16 +1,15 @@
 from decimal import Decimal
 from typing import cast
 
-from eth_typing import HexAddress
-from pydantic import PrivateAttr
-
+from eth_protocols.tokens import ERC20
+from eth_protocols.types import DexPair
 from eth_rpc.types import BLOCK_STRINGS, MaybeAwaitable
 from eth_typeshed.erc20 import OwnerRequest
 from eth_typeshed.multicall import multicall
 from eth_typeshed.uniswap_v3 import Slot0, UniswapV3Pool
-from eth_protocols.tokens import ERC20
-from eth_protocols.types import DexPair
+from eth_typing import HexAddress
 from eth_utils import to_checksum_address
+from pydantic import PrivateAttr
 
 Q192 = Decimal(2**192)
 

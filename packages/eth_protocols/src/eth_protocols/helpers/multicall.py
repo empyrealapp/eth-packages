@@ -1,5 +1,5 @@
-from eth_typeshed.utils import try_execute_with_setters
 from eth_rpc.types import BLOCK_STRINGS
+from eth_typeshed.utils import try_execute_with_setters
 
 
 class MultiCallRequestHelper:
@@ -29,5 +29,7 @@ class MultiCallRequestHelper:
         self.calls_with_setters.append((protocol_call_func, lambda_handler_func))
 
     async def call(self, block_number: int | BLOCK_STRINGS = "latest"):
-        await try_execute_with_setters(self.calls_with_setters, block_number=block_number)
+        await try_execute_with_setters(
+            self.calls_with_setters, block_number=block_number
+        )
         return self.data

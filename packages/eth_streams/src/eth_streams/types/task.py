@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
-from .base import Base
 from ..coordinator import Coordinator
+from .base import Base
 
 
 class Task(Base):

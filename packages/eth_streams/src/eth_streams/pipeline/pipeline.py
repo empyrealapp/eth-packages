@@ -1,5 +1,7 @@
 from typing import Generic, Optional, Type, TypeVar
 
+from eth_rpc.block import Block
+from eth_rpc.types import BLOCK_STRINGS
 from eth_streams.context import Context
 from eth_streams.coordinator import CoordinatorContext
 from eth_streams.logger import logger
@@ -7,9 +9,6 @@ from eth_streams.models import Checkpoint
 from eth_streams.utils import init_db
 from pydantic import BaseModel, Field
 from tortoise import Tortoise
-
-from eth_rpc.block import Block
-from eth_rpc.types import BLOCK_STRINGS
 
 from .stage import Stage
 from .subscriber import Subscriber

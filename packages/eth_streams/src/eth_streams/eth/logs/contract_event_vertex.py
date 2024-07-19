@@ -1,10 +1,10 @@
 import asyncio
 from typing import ClassVar, Generic, Optional, TypeVar
 
-from pydantic import BaseModel
-
 from eth_rpc import EventData
 from eth_streams.models import ContractEvent
+from pydantic import BaseModel
+
 from .db_loader import DBLoader
 
 T = TypeVar("T", bound=BaseModel)

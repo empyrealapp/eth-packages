@@ -1,5 +1,5 @@
-from tortoise.models import Model
 from tortoise import fields
+from tortoise.models import Model
 
 
 class Transaction(Model):
@@ -18,7 +18,9 @@ class Transaction(Model):
     gas = fields.DecimalField(max_digits=18, decimal_places=0)
     gas_price = fields.DecimalField(max_digits=18, decimal_places=0)
     max_fee_per_gas = fields.DecimalField(max_digits=18, decimal_places=0, null=True)
-    max_priority_fee_per_gas = fields.DecimalField(max_digits=18, decimal_places=0, null=True)
+    max_priority_fee_per_gas = fields.DecimalField(
+        max_digits=18, decimal_places=0, null=True
+    )
     type = fields.IntField(null=True)
     receipt_gas_used = fields.DecimalField(max_digits=18, decimal_places=0)
     receipt_effective_gas_price = fields.DecimalField(max_digits=18, decimal_places=0)

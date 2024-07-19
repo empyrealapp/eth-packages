@@ -1,5 +1,5 @@
-from tortoise import Model, fields
 from eth_streams.utils import EventModel
+from tortoise import Model, fields
 
 
 class PairCreated(Model):

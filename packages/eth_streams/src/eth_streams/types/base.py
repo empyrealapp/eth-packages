@@ -7,7 +7,9 @@ from ..coordinator import Coordinator, CoordinatorContext
 
 
 class Base(ABC, BaseModel):
-    coordinator: Optional[Coordinator] = Field(default_factory=CoordinatorContext.get_current_coordinator)
+    coordinator: Optional[Coordinator] = Field(
+        default_factory=CoordinatorContext.get_current_coordinator
+    )
 
     @computed_field  # type: ignore
     @property

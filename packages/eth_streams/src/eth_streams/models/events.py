@@ -36,7 +36,9 @@ class ContractEvent(Model):
 
     # Optionally, you can also define __repr__ for a more developer-focused representation
     def __repr__(self):
-        return f"<Events id={self.id} name={self.name} block_number={self.block_number}>"
+        return (
+            f"<Events id={self.id} name={self.name} block_number={self.block_number}>"
+        )
 
     @classmethod
     async def get_raw_sql(
@@ -81,7 +83,9 @@ class ContractEvent(Model):
         return result
 
     @classmethod
-    async def get_for_type(cls, chain_id: int, address: HexAddress, event_type: str) -> list["ContractEvent"]:
+    async def get_for_type(
+        cls, chain_id: int, address: HexAddress, event_type: str
+    ) -> list["ContractEvent"]:
         return await cls.filter(
             chain=chain_id,
             address=address,

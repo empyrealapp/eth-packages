@@ -1,8 +1,8 @@
 from collections.abc import AsyncIterator
 
 from eth_rpc import Event
-from eth_rpc.networks import Networks
 from eth_rpc.models import EventData, Log
+from eth_rpc.networks import Networks
 from eth_streams.models import ContractEvent
 
 
@@ -27,7 +27,9 @@ class EventIterator:
         pagination_full = True
         offset = 0
         while pagination_full:
-            query = ContractEvent.all().order_by("block_number", "transaction_index", "log_index")
+            query = ContractEvent.all().order_by(
+                "block_number", "transaction_index", "log_index"
+            )
 
             if from_block:
                 query = query.filter(block_number__gte=from_block)

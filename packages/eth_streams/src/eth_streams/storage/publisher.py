@@ -1,10 +1,9 @@
 from typing import Generic, Type, TypeVar
 
+from eth_streams.types import Sink
+from eth_streams.types.envelope import Envelope
 from pydantic import ConfigDict
 from tortoise import Model
-
-from eth_streams.types.envelope import Envelope
-from eth_streams.types import Sink
 
 T = TypeVar("T", bound=Model)
 

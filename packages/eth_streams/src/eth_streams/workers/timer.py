@@ -1,12 +1,11 @@
-from abc import abstractmethod
 import asyncio
-from collections.abc import AsyncIterator
 import time
+from abc import abstractmethod
+from collections.abc import AsyncIterator
 from typing import Generic, TypeVar
 
-from pydantic import Field, PrivateAttr
-
 from eth_streams.types import Source, StreamEvents, Topic
+from pydantic import Field, PrivateAttr
 
 T = TypeVar("T")
 
@@ -35,7 +34,7 @@ class Timer(Source[T], Generic[T]):
 
 class IntervalTimer(Timer[int]):
     iteration: int = Field(0)
-    max_count: float = float('inf')
+    max_count: float = float("inf")
 
     async def generate_timer_value(self) -> int | StreamEvents:
         self.iteration += 1

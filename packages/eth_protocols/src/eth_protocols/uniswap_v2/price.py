@@ -1,11 +1,11 @@
 from decimal import Decimal
 
+from eth_rpc import EventData, EventSubscriber
+from eth_typeshed.constants import Factories
+from eth_typeshed.uniswap_v2 import V2SyncEvent, V2SyncEventType
 from eth_typing import HexAddress
 from pydantic import BaseModel, Field, PrivateAttr
 
-from eth_rpc import EventData, EventSubscriber
-from eth_typeshed.constants import Factories
-from eth_typeshed.uniswap_v2 import V2SyncEventType, V2SyncEvent
 from .factory import V2Factory
 from .pair import V2Pair
 
@@ -47,7 +47,9 @@ class UniswapV2PriceSubscriber(BaseModel):
 
     _factory: V2Factory = PrivateAttr()
     _prepared: bool = PrivateAttr(False)
-    _subscriber: EventSubscriber = PrivateAttr(default_factory=lambda: EventSubscriber())
+    _subscriber: EventSubscriber = PrivateAttr(
+        default_factory=lambda: EventSubscriber()
+    )
 
     def model_post_init(self, __context):
         self._factory = V2Factory(self.factory_address)
@@ -70,7 +72,9 @@ class UniswapV2PriceSubscriber(BaseModel):
 
     async def subscribe(self):
         try:
-            await self.subscriber.listen(addresses=[pair_address for pair_address in self.pairs.keys()])
+            await self.subscriber.listen(
+                addresses=[pair_address for pair_address in self.pairs.keys()]
+            )
         except TerminateError:
             # This is a simple way to exit out of the subscribe loop
             return
@@ -90,7 +94,9 @@ class UniswapV2PriceSubscriber(BaseModel):
             return token1_reserves / token0_reserves
         return token0_reserves / token1_reserves
 
-    async def handle_price_update(self, price: Decimal, event: EventData[V2SyncEventType]):
+    async def handle_price_update(
+        self, price: Decimal, event: EventData[V2SyncEventType]
+    ):
         """Define an action based on a price"""
 
     def terminate(self):
