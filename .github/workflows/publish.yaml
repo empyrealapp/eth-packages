@@ -50,3 +50,17 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
           twine upload --repository pypi packages/eth_typeshed/dist/*
+
+      - name: Publish eth_protocols Package
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          twine upload --repository pypi packages/eth_protocols/dist/*
+
+      - name: Publish eth_streams Package
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          twine upload --repository pypi packages/eth_streams/dist/*
