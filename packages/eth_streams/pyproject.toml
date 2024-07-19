@@ -9,7 +9,7 @@ dynamic = ["version"]
 dependencies = [
     "eth_protocols_py",
     "eth_typeshed_py",
-    "eth_rpc",
+    "eth_rpc_py",
     "tortoise-orm",
 ]
 
