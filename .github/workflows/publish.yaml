@@ -36,6 +36,8 @@ jobs:
           tox -e test_all
           tox -e build_eth_rpc
           tox -e build_eth_typeshed
+          tox -e build_eth_protocols
+          tox -e build_eth_streams
 
       - name: Publish eth_rpc Package
         env:
