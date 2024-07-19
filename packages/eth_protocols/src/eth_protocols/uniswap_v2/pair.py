@@ -29,7 +29,9 @@ class V2Pair(DexPair):
         tokenb: HexAddress,
     ):
 
-        token0, token1 = (tokena, tokenb) if tokena < tokenb else (tokenb, tokena)
+        token0, token1 = (
+            (tokena, tokenb) if tokena.lower() < tokenb.lower() else (tokenb, tokena)
+        )
         network = cls._network or get_current_network()
         return V2Pair(
             pair_address=pair_address,  # type: ignore
@@ -141,4 +143,4 @@ def get_uniswap_v2_pair_addr(token_a: HexAddress, token_b: HexAddress) -> HexAdd
         "96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
     )
 
-    return factory_contract.create2(salt, keccak_init_code)
+    return to_checksum_address(factory_contract.create2(salt, keccak_init_code))

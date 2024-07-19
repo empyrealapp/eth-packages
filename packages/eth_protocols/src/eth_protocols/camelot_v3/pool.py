@@ -4,9 +4,9 @@ from typing import cast
 from eth_protocols.tokens import ERC20
 from eth_protocols.types import DexPair
 from eth_rpc.types import BLOCK_STRINGS, MaybeAwaitable
+from eth_typeshed.camelot_v3 import CamelotV3Pool, GlobalState
 from eth_typeshed.erc20 import OwnerRequest
 from eth_typeshed.multicall import multicall
-from eth_typeshed.uniswap_v3 import Slot0, UniswapV3Pool
 from eth_typing import HexAddress
 from eth_utils import to_checksum_address
 from pydantic import PrivateAttr
@@ -14,9 +14,8 @@ from pydantic import PrivateAttr
 Q192 = Decimal(2**192)
 
 
-class V3Pool(DexPair):
-    _contract: UniswapV3Pool = PrivateAttr()
-    fee: int
+class CamelotV3Pool(DexPair):
+    _contract: CamelotV3Pool = PrivateAttr()
 
     @classmethod
     def load_static(
@@ -24,7 +23,6 @@ class V3Pool(DexPair):
         pair_address: HexAddress,
         tokena: HexAddress,
         tokenb: HexAddress,
-        fee: int,
     ):
         token0, token1 = (
             (tokena, tokenb) if tokena.lower() < tokenb.lower() else (tokenb, tokena)
@@ -32,8 +30,7 @@ class V3Pool(DexPair):
         return cls(
             token0=ERC20(address=token0),  # type: ignore
             token1=ERC20(address=token1),  # type: ignore
-            pair_address=pair_address,  # type: ignore
-            fee=fee,
+            pair_address=pair_address,
         )
 
     @classmethod
@@ -42,22 +39,20 @@ class V3Pool(DexPair):
         pair_address: HexAddress,
     ):
         # TODO: type hints don't work with pydantic validators
-        _contract = UniswapV3Pool(address=pair_address)
+        _contract = CamelotV3Pool(address=pair_address)
         token0, token1, fee = await multicall.execute(
             _contract.token0(),
             _contract.token1(),
-            _contract.fee(),
         )
 
         return cls(
             token0=ERC20(address=token0),  # type: ignore
             token1=ERC20(address=token1),  # type: ignore
             pair_address=pair_address,  # type: ignore
-            fee=fee,
         )
 
-    def set_slot0(self, slot0: Slot0):
-        self._slot0 = slot0
+    def set_global_state(self, global_stage: GlobalState):
+        self._global_state = global_stage
 
     def set_reserve0(self, reserve: int):
         self._reserve0 = reserve
@@ -74,11 +69,11 @@ class V3Pool(DexPair):
         assert token == self.token0.address or token == self.token1.address
 
         if block_number:
-            slot0 = self._contract.slot0().get(block_number=block_number)
+            global_state = self._contract.global_state().get(block_number=block_number)
         else:
-            slot0 = self._slot0
+            global_state = self._global_state
 
-        sqrt_price = slot0.sqrt_price
+        sqrt_price = global_state.price
 
         return self.sqrt_price_x96_to_token_prices(
             sqrt_price,
