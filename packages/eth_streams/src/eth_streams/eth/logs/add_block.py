@@ -2,11 +2,10 @@ from abc import abstractmethod
 from collections.abc import AsyncIterator
 from typing import ClassVar, Generic, TypeVar
 
-from pydantic import BaseModel, Field
-
 from eth_rpc import Block, Log
 from eth_rpc.types import Network
 from eth_streams.types import Envelope, Topic, Vertex
+from pydantic import BaseModel, Field
 
 T = TypeVar("T")
 
@@ -39,7 +38,9 @@ class AddBlockVertex(Vertex[Log, BlockWrap[T]]):
     @abstractmethod
     def get_block_number(self, envelope: Envelope[T]) -> tuple[Block, Network]: ...
 
-    async def transform(self, envelope: Envelope[T]) -> AsyncIterator[tuple[Topic[BlockWrap[T]], BlockWrap[T]]]:
+    async def transform(
+        self, envelope: Envelope[T]
+    ) -> AsyncIterator[tuple[Topic[BlockWrap[T]], BlockWrap[T]]]:
         key = self.get_block_number(envelope)
         block_number, network = key
 

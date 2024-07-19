@@ -1,10 +1,9 @@
-from collections.abc import AsyncIterator
 import time
+from collections.abc import AsyncIterator
 from typing import Generic, TypeVar
 
-from pydantic import Field
-
 from eth_streams.types import Envelope, StreamEvents, Topic, Vertex
+from pydantic import Field
 
 T = TypeVar("T")
 
@@ -16,7 +15,9 @@ class Counter(Vertex[T, int], Generic[T]):
     count: int = Field(default=0)
     display_frequency: int = Field(default=20)
 
-    async def transform(self, envelope: Envelope[T]) -> AsyncIterator[tuple[Topic[int], int]]:
+    async def transform(
+        self, envelope: Envelope[T]
+    ) -> AsyncIterator[tuple[Topic[int], int]]:
         if isinstance(envelope.message, StreamEvents):
             return
         self.count += 1

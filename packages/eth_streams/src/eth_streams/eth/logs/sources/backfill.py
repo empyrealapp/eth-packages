@@ -1,13 +1,13 @@
 from typing import Generic, TypeVar
 
-from eth_typing import HexAddress
-from pydantic import ConfigDict, Field, computed_field
-
 from eth_rpc import Event, EventData, EventSubscriber
 from eth_rpc.types import BLOCK_STRINGS, Network
 from eth_streams.types import Source
-from eth_streams.workers import Throttler
 from eth_streams.utils import get_implicit
+from eth_streams.workers import Throttler
+from eth_typing import HexAddress
+from pydantic import ConfigDict, Field, computed_field
+
 from ..contract_event_vertex import ContractEventSink
 
 T = TypeVar("T")
@@ -22,7 +22,9 @@ class EventBackfillSource(Source[EventData[T]], Generic[T]):
     subscriber: EventSubscriber = Field(default_factory=EventSubscriber)
     addresses: list[HexAddress] = Field(default_factory=list)
 
-    start_block: int | BLOCK_STRINGS = Field(default_factory=lambda: get_implicit("start_block", "earliest"))
+    start_block: int | BLOCK_STRINGS = Field(
+        default_factory=lambda: get_implicit("start_block", "earliest")
+    )
     end_block: int | None = Field(default_factory=lambda: get_implicit("end_block"))
 
     @computed_field  # type: ignore
@@ -46,7 +48,9 @@ class EventBackfillSource(Source[EventData[T]], Generic[T]):
     ):
         log_source = cls(**kwargs)
         if with_throttler:
-            throttler: Throttler[EventData[T]] = Throttler[EventData[T]](max_size=batch_size, frequency=3.0)
+            throttler: Throttler[EventData[T]] = Throttler[EventData[T]](
+                max_size=batch_size, frequency=3.0
+            )
             log_source = log_source >> throttler
         if with_db_sink:
             sink: ContractEventSink
@@ -63,7 +67,9 @@ class EventBackfillSource(Source[EventData[T]], Generic[T]):
     async def _run(self):
         if self.end_block is None:
             # this will never terminate
-            await self.subscriber.backfill_and_listen(self.start_block, addresses=self.addresses)
+            await self.subscriber.backfill_and_listen(
+                self.start_block, addresses=self.addresses
+            )
 
         async for event in self.subscriber(
             start_block=self.start_block,

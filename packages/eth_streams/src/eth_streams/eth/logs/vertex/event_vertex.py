@@ -1,13 +1,13 @@
 from collections.abc import AsyncIterator
 from typing import Generic, TypeVar
 
-from eth_typing import HexAddress, HexStr
-from pydantic import BaseModel, Field
-
 from eth_rpc import Event, EventData, Log, get_current_network
 from eth_rpc.types import Network
 from eth_streams.types import Envelope, Topic, Vertex
 from eth_streams.workers import Batch
+from eth_typing import HexAddress, HexStr
+from pydantic import BaseModel, Field
+
 from ..signals import AddAddress, RemoveAddress
 
 U = TypeVar("U", bound=BaseModel)

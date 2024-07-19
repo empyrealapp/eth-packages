@@ -4,9 +4,9 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
+from ..types import StreamEvents
 from .envelope import Envelope
 from .sink import Sink
-from ..types import StreamEvents
 
 T = TypeVar("T")
 
@@ -47,7 +47,9 @@ class FilterTopic(Topic[T], Generic[T]):
     A topic that allows filtering which users are sent each message based on an arbitrary function
     """
 
-    sinks: dict[str, tuple[Sink, Callable[[Envelope[T | StreamEvents]], bool]]] = Field(default_factory=dict)
+    sinks: dict[str, tuple[Sink, Callable[[Envelope[T | StreamEvents]], bool]]] = Field(
+        default_factory=dict
+    )
     name: str
 
     def publish(self, envelope: Envelope[T | StreamEvents]) -> list[asyncio.Task]:
@@ -60,7 +62,9 @@ class FilterTopic(Topic[T], Generic[T]):
     def subscribe(self, sink: Sink):
         self.sinks[sink.name] = (sink, lambda x: True)
 
-    def subscribe_with_filter(self, *, sink: Sink, filter: Callable[[Envelope[T | StreamEvents]], bool]):
+    def subscribe_with_filter(
+        self, *, sink: Sink, filter: Callable[[Envelope[T | StreamEvents]], bool]
+    ):
         self.sinks[sink.name] = (sink, filter)
 
     def __rrshift__(self, envelope: Envelope[T | StreamEvents]) -> list[asyncio.Task]:

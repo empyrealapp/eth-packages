@@ -1,5 +1,5 @@
-import json
 import functools
+import json
 
 from tortoise import Model, fields
 from tortoise.fields.data import JsonDumpsFunc, JsonLoadsFunc

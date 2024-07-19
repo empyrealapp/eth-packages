@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 
 from pydantic import Field, computed_field
 
+from ..types import StreamEvents
 from .base import Base
 from .envelope import Envelope
-from ..types import StreamEvents
 
 if TYPE_CHECKING:
     from .source import Source

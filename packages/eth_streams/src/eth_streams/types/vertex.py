@@ -4,11 +4,11 @@ from typing import Generic, TypeVar
 
 from pydantic import ConfigDict
 
-from .envelope import Envelope
-from .source import Source
-from .sink import Sink
-from .topic import Topic
 from ..types import StreamEvents
+from .envelope import Envelope
+from .sink import Sink
+from .source import Source
+from .topic import Topic
 
 T = TypeVar("T")
 U = TypeVar("U")

@@ -1,17 +1,19 @@
 from typing import ClassVar
 
+from eth_rpc import get_current_network
+from eth_rpc.types import Network
+from eth_typeshed.uniswap_v2 import GetPairRequest, UniswapV2Factory
 from eth_typing import ChecksumAddress, HexAddress
 from eth_utils import to_checksum_address
 from pydantic import BaseModel, Field, PrivateAttr
 
-from eth_rpc import get_current_network
-from eth_rpc.types import Network
-from eth_typeshed.uniswap_v2 import GetPairRequest, UniswapV2Factory
 from .pair import V2Pair
 
 
 class V2Factory(BaseModel):
-    pairs: ClassVar[dict[tuple[Network, ChecksumAddress, ChecksumAddress], "ChecksumAddress"]] = Field({})
+    pairs: ClassVar[
+        dict[tuple[Network, ChecksumAddress, ChecksumAddress], "ChecksumAddress"]
+    ] = Field({})
     _network: ClassVar[Network | None] = None
 
     _contract: UniswapV2Factory = PrivateAttr()

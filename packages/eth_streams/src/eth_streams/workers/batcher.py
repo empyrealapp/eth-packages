@@ -1,14 +1,8 @@
 from collections.abc import AsyncIterator
-from typing import TypeVar, Generic
+from typing import Generic, TypeVar
 
+from eth_streams.types import Envelope, StreamEvents, Topic, Vertex
 from pydantic import BaseModel, Field, PrivateAttr
-
-from eth_streams.types import (
-    Envelope,
-    StreamEvents,
-    Topic,
-    Vertex,
-)
 
 T = TypeVar("T")
 
@@ -43,11 +37,16 @@ class Batcher(Vertex[T, Batch[T]]):
     def model_post_init(self, __context):
         self.count += 1
 
-    async def transform(self, envelope: Envelope[T]) -> AsyncIterator[tuple[Topic[Batch[T]], Batch[T]]]:
+    async def transform(
+        self, envelope: Envelope[T]
+    ) -> AsyncIterator[tuple[Topic[Batch[T]], Batch[T]]]:
         if not isinstance(envelope.message, StreamEvents):
             self.batch.append(envelope.message)
 
-        if len(self.batch) >= self.batch_size or envelope.message == StreamEvents.stopped:
+        if (
+            len(self.batch) >= self.batch_size
+            or envelope.message == StreamEvents.stopped
+        ):
             response = (self.default_topic, Batch(data=self.batch))
             self.batch = []
             yield response

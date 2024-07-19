@@ -1,9 +1,9 @@
-from abc import abstractmethod
 import asyncio
+from abc import abstractmethod
 from collections.abc import AsyncIterator
 from typing import Generic, TypeVar
 
-from pydantic import PrivateAttr, Field
+from pydantic import Field, PrivateAttr
 
 from ..types import StreamEvents
 from .envelope import Envelope
@@ -15,7 +15,9 @@ T = TypeVar("T")
 
 
 class Source(Task, Generic[T]):
-    _default_topic: Topic[T | StreamEvents] = PrivateAttr(default_factory=lambda: Topic(name="default"))
+    _default_topic: Topic[T | StreamEvents] = PrivateAttr(
+        default_factory=lambda: Topic(name="default")
+    )
     wait_for_downstreams: bool = Field(default=True)
 
     @property

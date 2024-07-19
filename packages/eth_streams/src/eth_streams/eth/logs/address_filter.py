@@ -1,11 +1,10 @@
 from collections.abc import AsyncIterator
 from typing import cast
 
-from eth_typing import HexAddress, HexStr
-from pydantic import Field
-
 from eth_rpc import Log
 from eth_streams.types import Address, Batch, Envelope, Topic, Vertex
+from eth_typing import HexAddress, HexStr
+from pydantic import Field
 
 
 class AddressFilterVertex(Vertex[Log | Batch[Log] | Address, Log | Batch[Log]]):

@@ -1,16 +1,11 @@
 import asyncio
-from collections.abc import AsyncIterator
 import itertools
-from typing import TypeVar, Generic
+from collections.abc import AsyncIterator
+from typing import Generic, TypeVar
 
+from eth_streams.types import Envelope, StreamEvents, Topic, Vertex
 from pydantic import ConfigDict, Field, PrivateAttr
 
-from eth_streams.types import (
-    Envelope,
-    StreamEvents,
-    Topic,
-    Vertex,
-)
 from .batcher import Batch
 from .timer import Timer
 
@@ -46,7 +41,9 @@ class Throttler(Timer[Batch[T]], Vertex[T, Batch[T]], Generic[T]):
             self.batch = Batch()
         return batch
 
-    async def transform(self, envelope: Envelope[T]) -> AsyncIterator[tuple[Topic[Batch[T]], Batch[T]]]:
+    async def transform(
+        self, envelope: Envelope[T]
+    ) -> AsyncIterator[tuple[Topic[Batch[T]], Batch[T]]]:
         if not isinstance(envelope.message, StreamEvents):
             self.batch.append(envelope.message)
 

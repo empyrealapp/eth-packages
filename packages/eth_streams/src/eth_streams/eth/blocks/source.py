@@ -1,11 +1,10 @@
 from collections.abc import AsyncIterator
 
-from pydantic import BaseModel, ConfigDict, Field
-
 from eth_rpc import Block, get_current_network
-from eth_rpc.types import Network, BLOCK_STRINGS
+from eth_rpc.types import BLOCK_STRINGS, Network
 from eth_streams.types import Source, Topic
 from eth_streams.utils import ExpiringDict, get_implicit
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ReorgError(BaseModel):
@@ -19,9 +18,13 @@ class BlockSource(Source[ReorgError | Block], BaseModel):
     reorg_topic: Topic[ReorgError]
 
     network: Network = Field(default_factory=get_current_network)
-    start_block: int | BLOCK_STRINGS = Field(default_factory=lambda: get_implicit("start_block", "earliest"))
+    start_block: int | BLOCK_STRINGS = Field(
+        default_factory=lambda: get_implicit("start_block", "earliest")
+    )
     reorg_distance: int = Field(5)
-    history: ExpiringDict[int, Block] = Field(default_factory=lambda: ExpiringDict(100, 12 * 100))
+    history: ExpiringDict[int, Block] = Field(
+        default_factory=lambda: ExpiringDict(100, 12 * 100)
+    )
     restart_point: int | None = Field(None)
 
     @property
@@ -34,14 +37,20 @@ class BlockSource(Source[ReorgError | Block], BaseModel):
     async def _run(self) -> AsyncIterator[tuple[Topic, ReorgError | Block]]:
         if self.start_block == "latest":
             latest = await Block[self.network].get_number()
-            prev_block = await Block[self.network].load_by_number(block_number=latest - 1)
+            prev_block = await Block[self.network].load_by_number(
+                block_number=latest - 1
+            )
         else:
-            prev_block = await Block[self.network].load_by_number(block_number=self.start_block - 1)
+            prev_block = await Block[self.network].load_by_number(
+                block_number=self.start_block - 1
+            )
         self.history[prev_block.number] = prev_block
         current_block: int = prev_block.number + 1
 
         while True:
-            async for block in Block[self.network].subscribe_from(start_block=current_block):
+            async for block in Block[self.network].subscribe_from(
+                start_block=current_block
+            ):
                 self.history[block.number] = block
                 if self.history[block.number - 1].hash != block.parent_hash:
                     # go back the reorg_distance to reindex those blocks

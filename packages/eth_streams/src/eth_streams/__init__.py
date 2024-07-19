@@ -1,14 +1,14 @@
 # flake8: noqa
-from .coordinator import Coordinator, CoordinatorContext
 from .context import Context
+from .coordinator import Coordinator, CoordinatorContext
 from .types import (
     Address,
     Callback,
     Envelope,
-    Monitor,
-    Source,
-    Sink,
     FilterTopic,
+    Monitor,
+    Sink,
+    Source,
     Task,
     Topic,
 )
@@ -16,10 +16,9 @@ from .types import (
 Coordinator.model_rebuild()
 
 from .eth import BlockSource, EventBackfillSource, ReorgError
-from .utils import init_db
 from .pipeline import Pipeline, Stage, Transformer
-from .workers import Batcher, Batch, Combinator, Counter, Echo, Skipper, Throttler
-
+from .utils import init_db
+from .workers import Batch, Batcher, Combinator, Counter, Echo, Skipper, Throttler
 
 __all__ = [
     "Address",

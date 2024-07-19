@@ -2,28 +2,24 @@ import asyncio
 from decimal import Decimal
 from typing import ClassVar, Optional
 
-from eth_typing import HexAddress, HexStr
-from pydantic import BaseModel, Field, PrivateAttr
-
-from eth_rpc import EventSubscriber, EventData
-from eth_typeshed.constants import Tokens
-from eth_typeshed.chainlink.eth_usd_feed import (
-    ETHUSDPriceFeed,
-    ChainlinkPriceOracle,
-)
-from eth_typeshed.uniswap_v2 import V2SyncEvent, V2SyncEventType
-from eth_typeshed.uniswap_v3 import V3SwapEvent, V3SwapEventType
+from eth_protocols.logger import logger
 from eth_protocols.uniswap_v2.pair import V2Pair
 from eth_protocols.uniswap_v3.pool import V3Pool
-from eth_protocols.logger import logger
-
-
-class TokenPriceInUSD:
-    tokens: Optional[dict[str, int]] = None
+from eth_rpc import EventData, EventSubscriber, get_current_network
+from eth_rpc.types import Network
+from eth_typeshed.chainlink.eth_usd_feed import ChainlinkPriceOracle, ETHUSDPriceFeed
+from eth_typeshed.constants import Tokens
+from eth_typeshed.uniswap_v2 import V2SyncEvent, V2SyncEventType
+from eth_typeshed.uniswap_v3 import V3SwapEvent, V3SwapEventType
+from eth_typing import HexAddress, HexStr
+from eth_utils import to_checksum_address
+from pydantic import BaseModel, Field, PrivateAttr
 
 
 class EthPriceProvider(BaseModel):
-    feed: ClassVar[ETHUSDPriceFeed] = ETHUSDPriceFeed(address=ChainlinkPriceOracle.ETH)
+    feed: ClassVar[ETHUSDPriceFeed] = ETHUSDPriceFeed(
+        address=ChainlinkPriceOracle.for_network().ETH
+    )
     price: float | None = None
     decimals: int = Field(default=8)
 
@@ -34,7 +30,9 @@ class EthPriceProvider(BaseModel):
 
     async def refresh_price(self, block_number: int | None = None):
         if block_number:
-            latest_round_data = (await self.feed.latest_round_data().get(block_number=block_number))[1]
+            latest_round_data = (
+                await self.feed.latest_round_data().get(block_number=block_number)
+            )[1]
         else:
             latest_round_data = (await self.feed.latest_round_data().get())[1]
 
@@ -51,14 +49,18 @@ class PriceTracker(BaseModel):
     pair_address_to_pairs: dict[HexAddress, V2Pair | V3Pool] = Field(
         default_factory=dict
     )
-    _eth_price_provider: EthPriceProvider = PrivateAttr(default_factory=EthPriceProvider)
+    _eth_price_provider: EthPriceProvider = PrivateAttr(
+        default_factory=EthPriceProvider
+    )
+    network: Network = Field(default_factory=get_current_network)
 
-    stables: list[HexAddress] = [
-        Tokens.Ethereum.USDC,
-        Tokens.Ethereum.USDT,
-        Tokens.Ethereum.DAI,
-    ]
-    WETH: HexAddress = Tokens.Ethereum.WETH
+    @property
+    def stables(self):
+        return Tokens.for_network(self.network).stables
+
+    @property
+    def WETH(self):
+        return Tokens.for_network(self.network).WETH
 
     @property
     def pairs(self):
@@ -67,7 +69,7 @@ class PriceTracker(BaseModel):
         ]
 
     async def get_pair_reserves(self, pair_address: HexAddress):
-        pair_address = self.to_lowercase_hex(pair_address)
+        pair_address = to_checksum_address(pair_address)
         pair = self.pair_address_to_pairs[pair_address]
         if not pair:
             return 0, 0
@@ -75,12 +77,12 @@ class PriceTracker(BaseModel):
 
     def update_pairs(self, pairs: dict[HexAddress, list[V2Pair | V3Pool]]):
         if not pairs:
-          return
+            return
         for k, pairs_list in pairs.items():
-            k = self.to_lowercase_hex(k)
+            k = to_checksum_address(k)
             tmp_pairs = []
             for pair in pairs_list:
-                address = self.to_lowercase_hex(pair.pair_address)
+                address = to_checksum_address(pair.pair_address)
                 tmp_pairs.append(pair)
                 self.pair_address_to_pairs[address] = pair
             self.token_address_to_pairs[k] = tmp_pairs
@@ -107,14 +109,16 @@ class PriceTracker(BaseModel):
     def get_highest_liq_pair(self, token_address: HexAddress):
         if not self.token_address_to_pairs:
             raise ValueError("token address_to_pairs not set")
-        pairs_list = self.token_address_to_pairs[self.to_lowercase_hex(token_address)]
+        pairs_list = self.token_address_to_pairs.get(
+            to_checksum_address(token_address), []
+        )
         return self.find_highest_reserve_pair(token_address, pairs_list)
 
     def get_tvl_in_usd(self, pair_address):
-        if self.to_lowercase_hex(pair_address) not in self.pair_address_to_pairs:
+        if to_checksum_address(pair_address) not in self.pair_address_to_pairs:
             logger.warning(f"not found {pair_address=}")
             return 0
-        pair = self.pair_address_to_pairs[self.to_lowercase_hex(pair_address)]
+        pair = self.pair_address_to_pairs[to_checksum_address(pair_address)]
         return pair.get_reserve(pair.token0.address) * (
             self.get_price_in_usd(pair.token0.address)
         ) + pair.get_reserve(pair.token1.address) * (
@@ -127,7 +131,7 @@ class PriceTracker(BaseModel):
         """
         Recurse the token address following its deepest liquidity until we reach a token with a known price.
         """
-        if self.to_lowercase_hex(token_address) == self.WETH.lower():
+        if to_checksum_address(token_address) == to_checksum_address(self.WETH):
             return self._eth_price_provider.get_eth_price()
         if not token_address:
             return 0
@@ -164,9 +168,3 @@ class PriceTracker(BaseModel):
                 # TODO: handle event ingest
                 #       maybe simulate reserves for V3
                 pass
-
-    @staticmethod
-    def to_lowercase_hex(
-        hex_str: HexAddress,
-    ) -> HexAddress:
-        return HexAddress(HexStr(hex_str.lower()))

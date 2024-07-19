@@ -1,16 +1,15 @@
-from abc import abstractmethod
 import asyncio
 import sqlite3
+from abc import abstractmethod
 from typing import ClassVar, Generic, TypeVar
-
-from pydantic import Field
-from tortoise import Model
 
 from eth_rpc import EventData, get_current_network
 from eth_rpc.types import Network
+from eth_streams.logger import logger
 from eth_streams.types import Envelope, Sink
 from eth_streams.workers import Batch
-from eth_streams.logger import logger
+from pydantic import Field
+from tortoise import Model
 
 T = TypeVar("T", bound=EventData)
 U = TypeVar("U", bound=Model)

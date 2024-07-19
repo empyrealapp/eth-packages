@@ -8,7 +8,9 @@ U = TypeVar("U")
 
 
 class ExpiringDict(OrderedDict[T, U], Generic[T, U]):
-    def __init__(self, max_len: Union[int, None], max_age_seconds: Union[float, None], items=None):
+    def __init__(
+        self, max_len: Union[int, None], max_age_seconds: Union[float, None], items=None
+    ):
         if not self.__is_instance_of_expiring_dict(items):
             self.__assertions(max_len, max_age_seconds)
 
@@ -207,7 +209,9 @@ class ExpiringDict(OrderedDict[T, U], Generic[T, U]):
     def size(self):
         return len(self.keys())
 
-    def __copy_expiring_dict(self, max_len: Union[int, None], max_age_seconds: Union[float, None], items):
+    def __copy_expiring_dict(
+        self, max_len: Union[int, None], max_age_seconds: Union[float, None], items
+    ):
         if max_len is not None:
             self.__assert_max_len(max_len)
             self.max_len = max_len
@@ -220,7 +224,10 @@ class ExpiringDict(OrderedDict[T, U], Generic[T, U]):
         else:
             self.max_age = items.max_age
 
-        [self.__setitem__(key, value, set_time) for key, (value, set_time) in items.items_with_timestamp()]
+        [
+            self.__setitem__(key, value, set_time)
+            for key, (value, set_time) in items.items_with_timestamp()
+        ]
 
     def __copy_dict(self, items):
         [self.__setitem__(key, value) for key, value in items.items()]

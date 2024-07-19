@@ -3,10 +3,12 @@ from typing import Generic, TypeVar
 
 from eth_streams.coordinator import Coordinator
 from pydantic import BaseModel
+
 from ..context import Context
 from .transformer import Transformer
 
 Ctx = TypeVar("Ctx", bound=Context)
+
 
 class Subscriber(ABC, BaseModel, Generic[Ctx]):
     @property

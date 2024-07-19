@@ -1,15 +1,11 @@
 from collections.abc import AsyncIterator
 
-from eth_typing import HexAddress
-from pydantic import BaseModel
-
 from eth_rpc import EventData
 from eth_rpc.constants import ADDRESS_ZERO
 from eth_rpc.utils import address_to_topic
-from eth_typeshed.erc20 import (
-    TransferEvent,
-    TransferEventType,
-)
+from eth_typeshed.erc20 import TransferEvent, TransferEventType
+from eth_typing import HexAddress
+from pydantic import BaseModel
 
 
 class TransferEvents(BaseModel):

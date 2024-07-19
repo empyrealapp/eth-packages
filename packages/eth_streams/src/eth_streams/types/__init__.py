@@ -10,7 +10,6 @@ from .task import Task
 from .topic import FilterTopic, Topic
 from .vertex import Vertex
 
-
 __all__ = [
     "Address",
     "Batch",

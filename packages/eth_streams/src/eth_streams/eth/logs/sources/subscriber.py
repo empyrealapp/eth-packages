@@ -1,12 +1,12 @@
 from collections.abc import AsyncIterator
 
+from eth_rpc import Block, Log, get_current_network
+from eth_rpc.types import BLOCK_STRINGS, Network
+from eth_streams.types import Envelope, Sink, Source, Topic
+from eth_streams.utils import get_implicit
+from eth_streams.workers import Batcher
 from pydantic import BaseModel, Field
 
-from eth_rpc import Block, Log, get_current_network
-from eth_rpc.types import Network, BLOCK_STRINGS
-from eth_streams.types import Envelope, Source, Sink, Topic
-from eth_streams.workers import Batcher
-from eth_streams.utils import get_implicit
 from ...blocks.source import ReorgError
 
 
@@ -14,7 +14,9 @@ class LogSubscriber(Source[Log], Sink[ReorgError], BaseModel):
     __name__ = "log-source"
 
     network: Network = Field(default_factory=get_current_network)
-    start_block: int | BLOCK_STRINGS = Field(default_factory=lambda: get_implicit("start_block", "earliest"))
+    start_block: int | BLOCK_STRINGS = Field(
+        default_factory=lambda: get_implicit("start_block", "earliest")
+    )
     reorg_triggered: bool = Field(False)
     reorg_block: int | None = Field(None)
 
@@ -48,7 +50,7 @@ class LogSubscriber(Source[Log], Sink[ReorgError], BaseModel):
     async def _get_current_block(self) -> int:
         if self.start_block == "latest":
             latest = int(await Block[self.network].get_number())  # type: ignore[name-defined]
-        elif isinstance(self.start_block, int):   
+        elif isinstance(self.start_block, int):
             latest = self.start_block
         else:
             latest = self.start_block
