@@ -57,9 +57,7 @@ class DexPairHelper(BaseModel):
                     calls_list.extend(
                         [
                             (
-                                UniswapV3Factory(
-                                    address=uniswap_v3_factory_address
-                                ).get_pool(
+                                UniswapV3Factory(address=factory).get_pool(
                                     GetPoolRequest(
                                         token_a=addr,
                                         token_b=paired_with,
