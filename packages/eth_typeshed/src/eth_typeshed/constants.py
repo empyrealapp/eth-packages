@@ -60,6 +60,7 @@ class Factories:
         ShibaSwap = HexAddress(HexStr("0x115934131916C8b277DD010Ee02de363c09d037c"))
 
         pod_factory = UniswapV2
+        all_factories = [UniswapV2, UniswapV3]
 
     class Arbitrum:
         UniswapV2 = HexAddress(HexStr("0xf1D7CC64Fb4452F05c498126312eBE29f30Fbcf9"))
@@ -68,6 +69,7 @@ class Factories:
         Camelot_V3 = HexAddress(HexStr("0x1a3c9B1d2F0529D97f2afC5136Cc23e58f1FD35B"))
 
         pod_factory = Camelot_V2
+        all_factories = [UniswapV2, UniswapV3, Camelot_V2, Camelot_V3]
 
     @classmethod
     def for_network(cls, network: Network = get_current_network()):
