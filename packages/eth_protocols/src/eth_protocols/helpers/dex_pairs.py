@@ -79,13 +79,11 @@ class DexPairHelper(BaseModel):
                             ),
                         ]
                     )
-            if factories == Factories.Arbitrum.Camelot_V3:
+            if factory == Factories.Arbitrum.Camelot_V3:
                 calls_list.extend(
                     [
                         (
-                            CamelotV3Factory(
-                                address=uniswap_v3_factory_address
-                            ).pool_by_pair(
+                            CamelotV3Factory(address=factory).pool_by_pair(
                                 CamelotGetPoolRequest(token_a=addr, token_b=paired_with)
                             ),
                             lambda result, addr=addr, paired_with=paired_with: (  # type: ignore
@@ -150,8 +148,7 @@ class DexPairHelper(BaseModel):
                     t[0],
                     t[1],
                     fee_tiers,
-                    uniswap_v2_factory_address,
-                    uniswap_v3_factory_address,
+                    factories,
                 )
             )
         await try_execute_with_setters(
