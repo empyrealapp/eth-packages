@@ -107,7 +107,7 @@ class ERC20(ERC20Metadata):
         if not response:
             return None
         try:
-            storage = response["result"][self.address.lower()]["storage"]
+            storage = response[self.address.lower()]["storage"]
         except KeyError:
             return None
 
