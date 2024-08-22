@@ -29,8 +29,11 @@ from .args import (
 from .basic import BLOCK_STRINGS, BlockReference, Empty, HexInt, HexInteger
 from .event import Indexed, Name
 from .network import BlockExplorer, Network, Rpcs, RpcUrl
+from .primitives import BASIC_TYPES, BYTES_TYPES
 from .response import NoArgs, RPCResponseModel
+from .struct import Struct
 from .transaction import SignedTransaction
+from .typed_data import EIP712Model
 
 T = TypeVar("T")
 MaybeAwaitable = Union[T, Awaitable[T]]
@@ -115,7 +118,12 @@ class JsonResponseWssResponse(TypedDict):
 
 
 __all__ = [
+    "BASIC_TYPES",
+    "BYTES_TYPES",
+    "BLOCK_STRINGS",
     "BlockExplorer",
+    "BlockReference",
+    "EIP712Model",
     "Indexed",
     "Name",
     "Network",
@@ -124,4 +132,5 @@ __all__ = [
     "Rpcs",
     "RpcUrl",
     "SignedTransaction",
+    "Struct",
 ]

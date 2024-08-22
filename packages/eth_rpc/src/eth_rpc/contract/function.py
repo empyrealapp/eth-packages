@@ -400,8 +400,9 @@ class ContractFunc(Generic[T, U]):
         max_priority_fee_per_gas: Optional[int] = None,
         use_access_list: bool = True,
         sync: bool = False,
+        buffer: float = 1.25,
     ) -> PreparedTransaction:
-        gas = await self._estimate_gas(sync=sync)
+        gas = await self._estimate_gas(from_=wallet.address, sync=sync, buffer=buffer)
         if use_access_list:
             if sync:
                 access_list_response = self.access_list(

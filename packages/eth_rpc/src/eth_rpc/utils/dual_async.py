@@ -1,13 +1,14 @@
 from asyncio import iscoroutine
 from collections.abc import Callable, Coroutine
-from typing import Any, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
-from eth_rpc.types import MaybeAwaitable
+if TYPE_CHECKING:
+    from eth_rpc.types import MaybeAwaitable
 
 T = TypeVar("T")
 
 
-async def handle_maybe_awaitable(t: MaybeAwaitable[T]) -> T:
+async def handle_maybe_awaitable(t: "MaybeAwaitable[T]") -> T:
     if iscoroutine(t):
         return await t
     else:

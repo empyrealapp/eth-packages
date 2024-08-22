@@ -1,4 +1,4 @@
-from typing import NewType
+from typing import NewType, Union
 
 int8 = NewType("int8", int)
 int16 = NewType("int16", int)
@@ -67,38 +67,38 @@ uint248 = NewType("uint248", int)
 uint256 = NewType("uint256", int)
 
 
-bytes1 = NewType("bytes1", str)
-bytes2 = NewType("bytes2", str)
-bytes3 = NewType("bytes3", str)
-bytes4 = NewType("bytes4", str)
-bytes5 = NewType("bytes5", str)
-bytes6 = NewType("bytes6", str)
-bytes7 = NewType("bytes7", str)
-bytes8 = NewType("bytes8", str)
-bytes9 = NewType("bytes9", str)
-bytes10 = NewType("bytes10", str)
-bytes11 = NewType("bytes11", str)
-bytes12 = NewType("bytes12", str)
-bytes13 = NewType("bytes13", str)
-bytes14 = NewType("bytes14", str)
-bytes15 = NewType("bytes15", str)
-bytes16 = NewType("bytes16", str)
-bytes17 = NewType("bytes17", str)
-bytes18 = NewType("bytes18", str)
-bytes19 = NewType("bytes19", str)
-bytes20 = NewType("bytes20", str)
-bytes21 = NewType("bytes21", str)
-bytes22 = NewType("bytes22", str)
-bytes23 = NewType("bytes23", str)
-bytes24 = NewType("bytes24", str)
-bytes25 = NewType("bytes25", str)
-bytes26 = NewType("bytes26", str)
-bytes27 = NewType("bytes27", str)
-bytes28 = NewType("bytes28", str)
-bytes29 = NewType("bytes29", str)
-bytes30 = NewType("bytes30", str)
-bytes31 = NewType("bytes31", str)
-bytes32 = NewType("bytes32", str)
+bytes1 = NewType("bytes1", bytes)
+bytes2 = NewType("bytes2", bytes)
+bytes3 = NewType("bytes3", bytes)
+bytes4 = NewType("bytes4", bytes)
+bytes5 = NewType("bytes5", bytes)
+bytes6 = NewType("bytes6", bytes)
+bytes7 = NewType("bytes7", bytes)
+bytes8 = NewType("bytes8", bytes)
+bytes9 = NewType("bytes9", bytes)
+bytes10 = NewType("bytes10", bytes)
+bytes11 = NewType("bytes11", bytes)
+bytes12 = NewType("bytes12", bytes)
+bytes13 = NewType("bytes13", bytes)
+bytes14 = NewType("bytes14", bytes)
+bytes15 = NewType("bytes15", bytes)
+bytes16 = NewType("bytes16", bytes)
+bytes17 = NewType("bytes17", bytes)
+bytes18 = NewType("bytes18", bytes)
+bytes19 = NewType("bytes19", bytes)
+bytes20 = NewType("bytes20", bytes)
+bytes21 = NewType("bytes21", bytes)
+bytes22 = NewType("bytes22", bytes)
+bytes23 = NewType("bytes23", bytes)
+bytes24 = NewType("bytes24", bytes)
+bytes25 = NewType("bytes25", bytes)
+bytes26 = NewType("bytes26", bytes)
+bytes27 = NewType("bytes27", bytes)
+bytes28 = NewType("bytes28", bytes)
+bytes29 = NewType("bytes29", bytes)
+bytes30 = NewType("bytes30", bytes)
+bytes31 = NewType("bytes31", bytes)
+bytes32 = NewType("bytes32", bytes)
 
 string = NewType("string", str)
 address = NewType("address", str)
@@ -106,3 +106,142 @@ address = NewType("address", str)
 # redundant, but facilitates code consistency, ie. tuple[primitives.bool, primitives.address]
 bool = bool
 bytes = bytes
+
+BYTES_TYPES = Union[
+    type[bytes1],
+    type[bytes2],
+    type[bytes3],
+    type[bytes4],
+    type[bytes5],
+    type[bytes6],
+    type[bytes7],
+    type[bytes8],
+    type[bytes9],
+    type[bytes10],
+    type[bytes11],
+    type[bytes12],
+    type[bytes13],
+    type[bytes14],
+    type[bytes15],
+    type[bytes16],
+    type[bytes17],
+    type[bytes18],
+    type[bytes19],
+    type[bytes20],
+    type[bytes21],
+    type[bytes22],
+    type[bytes23],
+    type[bytes24],
+    type[bytes25],
+    type[bytes26],
+    type[bytes27],
+    type[bytes28],
+    type[bytes29],
+    type[bytes30],
+    type[bytes31],
+    type[bytes32],
+    type[bytes],
+]
+
+BASIC_TYPES = Union[
+    int8,
+    int16,
+    int24,
+    int32,
+    int40,
+    int48,
+    int56,
+    int64,
+    int72,
+    int80,
+    int88,
+    int96,
+    int104,
+    int112,
+    int120,
+    int128,
+    int136,
+    int144,
+    int152,
+    int160,
+    int168,
+    int176,
+    int184,
+    int192,
+    int200,
+    int208,
+    int216,
+    int224,
+    int232,
+    int240,
+    int248,
+    int256,
+    uint8,
+    uint16,
+    uint24,
+    uint32,
+    uint40,
+    uint48,
+    uint56,
+    uint64,
+    uint72,
+    uint80,
+    uint88,
+    uint96,
+    uint104,
+    uint112,
+    uint120,
+    uint128,
+    uint136,
+    uint144,
+    uint152,
+    uint160,
+    uint168,
+    uint176,
+    uint184,
+    uint192,
+    uint200,
+    uint208,
+    uint216,
+    uint224,
+    uint232,
+    uint240,
+    uint248,
+    uint256,
+    bytes1,
+    bytes2,
+    bytes3,
+    bytes4,
+    bytes5,
+    bytes6,
+    bytes7,
+    bytes8,
+    bytes9,
+    bytes10,
+    bytes11,
+    bytes12,
+    bytes13,
+    bytes14,
+    bytes15,
+    bytes16,
+    bytes17,
+    bytes18,
+    bytes19,
+    bytes20,
+    bytes21,
+    bytes22,
+    bytes23,
+    bytes24,
+    bytes25,
+    bytes26,
+    bytes27,
+    bytes28,
+    bytes29,
+    bytes30,
+    bytes31,
+    bytes32,
+    bytes,
+    string,
+    address,
+    bool,
+]
