@@ -116,7 +116,8 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
         ):
             converted_inputs = convert_base_model(inputs)
             if issubclass(inputs, Struct):
-                return [f"({",".join(converted_inputs)})"]
+                converted_input_tuple = ",".join(converted_inputs)
+                return [f"({converted_input_tuple})"]
         else:
             converted_inputs = convert(inputs)
         if not isinstance(converted_inputs, list):
@@ -166,11 +167,13 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
         if isinstance(inputs, BaseModel):
             if isinstance(inputs, Struct):
                 input_data = encode(
-                    self.get_inputs(), [tuple(inputs.model_dump().values())],
+                    self.get_inputs(),
+                    [tuple(inputs.model_dump().values())],
                 ).hex()
             else:
                 input_data = encode(
-                    self.get_inputs(), list(inputs.model_dump().values()),
+                    self.get_inputs(),
+                    list(inputs.model_dump().values()),
                 ).hex()
         elif not isinstance(inputs, tuple):
             input_data = encode(self.get_inputs(), [inputs]).hex()
