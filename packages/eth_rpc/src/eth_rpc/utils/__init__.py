@@ -1,4 +1,4 @@
-from .address import address_to_bytes32, address_to_topic
+from .address import address_to_bytes32, address_to_topic, to_checksum
 from .bloom import BloomFilter
 from .datetime import convert_datetime_to_iso_8601, load_datetime_string
 from .dual_async import handle_maybe_awaitable, run
@@ -26,5 +26,6 @@ __all__ = [
     "ordered_iterator",
     "sort_key",
     "to_32byte_hex",
+    "to_checksum",
     "to_hex_str",
 ]

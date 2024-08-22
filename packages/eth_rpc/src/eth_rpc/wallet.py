@@ -165,3 +165,8 @@ class PrivateKeyWallet(BaseWallet):
                 block_number=block_number,
             ),
         )
+
+    def transfer(self, to: HexAddress, value: int):
+        prepared_tx = self.prepare(to=to, value=value)
+        signed_tx = self.sign_transaction(prepared_tx)
+        return self.send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction)).sync
