@@ -77,7 +77,8 @@ class Multicall(ProtocolBase):
         *calls: ContractFunc,
         sync: Literal[False],
         block_number: int | BLOCK_STRINGS = ...,
-    ) -> list[Any]: ...
+    ) -> list[Any]:
+        ...
 
     @overload
     def execute(
@@ -85,14 +86,16 @@ class Multicall(ProtocolBase):
         *calls: ContractFunc,
         sync: Literal[True],
         block_number: int | BLOCK_STRINGS = ...,
-    ) -> Awaitable[list[Any]]: ...
+    ) -> Awaitable[list[Any]]:
+        ...
 
     @overload
     def execute(
         self,
         *calls: ContractFunc,
         block_number: int | BLOCK_STRINGS = ...,
-    ) -> Awaitable[list[Any]]: ...
+    ) -> Awaitable[list[Any]]:
+        ...
 
     def execute(
         self,
@@ -109,7 +112,6 @@ class Multicall(ProtocolBase):
         sync: bool = False,
         block_number: int | BLOCK_STRINGS = "latest",
     ) -> list[TryResult]:
-
         call = await self.try_block_and_aggregate(
             TryMulticallRequest(
                 require_success=require_success,
@@ -140,7 +142,8 @@ class Multicall(ProtocolBase):
         sync: Literal[True],
         require_success: bool = ...,
         block_number: int | BLOCK_STRINGS = ...,
-    ) -> list[TryResult]: ...
+    ) -> list[TryResult]:
+        ...
 
     @overload
     def try_execute(
@@ -148,7 +151,8 @@ class Multicall(ProtocolBase):
         *calls: ContractFunc,
         require_success: bool = ...,
         block_number: int | BLOCK_STRINGS = ...,
-    ) -> Awaitable[list[TryResult]]: ...
+    ) -> Awaitable[list[TryResult]]:
+        ...
 
     @overload
     def try_execute(
@@ -157,7 +161,8 @@ class Multicall(ProtocolBase):
         require_success: bool = ...,
         sync: bool = ...,
         block_number: int | BLOCK_STRINGS = ...,
-    ) -> MaybeAwaitable[list[TryResult]]: ...
+    ) -> MaybeAwaitable[list[TryResult]]:
+        ...
 
     def try_execute(
         self,

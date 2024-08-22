@@ -40,18 +40,18 @@ class WeightedIndex(ERC20):
     index_tokens: Annotated[
         ContractFunc[primitives.uint256, IndexAssetInfo], Name("indexTokens")
     ] = METHOD
-    indextype: Annotated[ContractFunc[NoArgs, primitives.uint8], Name("indexType")] = (
-        METHOD
-    )
-    bond_fee: Annotated[ContractFunc[NoArgs, primitives.uint256], Name("BOND_FEE")] = (
-        METHOD
-    )
+    indextype: Annotated[
+        ContractFunc[NoArgs, primitives.uint8], Name("indexType")
+    ] = METHOD
+    bond_fee: Annotated[
+        ContractFunc[NoArgs, primitives.uint256], Name("BOND_FEE")
+    ] = METHOD
     debond_fee: Annotated[
         ContractFunc[NoArgs, primitives.uint256], Name("DEBOND_FEE")
     ] = METHOD
-    is_asset: Annotated[ContractFunc[HexAddress, primitives.bool], Name("isAsset")] = (
-        METHOD
-    )
+    is_asset: Annotated[
+        ContractFunc[HexAddress, primitives.bool], Name("isAsset")
+    ] = METHOD
     lp_rewards_token: Annotated[
         ContractFunc[NoArgs, HexAddress], Name("lpRewardsToken")
     ] = METHOD
@@ -64,6 +64,6 @@ class WeightedIndex(ERC20):
     partner: ContractFunc[NoArgs, HexAddress] = METHOD
     fees: ContractFunc[NoArgs, Fees] = METHOD
     created: ContractFunc[NoArgs, primitives.uint256] = METHOD
-    index_type: Annotated[ContractFunc[NoArgs, primitives.uint8], Name("indexType")] = (
-        METHOD
-    )
+    index_type: Annotated[
+        ContractFunc[NoArgs, primitives.uint8], Name("indexType")
+    ] = METHOD

@@ -16,6 +16,6 @@ class GetPairRequest(BaseModel):
 
 
 class UniswapV2Factory(ProtocolBase):
-    get_pair: Annotated[ContractFunc[GetPairRequest, HexAddress], Name("getPair")] = (
-        METHOD
-    )
+    get_pair: Annotated[
+        ContractFunc[GetPairRequest, HexAddress], Name("getPair")
+    ] = METHOD

@@ -36,9 +36,9 @@ class CamelotV3Pool(ProtocolBase):
     _token1: ERC20 | None = PrivateAttr(None)
 
     fee: ContractFunc[NoArgs, primitives.uint24] = METHOD
-    global_state: Annotated[ContractFunc[NoArgs, GlobalState], Name("globalState")] = (
-        METHOD
-    )
+    global_state: Annotated[
+        ContractFunc[NoArgs, GlobalState], Name("globalState")
+    ] = METHOD
     token0: ContractFunc[NoArgs, HexAddress] = METHOD
     token1: ContractFunc[NoArgs, HexAddress] = METHOD
 
