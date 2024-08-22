@@ -131,7 +131,8 @@ class ContractFunc(Generic[T, U]):
         sync: Literal[True],
         from_: Optional[HexAddress] = ...,
         block_number: HexInteger | Literal["latest", "pending"] = ...,
-    ) -> HexInteger: ...
+    ) -> HexInteger:
+        ...
 
     @overload
     def estimate_gas(
@@ -140,7 +141,8 @@ class ContractFunc(Generic[T, U]):
         sync: Literal[False] = ...,
         from_: Optional[HexAddress] = ...,
         block_number: HexInteger | Literal["latest", "pending"] = ...,
-    ) -> Awaitable[HexInteger]: ...
+    ) -> Awaitable[HexInteger]:
+        ...
 
     def estimate_gas(
         self,
@@ -195,7 +197,8 @@ class ContractFunc(Generic[T, U]):
         gas: int = 10000000,
         sender: HexAddress = ADDRESS_ZERO,
         block_number: int | None = None,
-    ) -> AccessListResponse: ...
+    ) -> AccessListResponse:
+        ...
 
     @overload
     def access_list(
@@ -204,7 +207,8 @@ class ContractFunc(Generic[T, U]):
         gas: int = 10000000,
         sender: HexAddress = ADDRESS_ZERO,
         block_number: int | None = None,
-    ) -> Awaitable[AccessListResponse]: ...
+    ) -> Awaitable[AccessListResponse]:
+        ...
 
     def access_list(
         self,
@@ -286,7 +290,8 @@ class ContractFunc(Generic[T, U]):
         block_number: int | BLOCK_STRINGS = ...,
         value: HexInteger | int = ...,
         state_diff: dict[HexAddress, Any] = ...,
-    ) -> EthResponse[T, U]: ...
+    ) -> EthResponse[T, U]:
+        ...
 
     @overload
     def call(
@@ -297,7 +302,8 @@ class ContractFunc(Generic[T, U]):
         block_number: int | BLOCK_STRINGS = ...,
         value: HexInteger | int = ...,
         state_diff: dict[HexAddress, Any] = ...,
-    ) -> Awaitable[EthResponse[T, U]]: ...
+    ) -> Awaitable[EthResponse[T, U]]:
+        ...
 
     @overload
     def call(
@@ -307,7 +313,8 @@ class ContractFunc(Generic[T, U]):
         block_number: int | BLOCK_STRINGS = ...,
         value: HexInteger | int = ...,
         state_diff: dict[HexAddress, Any] = ...,
-    ) -> Awaitable[EthResponse[T, U]]: ...
+    ) -> Awaitable[EthResponse[T, U]]:
+        ...
 
     @overload
     def call(
@@ -318,7 +325,8 @@ class ContractFunc(Generic[T, U]):
         block_number: int | BLOCK_STRINGS = ...,
         value: HexInteger | int = ...,
         state_diff: dict[HexAddress, Any] = ...,
-    ) -> MaybeAwaitable[EthResponse[T, U]]: ...
+    ) -> MaybeAwaitable[EthResponse[T, U]]:
+        ...
 
     def call(
         self,
@@ -359,7 +367,8 @@ class ContractFunc(Generic[T, U]):
         block_number: int | BLOCK_STRINGS = ...,
         value: HexInteger | int = ...,
         state_diff: dict[HexAddress, Any] = ...,
-    ) -> U: ...
+    ) -> U:
+        ...
 
     @overload
     def get(
@@ -370,7 +379,8 @@ class ContractFunc(Generic[T, U]):
         block_number: int | BLOCK_STRINGS = ...,
         value: HexInteger | int = ...,
         state_diff: dict[HexAddress, Any] = ...,
-    ) -> Awaitable[U]: ...
+    ) -> Awaitable[U]:
+        ...
 
     def get(
         self,
@@ -470,7 +480,8 @@ class ContractFunc(Generic[T, U]):
         max_fee_per_gas: Optional[int] = ...,
         max_priority_fee_per_gas: Optional[int] = ...,
         use_access_list: bool = ...,
-    ) -> PreparedTransaction: ...
+    ) -> PreparedTransaction:
+        ...
 
     @overload
     def prepare(
@@ -482,7 +493,8 @@ class ContractFunc(Generic[T, U]):
         max_fee_per_gas: Optional[int] = ...,
         max_priority_fee_per_gas: Optional[int] = ...,
         use_access_list: bool = ...,
-    ) -> Awaitable[PreparedTransaction]: ...
+    ) -> Awaitable[PreparedTransaction]:
+        ...
 
     def prepare(
         self,
@@ -538,8 +550,12 @@ class ContractFunc(Generic[T, U]):
             )
         signed_tx = wallet.sign_transaction(prepared_tx)
         if sync:
-            return wallet.send_raw_transaction(HexStr('0x' + signed_tx.raw_transaction)).sync
-        return await wallet.send_raw_transaction(HexStr('0x' + signed_tx.raw_transaction))
+            return wallet.send_raw_transaction(
+                HexStr("0x" + signed_tx.raw_transaction)
+            ).sync
+        return await wallet.send_raw_transaction(
+            HexStr("0x" + signed_tx.raw_transaction)
+        )
 
     @overload
     def execute(
@@ -552,7 +568,8 @@ class ContractFunc(Generic[T, U]):
         max_fee_per_gas: Optional[int] = ...,
         max_priority_fee_per_gas: Optional[int] = ...,
         use_access_list: bool = ...,
-    ) -> HexStr: ...
+    ) -> HexStr:
+        ...
 
     @overload
     def execute(
@@ -564,7 +581,8 @@ class ContractFunc(Generic[T, U]):
         max_fee_per_gas: Optional[int] = ...,
         max_priority_fee_per_gas: Optional[int] = ...,
         use_access_list: bool = ...,
-    ) -> Awaitable[HexStr]: ...
+    ) -> Awaitable[HexStr]:
+        ...
 
     def execute(
         self,

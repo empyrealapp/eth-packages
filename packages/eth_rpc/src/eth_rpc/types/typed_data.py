@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 from . import primitives
 from .struct import Struct
 
-ALL_PRIMITIVES = [x for x in dir(primitives) if x[0].islower() and x[0] != '_']
+ALL_PRIMITIVES = [x for x in dir(primitives) if x[0].islower() and x[0] != "_"]
 
 
 class Domain(BaseModel):
@@ -44,7 +44,7 @@ class EIP712Model(Struct):
         # handle list type
         if isinstance(type_, GenericAlias):
             (arg,) = get_args(type_)
-            return f'{arg.__name__}[]'
+            return f"{arg.__name__}[]"
         return type_.__name__
 
     @classmethod
