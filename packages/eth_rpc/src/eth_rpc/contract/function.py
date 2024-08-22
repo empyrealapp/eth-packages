@@ -107,6 +107,7 @@ class ContractFunc(Generic[T, U]):
         from_: Optional[HexAddress] = None,
         block_number: HexInteger | Literal["latest", "pending"] = "latest",
         sync: bool = False,
+        buffer: float = 1.25,
     ) -> HexInteger:
         query: RPCResponseModel[CallWithBlockArgs, HexInteger] = RPCResponseModel(
             self._rpc().estimate_gas,
@@ -120,8 +121,8 @@ class ContractFunc(Generic[T, U]):
             ),
         )
         if sync:
-            return query.sync
-        return await query
+            return HexInteger(query.sync * buffer)
+        return HexInteger((await query) * buffer)
 
     @overload
     def estimate_gas(
@@ -412,7 +413,10 @@ class ContractFunc(Generic[T, U]):
         else:
             access_list = None
         rpc = _force_get_global_rpc()
-        chain_id = rpc.chain_id
+        if sync:
+            chain_id = rpc.chain_id.sync()
+        else:
+            chain_id = await rpc.chain_id()
 
         if sync:
             max_priority_fee_per_gas = (
@@ -424,20 +428,32 @@ class ContractFunc(Generic[T, U]):
                 max_priority_fee_per_gas or await Block.priority_fee()
             )
             # TODO: fix pending()
-            base_fee_per_gas = Block.pending().sync.base_fee_per_gas
+            base_fee_per_gas = (await Block.pending()).base_fee_per_gas
 
         assert base_fee_per_gas, "block is earlier than London Hard Fork"
         max_fee_per_gas = max_fee_per_gas or (
             2 * base_fee_per_gas + max_priority_fee_per_gas
         )
 
+        if sync:
+            return PreparedTransaction(
+                data=self.data,
+                to=self.address,
+                gas=HexInteger(gas),
+                max_fee_per_gas=max_fee_per_gas,
+                max_priority_fee_per_gas=max_priority_fee_per_gas,
+                nonce=nonce or wallet.get_nonce().sync,
+                value=value,
+                access_list=access_list,
+                chain_id=chain_id,
+            )
         return PreparedTransaction(
             data=self.data,
             to=self.address,
             gas=HexInteger(gas),
             max_fee_per_gas=max_fee_per_gas,
             max_priority_fee_per_gas=max_priority_fee_per_gas,
-            nonce=nonce or wallet.get_nonce(),
+            nonce=nonce or await wallet.get_nonce(),
             value=value,
             access_list=access_list,
             chain_id=chain_id,
@@ -522,8 +538,8 @@ class ContractFunc(Generic[T, U]):
             )
         signed_tx = wallet.sign_transaction(prepared_tx)
         if sync:
-            return wallet.send_raw_transaction(signed_tx.raw_transaction).sync
-        return await wallet.send_raw_transaction(signed_tx.raw_transaction)
+            return wallet.send_raw_transaction(HexStr('0x' + signed_tx.raw_transaction)).sync
+        return await wallet.send_raw_transaction(HexStr('0x' + signed_tx.raw_transaction))
 
     @overload
     def execute(
