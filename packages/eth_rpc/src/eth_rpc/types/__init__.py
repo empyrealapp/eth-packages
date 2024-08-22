@@ -29,6 +29,7 @@ from .args import (
 from .basic import BLOCK_STRINGS, BlockReference, Empty, HexInt, HexInteger
 from .event import Indexed, Name
 from .network import BlockExplorer, Network, Rpcs, RpcUrl
+from .primitives import BASIC_TYPES, BYTES_TYPES
 from .response import NoArgs, RPCResponseModel
 from .struct import Struct
 from .transaction import SignedTransaction
@@ -117,6 +118,8 @@ class JsonResponseWssResponse(TypedDict):
 
 
 __all__ = [
+    "BASIC_TYPES",
+    "BYTES_TYPES",
     "BLOCK_STRINGS",
     "BlockExplorer",
     "BlockReference",

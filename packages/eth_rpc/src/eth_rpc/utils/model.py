@@ -4,7 +4,6 @@ from typing import Any, ClassVar, Optional
 from pydantic import BaseModel, ConfigDict, PrivateAttr
 from pydantic.alias_generators import to_camel
 
-from .._transport import _force_get_default_network
 from ..types import Network as NetworkType
 from .datetime import convert_datetime_to_iso_8601
 
@@ -33,6 +32,8 @@ class RPCModel(BaseModel):
 
     @property
     def network(self) -> NetworkType:  # noqa: F811
+        from .._transport import _force_get_default_network
+
         network = self.__network or self._network
         if not network:
             return _force_get_default_network()
