@@ -98,10 +98,14 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
 
     def get_identifier(self):
         """This works most of the time"""
+        input_arg, _ = self.__pydantic_generic_metadata__["args"]
+
         signature = f'{self.name}({",".join(self.get_inputs())})'
         return f"0x{keccak_256(signature.encode('utf-8')).hex()[:8]}"
 
     def get_inputs(self):
+        from .types import Struct
+
         inputs, _ = self.__pydantic_generic_metadata__["args"]
         if inputs is NoArgs:
             return []
@@ -111,6 +115,8 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
             and issubclass(inputs, BaseModel)
         ):
             converted_inputs = convert_base_model(inputs)
+            if issubclass(inputs, Struct):
+                return [f"({",".join(converted_inputs)})"]
         else:
             converted_inputs = convert(inputs)
         if not isinstance(converted_inputs, list):
@@ -153,11 +159,19 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
         return [self._get_name(output) for output in get_args(self._output)]
 
     def encode_call(self, *, inputs: T) -> HexStr:
+        from .types import Struct
+
         identifier = self.get_identifier()
+        # TODO: this is hard
         if isinstance(inputs, BaseModel):
-            input_data = encode(
-                self.get_inputs(), list(inputs.model_dump().values())
-            ).hex()
+            if isinstance(inputs, Struct):
+                input_data = encode(
+                    self.get_inputs(), [tuple(inputs.model_dump().values())],
+                ).hex()
+            else:
+                input_data = encode(
+                    self.get_inputs(), list(inputs.model_dump().values()),
+                ).hex()
         elif not isinstance(inputs, tuple):
             input_data = encode(self.get_inputs(), [inputs]).hex()
         else:
