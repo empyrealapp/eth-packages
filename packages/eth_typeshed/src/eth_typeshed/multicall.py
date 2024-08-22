@@ -109,7 +109,6 @@ class Multicall(ProtocolBase):
         sync: bool = False,
         block_number: int | BLOCK_STRINGS = "latest",
     ) -> list[TryResult]:
-
         call = await self.try_block_and_aggregate(
             TryMulticallRequest(
                 require_success=require_success,

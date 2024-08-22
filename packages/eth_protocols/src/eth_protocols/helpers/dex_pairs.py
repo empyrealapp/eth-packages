@@ -18,7 +18,6 @@ from pydantic import BaseModel
 
 
 class DexPairHelper(BaseModel):
-
     @staticmethod
     def find_pair(
         data: dict[HexAddress, list[V2Pair | V3Pool]],

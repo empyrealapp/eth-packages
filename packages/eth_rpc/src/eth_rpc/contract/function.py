@@ -538,8 +538,12 @@ class ContractFunc(Generic[T, U]):
             )
         signed_tx = wallet.sign_transaction(prepared_tx)
         if sync:
-            return wallet.send_raw_transaction(HexStr('0x' + signed_tx.raw_transaction)).sync
-        return await wallet.send_raw_transaction(HexStr('0x' + signed_tx.raw_transaction))
+            return wallet.send_raw_transaction(
+                HexStr("0x" + signed_tx.raw_transaction)
+            ).sync
+        return await wallet.send_raw_transaction(
+            HexStr("0x" + signed_tx.raw_transaction)
+        )
 
     @overload
     def execute(
