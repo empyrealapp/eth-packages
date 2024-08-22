@@ -133,6 +133,8 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
 
     def get_output(self):
         outputs = self._output
+        if outputs is type(None):
+            return None
 
         if is_annotation(outputs):
             outputs = get_args(outputs)[0]
@@ -164,6 +166,10 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
 
     def decode_result(self, result: HexStr) -> U:
         output = self.get_output()
+        if output is None:
+            # return None if the expected return type is None
+            return output  # type: ignore
+
         if not isinstance(output, list):
             output = [output]
             decoded_output = decode(output, bytes.fromhex(result.removeprefix("0x")))[0]
