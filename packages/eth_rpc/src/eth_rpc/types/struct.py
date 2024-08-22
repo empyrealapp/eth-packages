@@ -1,7 +1,6 @@
 from eth_abi import encode
-from pydantic import BaseModel
-
 from eth_rpc.function import convert_base_model
+from pydantic import BaseModel
 
 
 class Struct(BaseModel):

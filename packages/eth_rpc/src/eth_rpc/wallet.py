@@ -38,14 +38,12 @@ class BaseWallet(Request, ABC):
         )
 
     @abstractmethod
-    def sign_transaction(self, tx) -> SignedTransaction:
-        ...
+    def sign_transaction(self, tx) -> SignedTransaction: ...
 
     @abstractmethod
     def send_raw_transaction(
         self, tx: HexStr
-    ) -> RPCResponseModel[RawTransaction, HexStr]:
-        ...
+    ) -> RPCResponseModel[RawTransaction, HexStr]: ...
 
 
 class MockWallet(BaseWallet):

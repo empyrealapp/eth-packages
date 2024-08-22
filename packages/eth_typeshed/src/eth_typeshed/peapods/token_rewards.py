@@ -37,9 +37,9 @@ class TokenRewards(ProtocolBase):
         Name("getUnpaid"),
     ] = METHOD
     rewards: ContractFunc[HexAddress, Rewards] = METHOD
-    rewards_token: Annotated[
-        ContractFunc[NoArgs, HexAddress], Name("rewardsToken")
-    ] = METHOD
+    rewards_token: Annotated[ContractFunc[NoArgs, HexAddress], Name("rewardsToken")] = (
+        METHOD
+    )
     shares: ContractFunc[HexAddress, primitives.uint256] = METHOD
     total_shares: Annotated[
         ContractFunc[NoArgs, primitives.uint256], Name("totalShares")

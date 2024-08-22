@@ -17,6 +17,6 @@ class GetPoolRequest(BaseModel):
 
 
 class UniswapV3Factory(ProtocolBase):
-    get_pool: Annotated[
-        ContractFunc[GetPoolRequest, HexAddress], Name("getPool")
-    ] = METHOD
+    get_pool: Annotated[ContractFunc[GetPoolRequest, HexAddress], Name("getPool")] = (
+        METHOD
+    )

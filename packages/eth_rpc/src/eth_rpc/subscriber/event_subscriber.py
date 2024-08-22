@@ -29,8 +29,7 @@ T = TypeVar("T", bound=BaseModel)
 
 
 class Receiver(Protocol, Generic[T]):
-    async def put(self, event: EventData[T]) -> None:
-        ...
+    async def put(self, event: EventData[T]) -> None: ...
 
 
 class EventSubscriber(Request):

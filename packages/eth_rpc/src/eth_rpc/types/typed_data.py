@@ -2,9 +2,9 @@ from inspect import isclass
 from types import GenericAlias
 from typing import get_args
 
-from eth_account.messages import encode_typed_data
 from eth_account.account import Account, LocalAccount, SignableMessage
 from eth_account.datastructures import SignedMessage
+from eth_account.messages import encode_typed_data
 from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import BaseModel, Field
 

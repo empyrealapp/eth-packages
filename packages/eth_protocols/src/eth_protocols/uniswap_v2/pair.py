@@ -28,7 +28,6 @@ class V2Pair(DexPair):
         tokena: HexAddress,
         tokenb: HexAddress,
     ):
-
         token0, token1 = (
             (tokena, tokenb) if tokena.lower() < tokenb.lower() else (tokenb, tokena)
         )

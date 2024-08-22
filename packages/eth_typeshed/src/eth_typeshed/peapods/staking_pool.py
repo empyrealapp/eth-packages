@@ -8,10 +8,10 @@ from eth_typing import HexAddress, HexStr
 
 
 class StakingPool(ERC20):
-    pool_rewards: Annotated[
-        ContractFunc[NoArgs, HexAddress], Name("poolRewards")
-    ] = METHOD
+    pool_rewards: Annotated[ContractFunc[NoArgs, HexAddress], Name("poolRewards")] = (
+        METHOD
+    )
     index_fund: Annotated[ContractFunc[NoArgs, HexAddress], Name("indexFund")] = METHOD
-    staking_token: Annotated[
-        ContractFunc[NoArgs, HexAddress], Name("stakingToken")
-    ] = METHOD
+    staking_token: Annotated[ContractFunc[NoArgs, HexAddress], Name("stakingToken")] = (
+        METHOD
+    )

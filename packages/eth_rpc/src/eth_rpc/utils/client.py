@@ -18,14 +18,12 @@ class HTTPClient(DualAsync):
 
     # GET
     @overload
-    def get(self, url, *args, sync: Literal[True], **kwargs) -> Response:
-        ...
+    def get(self, url, *args, sync: Literal[True], **kwargs) -> Response: ...
 
     @overload
     def get(
         self, url, *args, sync: Literal[False] = ..., **kwargs
-    ) -> Coroutine[Any, Any, AsyncResponse]:
-        ...
+    ) -> Coroutine[Any, Any, AsyncResponse]: ...
 
     def get(
         self, url, *args, sync: bool = False, **kwargs
@@ -34,14 +32,12 @@ class HTTPClient(DualAsync):
 
     # PUT
     @overload
-    def put(self, url, *args, sync: Literal[True], **kwargs) -> Response:
-        ...
+    def put(self, url, *args, sync: Literal[True], **kwargs) -> Response: ...
 
     @overload
     def put(
         self, url, *args, sync: Literal[False] = ..., **kwargs
-    ) -> Coroutine[Any, Any, AsyncResponse]:
-        ...
+    ) -> Coroutine[Any, Any, AsyncResponse]: ...
 
     def put(
         self, url, *args, sync: bool = False, **kwargs
@@ -50,14 +46,12 @@ class HTTPClient(DualAsync):
 
     # POST
     @overload
-    def post(self, url, *args, sync: Literal[True], **kwargs) -> Response:
-        ...
+    def post(self, url, *args, sync: Literal[True], **kwargs) -> Response: ...
 
     @overload
     def post(
         self, url, *args, sync: Literal[False] = ..., **kwargs
-    ) -> Coroutine[Any, Any, AsyncResponse]:
-        ...
+    ) -> Coroutine[Any, Any, AsyncResponse]: ...
 
     def post(
         self, url, *args, sync: bool = False, **kwargs
@@ -66,14 +60,12 @@ class HTTPClient(DualAsync):
 
     # DELETE
     @overload
-    def delete(self, url, *args, sync: Literal[True], **kwargs) -> Response:
-        ...
+    def delete(self, url, *args, sync: Literal[True], **kwargs) -> Response: ...
 
     @overload
     def delete(
         self, url, *args, sync: Literal[False] = ..., **kwargs
-    ) -> Coroutine[Any, Any, AsyncResponse]:
-        ...
+    ) -> Coroutine[Any, Any, AsyncResponse]: ...
 
     def delete(
         self, url, *args, sync: bool = False, **kwargs

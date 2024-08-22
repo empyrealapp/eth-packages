@@ -12,8 +12,7 @@ from pydantic_core import core_schema
 BLOCK_STRINGS = Literal["latest", "earliest", "pending", "safe", "finalized"]
 
 
-class Empty(BaseModel):
-    ...
+class Empty(BaseModel): ...
 
 
 class HexInt(int):

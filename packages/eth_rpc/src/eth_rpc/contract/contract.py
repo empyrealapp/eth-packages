@@ -147,14 +147,12 @@ class Contract(BaseModel, Request):
     @overload
     def get_storage_at(
         self, *, sync: Literal[True], slot: int | HexStr, block_number="latest"
-    ) -> HexStr:
-        ...
+    ) -> HexStr: ...
 
     @overload
     def get_storage_at(
         self, *, slot: int | HexStr, block_number="latest"
-    ) -> Awaitable[HexStr]:
-        ...
+    ) -> Awaitable[HexStr]: ...
 
     def get_storage_at(
         self, *, slot: int | HexStr, block_number="latest", sync: bool = False
@@ -218,8 +216,7 @@ class Contract(BaseModel, Request):
         sync: Literal[True],
         block_number: int | BLOCK_STRINGS | None = None,
         block_hash: HexStr | None = None,
-    ) -> HexStr:
-        ...
+    ) -> HexStr: ...
 
     @overload
     def get_code(
@@ -227,8 +224,7 @@ class Contract(BaseModel, Request):
         *,
         block_number: int | BLOCK_STRINGS | None = None,
         block_hash: HexStr | None = None,
-    ) -> Awaitable[HexStr]:
-        ...
+    ) -> Awaitable[HexStr]: ...
 
     def get_code(
         self,
