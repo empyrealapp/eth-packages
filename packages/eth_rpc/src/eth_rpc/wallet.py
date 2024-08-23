@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Literal, Optional
 
 from eth_account import Account
-from eth_account.account import LocalAccount
+from eth_account.account import LocalAccount, SignedMessage
 from eth_rpc.types import (
     BLOCK_STRINGS,
     CallWithBlockArgs,
@@ -170,3 +170,6 @@ class PrivateKeyWallet(BaseWallet):
         prepared_tx = self.prepare(to=to, value=value)
         signed_tx = self.sign_transaction(prepared_tx)
         return self.send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction)).sync
+
+    def sign_hash(self, hashed: bytes) -> SignedMessage:
+        return Account._sign_hash(hashed, self.account.key)

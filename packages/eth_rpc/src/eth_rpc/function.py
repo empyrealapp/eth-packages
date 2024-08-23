@@ -4,7 +4,7 @@ from typing import Generic, NamedTuple, TypeVar, get_args, get_origin
 
 from eth_abi import decode, encode
 from eth_hash.auto import keccak as keccak_256
-from eth_typing import HexAddress, HexStr, Primitives
+from eth_typing import ChecksumAddress, HexAddress, HexStr, Primitives
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
@@ -27,6 +27,9 @@ U = TypeVar("U")
 def map_name(name):
     return {
         HexAddress: "address",
+        HexStr: "bytes",
+        ChecksumAddress: "address",
+        str: "string",
     }.get(name, name.__name__)
 
 

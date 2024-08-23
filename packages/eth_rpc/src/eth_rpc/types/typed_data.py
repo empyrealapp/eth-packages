@@ -2,26 +2,53 @@ from inspect import isclass
 from types import GenericAlias
 from typing import get_args
 
+from eth_abi import encode
 from eth_account.account import Account, LocalAccount, SignableMessage
 from eth_account.datastructures import SignedMessage
-from eth_account.messages import encode_typed_data
-from eth_typing import ChecksumAddress, HexAddress, HexStr
+from eth_hash.auto import keccak
+from eth_typing import HexAddress
 from pydantic import BaseModel, Field
 
-from . import primitives
 from .struct import Struct
 
-ALL_PRIMITIVES = [x for x in dir(primitives) if x[0].islower() and x[0] != "_"]
+
+def encode_packed_array(type_, values):
+    if type_ == "string":
+        return encode(
+            [type_] * len(values),
+            [keccak(value.encode("utf-8")) for value in values],
+        )
+    return encode(
+        [type_] * len(values),
+        values,
+    )
 
 
 class Domain(BaseModel):
     name: str
     version: str
     chain_id: int = Field(serialization_alias="chainId")
-    verifying_contract: HexStr = Field(serialization_alias="verifyingContract")
+    verifying_contract: HexAddress = Field(serialization_alias="verifyingContract")
 
     def model_dump(self, by_alias=True, **kwargs):
         return super().model_dump(by_alias=by_alias, **kwargs)
+
+    def hash(self):
+        hash = keccak(
+            b"EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+        )
+        return keccak(
+            encode(
+                ["bytes32", "bytes32", "bytes32", "uint256", "address"],
+                [
+                    hash,
+                    keccak(self.name.encode("utf-8")),
+                    keccak(self.version.encode("utf-8")),
+                    self.chain_id,
+                    self.verifying_contract,
+                ],
+            )
+        )
 
 
 class EIP712Model(Struct):
@@ -29,57 +56,60 @@ class EIP712Model(Struct):
     def name(cls) -> str:
         return cls.__name__
 
-    @staticmethod
-    def transform(type_):
-        mapping = {
-            str: "string",
-            int: "uint256",  # defaults to uint
-            HexAddress: "address",
-            ChecksumAddress: "address",
-        }
-        if type_ in mapping:
-            return mapping[type_]
-        if str(type_) in ALL_PRIMITIVES:
-            return str(type_)
-        # handle list type
-        if isinstance(type_, GenericAlias):
-            (arg,) = get_args(type_)
-            return f"{arg.__name__}[]"
-        return type_.__name__
-
     @classmethod
-    def get_submodels(cls):
-        for _, field_data in cls.model_fields.items():
+    def type_string(cls):
+        type_string = ""
+        for name, field_data in cls.model_fields.items():
+            name = field_data.serialization_alias or name
             type_ = field_data.annotation
-            if isclass(type_) and issubclass(type_, EIP712Model):
-                yield type_
-                yield from type_.get_submodels()
-            elif isinstance(type_, GenericAlias):
+            if isinstance(type_, GenericAlias):
                 (arg,) = get_args(type_)
+                type_str = f"{cls.transform(arg)}[]"
+            else:
+                type_str = cls.transform(type_)
+            type_string += f"{type_str} {name},"
+        encoded_typestr = f'{cls.__name__}({type_string.rstrip(",")})'.encode("utf-8")
+        return encoded_typestr
+
+    @classmethod
+    def typehash(cls):
+        return keccak(cls.type_string())
+
+    def hash(self):
+        types = ["bytes32"]
+        values = [self.__class__.typehash()]
+        for name, field_data in self.model_fields.items():
+            value = getattr(self, name)
+            type_ = field_data.annotation
+            if isinstance(type_, GenericAlias):
+                (arg,) = get_args(type_)
+                types.append("bytes32")
                 if isclass(arg) and issubclass(arg, EIP712Model):
-                    yield arg
-                    yield from arg.get_submodels()
-
-    @classmethod
-    def get_models(cls):
-        models = [cls]
-        for _, field_data in cls.model_fields.items():
-            if issubclass(field_data.annotation, EIP712Model):
-                models.append(field_data.annotation)
-
-        return models
-
-    @classmethod
-    def build(cls):
-        response = []
-        for field_name, field_data in cls.model_fields.items():
-            response.append(
-                {
-                    "name": field_data.alias or field_name,
-                    "type": cls.transform(field_data.annotation),
-                },
-            )
-        return response
+                    hashed_arr = []
+                    for row in value:
+                        hashed_arr.append(row.hash())
+                    encoding = keccak(
+                        encode_packed_array(
+                            "bytes32",
+                            hashed_arr,
+                        )
+                    )
+                    values.append(encoding)
+                else:
+                    arg_name = self.transform(arg)
+                    values.append(keccak(encode_packed_array(arg_name, value)))
+            elif isclass(type_) and issubclass(type_, EIP712Model):
+                types.append("bytes32")
+                values.append(value.hash())
+            else:
+                type_name = self.transform(type_)
+                if type_name == "string":
+                    types.append("bytes32")
+                    values.append(keccak(value.encode("utf-8")))
+                else:
+                    types.append(type_name)
+                    values.append(value)
+        return keccak(encode(types, values))
 
     def model_dump(self, by_alias=True, **kwargs):
         return super().model_dump(by_alias=by_alias, **kwargs)
@@ -95,16 +125,9 @@ class DomainTypes(Struct):
         return response
 
 
-def encode_data(domain: Domain, message_data: EIP712Model) -> SignableMessage:
-    class_set: set[EIP712Model] = set()
-    for type_ in message_data.get_submodels():
-        class_set.add(type_)
-    signable_message = encode_typed_data(
-        domain.model_dump(),
-        {klass.name(): klass.build() for klass in class_set},
-        message_data.model_dump(),
-    )
-    return signable_message
+def hash_eip712_bytes(domain: Domain, struct: EIP712Model):
+    joined = b"\x19\x01" + domain.hash() + struct.hash()
+    return keccak(joined)
 
 
 def sign(message: SignableMessage, acc: LocalAccount) -> SignedMessage:
