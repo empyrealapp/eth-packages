@@ -1,8 +1,8 @@
 import asyncio
-import json
-import re
 from collections.abc import AsyncIterator
 from contextvars import ContextVar
+import json
+import re
 from typing import Generic, Optional, Protocol, TypeVar
 
 from eth_rpc import Block
