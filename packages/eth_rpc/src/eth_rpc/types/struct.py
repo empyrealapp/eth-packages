@@ -22,6 +22,7 @@ class Struct(BaseModel):
     One is a field with two arguments, the other is a field with a single argument,
         that is a struct with two fields
     """
+
     @staticmethod
     def transform(type_):
         mapping = {
@@ -43,15 +44,17 @@ class Struct(BaseModel):
 
     def to_bytes(self):
         # TODO: this should be able to handle recursive types, it will fail if the depth is more than 2
-        types = ','.join(convert_base_model(self.__class__))
+        types = ",".join(convert_base_model(self.__class__))
         values = []
         for _, value in self:
             # this generally works, but should be revisited
-            if isinstance(value, list) and len(value) > 0 and isinstance(value[0], Struct):
+            if (
+                isinstance(value, list)
+                and len(value) > 0
+                and isinstance(value[0], Struct)
+            ):
                 value = [tuple(v.model_dump().values()) for v in value]
             elif isinstance(value, Struct):
                 value = tuple(value.model_dump().values())
             values.append(value)
-        return encode(
-            [f'({types})'], [tuple(values)]
-        )
+        return encode([f"({types})"], [tuple(values)])
