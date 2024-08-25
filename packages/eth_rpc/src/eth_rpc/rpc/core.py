@@ -13,7 +13,6 @@ from eth_rpc.types import (
     AlchemyBlockReceipt,
     BlockNumberArg,
     CallWithBlockArgs,
-    Empty,
     EthCallArgs,
     FeeHistoryArgs,
     GetAccountArgs,
@@ -25,6 +24,7 @@ from eth_rpc.types import (
     GetTransactionByBlockNumber,
     HexInteger,
     LogsArgs,
+    NoArgs,
     RawTransaction,
     TraceArgs,
     TransactionRequest,
@@ -38,8 +38,8 @@ from .method import RPCMethod
 
 
 class RPC(BaseRPC):
-    chain_id: RPCMethod = RPCMethod[Empty, HexInteger](name="eth_chainId")
-    max_priority_fee_per_gas: RPCMethod = RPCMethod[Empty, HexInteger](
+    chain_id: RPCMethod = RPCMethod[NoArgs, HexInteger](name="eth_chainId")
+    max_priority_fee_per_gas: RPCMethod = RPCMethod[NoArgs, HexInteger](
         name="eth_maxPriorityFeePerGas"
     )
     fee_history: RPCMethod = RPCMethod[FeeHistoryArgs, FeeHistory](
@@ -64,7 +64,7 @@ class RPC(BaseRPC):
     estimate_gas: RPCMethod = RPCMethod[CallWithBlockArgs, HexInteger](
         name="eth_estimateGas"
     )
-    block_number: RPCMethod = RPCMethod[Empty, HexInteger](name="eth_blockNumber")
+    block_number: RPCMethod = RPCMethod[NoArgs, HexInteger](name="eth_blockNumber")
     create_access_list: RPCMethod = RPCMethod[CallWithBlockArgs, AccessListResponse](
         name="eth_createAccessList"
     )

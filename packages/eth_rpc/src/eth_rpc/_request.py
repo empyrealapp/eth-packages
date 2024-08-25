@@ -15,6 +15,11 @@ class Request:
     def __class_getitem__(cls, params):
         if issubclass(params, Network):
             cls._network = params
+        print("cls", cls)
+        if False:
+            super().__class_getitem__(cls, params)
+        # except Exception as exc:
+        #     print("EXC:", exc)
         return cls
 
     def __getitem__(self, params):

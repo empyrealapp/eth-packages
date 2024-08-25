@@ -11,7 +11,7 @@ from eth_abi import decode
 from eth_abi.exceptions import InsufficientDataBytes
 from eth_typing import HexAddress, HexStr
 from eth_utils import event_signature_to_log_topic
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, PrivateAttr, computed_field
 from websockets.exceptions import ConnectionClosedError
 from websockets.legacy.client import WebSocketClientProtocol, connect
 
@@ -22,6 +22,7 @@ from .exceptions import LogDecodeError, LogResponseExceededError
 from .models import EventData, Log
 from .types import (
     BLOCK_STRINGS,
+    BlockReference,
     EvmDataDict,
     Indexed,
     JsonResponseWssResponse,
@@ -77,7 +78,7 @@ def convert(type, with_name: bool = False, with_indexed: bool = False):
     return f"{map_type(type)}{map_indexed(indexed)}{name}".strip()
 
 
-class Event(Request, BaseModel, Generic[T]):
+class Event(BaseModel, Request, Generic[T]):
     name: str
     anonymous: bool = False
 
@@ -85,6 +86,25 @@ class Event(Request, BaseModel, Generic[T]):
     topic2_filter: Optional[HexStr | list[HexStr]] | IGNORE = IGNORE_VAL
     topic3_filter: Optional[HexStr | list[HexStr]] | IGNORE = IGNORE_VAL
     addresses_filter: list[HexAddress] = []
+
+    _output_type: BaseModel = PrivateAttr()
+
+    def model_post_init(self, __context):
+        EventType, *_ = self.__pydantic_generic_metadata__["args"]
+        self._output_type = EventType
+        self._network = self.__class__._network
+
+    def __class_getitem__(cls, params):
+        if issubclass(params, Network):
+            cls._network = params
+        else:
+            return super().__class_getitem__(params)
+
+    def __getitem__(self, params):
+        if issubclass(params, Network):
+            copy = self.model_copy()
+            copy._network = params
+        return copy
 
     @staticmethod
     def _matches(topic: HexStr, topic_filter: HexStr | list[HexStr] | None) -> bool:
@@ -233,8 +253,8 @@ class Event(Request, BaseModel, Generic[T]):
 
     def _get_logs(
         self,
-        start_block,
-        end_block,
+        start_block: BlockReference | int,
+        end_block: BlockReference | int,
         addresses: list[HexAddress] = [],
         topic1: Optional[HexStr | list[HexStr] | None] | IGNORE = IGNORE_VAL,
         topic2: Optional[HexStr | list[HexStr] | None] | IGNORE = IGNORE_VAL,
@@ -278,8 +298,8 @@ class Event(Request, BaseModel, Generic[T]):
 
     async def get_logs(
         self,
-        start_block,
-        end_block,
+        start_block: BlockReference | int,
+        end_block: BlockReference | int,
     ) -> AsyncIterator[EventData[T]]:
         cur_end = end_block
         try:

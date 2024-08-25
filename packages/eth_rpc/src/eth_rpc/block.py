@@ -22,14 +22,7 @@ from websockets.legacy.client import connect
 from ._request import Request
 from .constants import DEFAULT_EVENT
 from .models import Transaction as TransactionModel
-from .types import (
-    BLOCK_STRINGS,
-    BlockReference,
-    Empty,
-    HexInteger,
-    NoArgs,
-    RPCResponseModel,
-)
+from .types import BLOCK_STRINGS, BlockReference, HexInteger, NoArgs, RPCResponseModel
 
 SUBSCRIPTION_TYPE = Literal["newHeads", "newPendingTransactions"]
 DEFAULT_CONTEXT = ContextVar[int]("DEFAULT_CONTEXT")
@@ -88,7 +81,7 @@ class BlockRPC(Request):
             ),
         )
 
-    def get_number(self) -> RPCResponseModel[Empty, HexInteger]:
+    def get_number(self) -> RPCResponseModel[NoArgs, HexInteger]:
         return RPCResponseModel(
             self._rpc().block_number,
         )
