@@ -1,10 +1,9 @@
 from typing import Annotated
 
-from eth_rpc.contract import ContractFunc
+from eth_rpc import ContractFunc, ProtocolBase
 from eth_rpc.function import Name
 from eth_rpc.types import METHOD
 
-from ..._base import ProtocolBase
 from .types import (
     AddLiquidityETHRequest,
     AddLiquidityRequest,

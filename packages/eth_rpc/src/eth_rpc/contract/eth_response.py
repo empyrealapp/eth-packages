@@ -2,18 +2,19 @@ from collections.abc import Generator
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 
-from eth_typing import HexAddress, HexStr, Primitives
+from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel
 
 from ..function import FuncSignature
+from ..types import BASIC_TYPES
 
 T = TypeVar(
     "T",
     bound=tuple
     | BaseModel
-    | Primitives
-    | list[Primitives]
-    | tuple[Primitives, ...]
+    | BASIC_TYPES
+    | list[BASIC_TYPES]
+    | tuple[BASIC_TYPES, ...]
     | HexAddress,
 )
 U = TypeVar("U")

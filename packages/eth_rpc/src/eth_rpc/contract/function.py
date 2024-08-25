@@ -5,6 +5,7 @@ from typing import Any, Generic, Literal, Optional, TypeVar, cast, overload
 
 from eth_rpc.models import AccessListResponse
 from eth_rpc.types import (
+    BASIC_TYPES,
     BLOCK_STRINGS,
     CallWithBlockArgs,
     EthCallArgs,
@@ -14,7 +15,7 @@ from eth_rpc.types import (
 )
 from eth_rpc.types import Network as NetworkType
 from eth_rpc.types import RPCResponseModel
-from eth_typing import HexAddress, HexStr, Primitives
+from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel
 
 from .._transport import _force_get_global_rpc
@@ -33,9 +34,9 @@ T = TypeVar(
     "T",
     bound=tuple
     | BaseModel
-    | Primitives
-    | list[Primitives]
-    | tuple[Primitives, ...]
+    | BASIC_TYPES
+    | list[BASIC_TYPES]
+    | tuple[BASIC_TYPES, ...]
     | HexAddress,
 )
 U = TypeVar("U")

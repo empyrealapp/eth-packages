@@ -166,7 +166,7 @@ class TransactionRPC(Request):
             ),
         )
 
-    async def subscribe_pending(
+    async def subscribe_pending(  # noqa: C901
         self,
     ) -> AsyncIterator[PendingTransaction]:  # noqa: C901
         rpc = _force_get_global_rpc()

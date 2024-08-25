@@ -4,21 +4,21 @@ from typing import Any, Generic, NamedTuple, TypeVar, get_args, get_origin
 
 from eth_abi import decode, encode
 from eth_hash.auto import keccak as keccak_256
-from eth_typing import ChecksumAddress, HexAddress, HexStr, Primitives
+from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
 from ._request import Request
-from .types import Name, NoArgs
+from .types import BASIC_TYPES, Name, NoArgs
 from .utils import is_annotation
 
 T = TypeVar(
     "T",
     bound=tuple
     | BaseModel
-    | Primitives
-    | list[Primitives]
-    | tuple[Primitives, ...]
+    | BASIC_TYPES
+    | list[BASIC_TYPES]
+    | tuple[BASIC_TYPES, ...]
     | HexAddress,
 )
 U = TypeVar("U")

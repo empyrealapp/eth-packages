@@ -1,12 +1,12 @@
 from typing import Annotated, Optional
 
 from eth_rpc import ContractFunc
+from eth_rpc.contract import ProtocolBase
 from eth_rpc.types import METHOD, Name, NoArgs, primitives
 from eth_rpc.utils import to_32byte_hex
 from eth_typing import HexAddress, HexStr
 from pydantic import PrivateAttr
 
-from .._base import ProtocolBase
 from .constants import ADMIN_SLOT, EIP1967_IMPLEMENTATION_SLOT, OZ_IMPLEMENTATION_SLOT
 from .types import (
     ApproveRequest,

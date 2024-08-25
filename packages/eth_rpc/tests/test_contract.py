@@ -14,6 +14,13 @@ class Token(ProtocolBase):
         NoArgs,
         Annotated[primitives.string, Name("_name")],
     ] = METHOD
+    balance_of: Annotated[
+        ContractFunc[
+            primitives.address,
+            Annotated[primitives.uint256, Name("_name")],
+        ],
+        Name("balanceOf"),
+    ] = METHOD
 
 
 @pytest.mark.contract
@@ -49,3 +56,11 @@ async def test_contract() -> None:
 
     assert await usdt.name().get() == "Tether USD"
     assert await usdc.name().get() == "USD Coin"
+
+    binance_balance = await usdt.balance_of(
+        "0xF977814e90dA44bFA03b6295A0616a897441aceC"
+    ).get()
+    binance_balance = await usdt.balance_of(
+        "0xF977814e90dA44bFA03b6295A0616a897441aceC"
+    ).get(block_number=20_604_386)
+    assert binance_balance == 6600822508869000

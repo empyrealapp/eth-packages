@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import TYPE_CHECKING
 
 from eth_rpc.types.args import EthCallParams, TraceArgs
@@ -15,39 +16,27 @@ class Request:
     def __class_getitem__(cls, params):
         if issubclass(params, Network):
             cls._network = params
-        print("cls", cls)
-        if False:
-            super().__class_getitem__(cls, params)
-        # except Exception as exc:
-        #     print("EXC:", exc)
+        else:
+            try:
+                super().__class_getitem__(cls, params)
+            except AttributeError:
+                pass
         return cls
 
     def __getitem__(self, params):
         if issubclass(params, Network):
+            self = deepcopy(self)
             self._network = params
         return self
 
     def _rpc(self) -> "RPC":
         """
-        This uses the default network, unless a network has been provided, then immediately unsets the network.
-        This makes it safe for async code.
+        This uses the default network, unless a network has been provided
         """
         from ._transport import _force_get_global_rpc
 
         network = self._network
         # self._network = None
-        response = _force_get_global_rpc(network)
-        return response
-
-    def _rpc_(self) -> "RPC":
-        """
-        This uses the default network, unless a network has been provided, then immediately unsets the network.
-        This makes it safe for async code.
-        """
-        from ._transport import _force_get_global_rpc
-
-        network = self._network
-        self._network = None  # type: ignore
         response = _force_get_global_rpc(network)
         return response
 

@@ -4,9 +4,8 @@ from collections.abc import Iterable
 from decimal import Decimal
 from typing import Annotated, cast
 
-from eth_rpc.contract import ContractFunc
+from eth_rpc import ContractFunc, ProtocolBase
 from eth_rpc.types import METHOD, Name, NoArgs, primitives
-from eth_typeshed._base import ProtocolBase
 from eth_typeshed.multicall import multicall
 from eth_typing import HexAddress
 from pydantic import BaseModel, Field, PrivateAttr

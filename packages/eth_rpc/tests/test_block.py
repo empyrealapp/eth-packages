@@ -9,12 +9,12 @@ from eth_rpc.networks import Arbitrum, Ethereum
 def test_block_network() -> None:
     # Currently, block is a singleton
     block = Block[Arbitrum]
-    assert block == Block
     assert block._network == Arbitrum
 
-    Block[Ethereum]
-    assert Block._network == Ethereum
-    assert block._network == Ethereum
+    block2 = Block[Ethereum]
+    assert Block._network is None
+    assert block._network == Arbitrum
+    assert block2._network == Ethereum
 
 
 @pytest.mark.asyncio(scope="session")

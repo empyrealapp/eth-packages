@@ -108,7 +108,6 @@ class Contract(BaseModel, Request):
         network = self.__class__.__network or _force_get_default_network()
         self._network = network
         self.__class__._network = None
-        self._rpc = self._rpc_
 
     def __getattr__(self, attr):
         f = [func for func in self.functions if func.alias == attr]
