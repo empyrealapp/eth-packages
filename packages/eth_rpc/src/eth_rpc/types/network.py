@@ -2,10 +2,6 @@ from eth_typing import HexAddress, HexStr
 from pydantic import AnyHttpUrl, BaseModel
 from pydantic.networks import AnyWebsocketUrl, Url
 
-# from pydantic._internal._model_construction import ModelMetaclass
-# class MetaNetwork(type):
-#     def __class_getitem__(cls, network: "Network"):
-
 
 class BlockExplorer(BaseModel):
     name: str

@@ -245,3 +245,7 @@ BASIC_TYPES = Union[
     address,
     bool,
 ]
+
+# in solidity, these can not be assigned to yet but can be declared
+ufixed128x18 = NewType("ufixed128x18", float)
+fixed128x18 = NewType("fixed128x18", float)

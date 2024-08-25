@@ -1,6 +1,6 @@
 from inspect import isclass
 from types import GenericAlias
-from typing import Generic, NamedTuple, TypeVar, get_args, get_origin
+from typing import Any, Generic, NamedTuple, TypeVar, get_args, get_origin
 
 from eth_abi import decode, encode
 from eth_hash.auto import keccak as keccak_256
@@ -24,7 +24,8 @@ T = TypeVar(
 U = TypeVar("U")
 
 
-def map_name(name):
+def map_name(name: Any) -> str:
+    """Convert a type to its solidity compatible format"""
     return {
         HexAddress: "address",
         HexStr: "bytes",
@@ -33,19 +34,18 @@ def map_name(name):
     }.get(name, name.__name__)
 
 
-# TODO: this needs a massive overhaul
 def convert_base_model(
     base: type[BaseModel], with_name: bool = False, as_tuple: bool = False
 ):
     lst = []
     for key, field_info in base.model_fields.items():
-        lst.append(convert_field_info(key, field_info, with_name=with_name))
+        lst.append(_convert_field_info(key, field_info, with_name=with_name))
     if as_tuple:
         return ",".join(lst)
     return lst
 
 
-def convert_field_info(alias: str, field: FieldInfo, with_name: bool = False):
+def _convert_field_info(alias: str, field: FieldInfo, with_name: bool = False):
     name = "" if not with_name else alias
     field_type = field.annotation
 

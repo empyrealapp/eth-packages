@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Generator, Generic, NewType, Optional, TypeVar
 if TYPE_CHECKING:
     from eth_rpc.rpc.method import RPCMethod
 
+# used to indicate methods with no arguments
 NoArgs = NewType("NoArgs", tuple[()])
 
 ArgType = TypeVar("ArgType")
