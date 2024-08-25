@@ -12,6 +12,11 @@ if TYPE_CHECKING:
 class Request:
     _network: type[Network] | None = None  # type: ignore
 
+    def __class_getitem__(cls, params):
+        if issubclass(params, Network):
+            cls._network = params
+        return cls
+
     def __getitem__(self, params):
         if issubclass(params, Network):
             self._network = params

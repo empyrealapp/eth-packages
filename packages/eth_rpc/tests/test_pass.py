@@ -1,6 +1,6 @@
+import pytest
 from eth_rpc.types.basic import HexInt, HexInteger
 from pydantic import BaseModel
-import pytest
 
 
 @pytest.mark.unit

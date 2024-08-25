@@ -1,5 +1,4 @@
 import pytest
-
 from eth_rpc import Transaction
 from eth_rpc.networks import Arbitrum, Ethereum
 

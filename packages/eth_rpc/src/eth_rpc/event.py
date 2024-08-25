@@ -371,7 +371,6 @@ class Event(Request, BaseModel, Generic[T]):
         """
         # TODO: sometimes the topics match, but the indexed fields are different
         network = _force_get_default_network()
-        print("network", network)
         return AsyncSubscribeCallable(
             network=network,
             event=self,

@@ -15,7 +15,6 @@ from .models import EventData
 from .subscriber import EventSubscriber
 from .transaction import Transaction, TransactionReceipt
 
-
 __all__ = [
     "Account",
     "Block",
