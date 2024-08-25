@@ -26,13 +26,14 @@ from ..types import (
 )
 
 T = TypeVar("T", bound=BaseModel)
+U = TypeVar("U", bound=BaseModel)
 
 
 class Receiver(Protocol, Generic[T]):
     async def put(self, event: EventData[T]) -> None: ...
 
 
-class EventSubscriber(Request):
+class EventSubscriber(Request, Generic[U]):
     receivers: dict[HexStr, list[Receiver]]
     events: list[Event]
     step_size: int | None
@@ -101,7 +102,7 @@ class EventSubscriber(Request):
                     # print("INDEX MISMATCH", result.transaction_hash, result.log_index)
                     continue
 
-                event_data = EventData(
+                event_data = EventData[U](
                     name=event.name,
                     log=result,
                     event=event.process(
@@ -147,7 +148,7 @@ class EventSubscriber(Request):
         self,
         w3_connection: WebSocketClientProtocol,
         event_dict: dict[HexStr, "Event"],
-    ) -> EventData | None:
+    ) -> EventData[U] | None:
         message = await asyncio.wait_for(w3_connection.recv(), timeout=32.0)
         message_json: JsonResponseWssResponse = json.loads(message)
         if "params" not in message_json:
@@ -240,7 +241,7 @@ class EventSubscriber(Request):
         The start_context is used to set a starting block number, so you can synchronize this
         with backfill.
         """
-        queue: asyncio.Queue[EventData] = asyncio.Queue()
+        queue: asyncio.Queue[EventData[U]] = asyncio.Queue()
         flush_queue: bool = True
         async for event_data in self._listen(addresses=addresses):
             if publish_events.is_set():
