@@ -1,13 +1,13 @@
 import os
 from typing import Annotated
 
-from pydantic import BaseModel
 import pytest
 from eth_rpc import ContractFunc, FuncSignature, set_alchemy_key
 from eth_rpc.contract.base import ProtocolBase
 from eth_rpc.networks import Arbitrum, Ethereum
 from eth_rpc.types import METHOD, Name, NoArgs, primitives
 from eth_typing import HexAddress, HexStr
+from pydantic import BaseModel
 
 
 class AllowanceRequest(BaseModel):

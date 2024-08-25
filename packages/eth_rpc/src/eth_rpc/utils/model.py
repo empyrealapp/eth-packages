@@ -8,14 +8,6 @@ from ..types import Network as NetworkType
 from .datetime import convert_datetime_to_iso_8601
 
 
-class classproperty(object):
-    def __init__(self, f):
-        self.f = f
-
-    def __get__(self, obj, owner):
-        return self.f(owner)
-
-
 class RPCModel(BaseModel):
     _metadata: dict[str, Any] = PrivateAttr(default_factory=dict)
     _network: ClassVar[Optional[NetworkType]] = PrivateAttr(None)

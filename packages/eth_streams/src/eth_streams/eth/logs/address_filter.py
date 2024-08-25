@@ -1,7 +1,7 @@
 from collections.abc import AsyncIterator
 from typing import cast
 
-from eth_rpc import Log
+from eth_rpc.models import Log
 from eth_streams.types import Address, Batch, Envelope, Topic, Vertex
 from eth_typing import HexAddress, HexStr
 from pydantic import Field

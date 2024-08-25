@@ -26,7 +26,7 @@ from .args import (  # noqa: F401
     TraceArgs,
     TransactionRequest,
 )
-from .basic import BLOCK_STRINGS, BlockReference, HexInt, HexInteger
+from .basic import ALL_PRIMITIVES, BLOCK_STRINGS, BlockReference, HexInt, HexInteger, map_type_to_str
 from .event import Indexed, Name
 from .network import BlockExplorer, Network, Rpcs, RpcUrl
 from .primitives import BASIC_TYPES, BYTES_TYPES
@@ -118,6 +118,7 @@ class JsonResponseWssResponse(TypedDict):
 
 
 __all__ = [
+    "ALL_PRIMITIVES",
     "BASIC_TYPES",
     "BYTES_TYPES",
     "BLOCK_STRINGS",
@@ -135,4 +136,5 @@ __all__ = [
     "RpcUrl",
     "SignedTransaction",
     "Struct",
+    "map_type_to_str",
 ]

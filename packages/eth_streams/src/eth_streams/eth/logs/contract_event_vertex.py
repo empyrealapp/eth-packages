@@ -3,11 +3,10 @@ from typing import ClassVar, Generic, Optional, TypeVar
 
 from eth_rpc import EventData
 from eth_streams.models import ContractEvent
-from pydantic import BaseModel
 
 from .db_loader import DBLoader
 
-T = TypeVar("T", bound=BaseModel)
+T = TypeVar("T", bound=EventData)
 
 
 class ContractEventSink(DBLoader[T, ContractEvent], Generic[T]):

@@ -14,7 +14,7 @@ class Request:
     _network: Network | None = None  # type: ignore
 
     def __class_getitem__(cls, params):
-        if issubclass(params, Network):
+        if isinstance(params, Network):
             cls._network = params
         else:
             try:
@@ -36,14 +36,13 @@ class Request:
         from ._transport import _force_get_global_rpc
 
         network = self._network
-        # self._network = None
         response = _force_get_global_rpc(network)
         return response
 
     def _get_debug_tracecall(
         self, address, data, block_number: BlockReference = "latest"
     ):
-        return self._rpc().debug_tracecall.sync(
+        return self._rpc().debug_tracecall(
             TraceArgs(
                 params=EthCallParams(
                     to=address,

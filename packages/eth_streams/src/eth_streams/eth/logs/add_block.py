@@ -2,7 +2,8 @@ from abc import abstractmethod
 from collections.abc import AsyncIterator
 from typing import ClassVar, Generic, TypeVar
 
-from eth_rpc import Block, Log
+from eth_rpc import Block as BlockRPC
+from eth_rpc.models import Block, Log
 from eth_rpc.types import Network
 from eth_streams.types import Envelope, Topic, Vertex
 from pydantic import BaseModel, Field
@@ -36,16 +37,17 @@ class AddBlockVertex(Vertex[Log, BlockWrap[T]]):
             super().__init__(**kwargs)
 
     @abstractmethod
-    def get_block_number(self, envelope: Envelope[T]) -> tuple[Block, Network]: ...
+    def get_block_number(self, envelope: Envelope[Log]) -> tuple[Block, Network]: ...
 
     async def transform(
-        self, envelope: Envelope[T]
+        self,
+        envelope: Envelope[Log],
     ) -> AsyncIterator[tuple[Topic[BlockWrap[T]], BlockWrap[T]]]:
-        key = self.get_block_number(envelope)
-        block_number, network = key
+        block, network = self.get_block_number(envelope)
+        key = (block.number, network)
 
         if key not in self.blocks:
-            self.blocks[key] = await Block[network].load_by_number(block_number)
+            self.blocks[key] = await BlockRPC[network].load_by_number(block.number)
 
         yield (
             self.default_topic,

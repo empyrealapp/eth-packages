@@ -1,6 +1,8 @@
 from collections.abc import AsyncIterator
+from typing import cast
 
 from eth_rpc import Block, get_current_network
+from eth_rpc.models import Block as BlockModel
 from eth_rpc.types import BLOCK_STRINGS, Network
 from eth_streams.types import Source, Topic
 from eth_streams.utils import ExpiringDict, get_implicit
@@ -11,7 +13,7 @@ class ReorgError(BaseModel):
     block_number: int
 
 
-class BlockSource(Source[ReorgError | Block], BaseModel):
+class BlockSource(Source[ReorgError | BlockModel], BaseModel):
     __name__ = "block-source"
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -22,7 +24,7 @@ class BlockSource(Source[ReorgError | Block], BaseModel):
         default_factory=lambda: get_implicit("start_block", "earliest")
     )
     reorg_distance: int = Field(5)
-    history: ExpiringDict[int, Block] = Field(
+    history: ExpiringDict[int, BlockModel] = Field(
         default_factory=lambda: ExpiringDict(100, 12 * 100)
     )
     restart_point: int | None = Field(None)
@@ -31,19 +33,25 @@ class BlockSource(Source[ReorgError | Block], BaseModel):
     def block_topic(self):
         return self.default_topic
 
-    def __class_getitem__(self, network: Network):
+    def __class_getitem__(self, network: Network):  # type: ignore
         self.network = network
 
-    async def _run(self) -> AsyncIterator[tuple[Topic, ReorgError | Block]]:
+    async def _run(self) -> AsyncIterator[tuple[Topic, ReorgError | BlockModel]]:
         if self.start_block == "latest":
             latest = await Block[self.network].get_number()
             prev_block = await Block[self.network].load_by_number(
                 block_number=latest - 1
             )
         else:
-            prev_block = await Block[self.network].load_by_number(
-                block_number=self.start_block - 1
-            )
+            if self.start_block in BLOCK_STRINGS.__dict__["__args__"]:
+                prev_block = await Block[self.network].load_by_number(
+                    block_number=self.start_block
+                )
+            else:
+                block_number = cast(int, self.start_block)
+                prev_block = await Block[self.network].load_by_number(
+                    block_number=block_number - 1
+                )
         self.history[prev_block.number] = prev_block
         current_block: int = prev_block.number + 1
 

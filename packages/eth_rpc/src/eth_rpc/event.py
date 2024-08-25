@@ -94,12 +94,6 @@ class Event(BaseModel, Request, Generic[T]):
         self._output_type = EventType
         self._network = self.__class__._network
 
-    def __class_getitem__(cls, params):
-        if issubclass(params, Network):
-            cls._network = params
-        else:
-            return super().__class_getitem__(params)
-
     def __getitem__(self, params):
         if isinstance(params, Network):
             copy = self.model_copy()

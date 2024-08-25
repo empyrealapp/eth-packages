@@ -1,7 +1,6 @@
 from eth_rpc.types import BlockExplorer, Network, Rpcs, RpcUrl
 from pydantic.networks import Url
 
-
 Ethereum = Network(
     chain_id=1,
     name="Ethereum",

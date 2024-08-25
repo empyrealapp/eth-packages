@@ -1,6 +1,6 @@
 from typing import Generic, TypeVar
 
-from eth_rpc import Block
+from eth_rpc.models import Block
 from eth_streams.models import Block as BlockModel
 from eth_streams.types import Envelope, Sink
 

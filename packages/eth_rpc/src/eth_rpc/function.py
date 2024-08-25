@@ -1,15 +1,15 @@
 from inspect import isclass
 from types import GenericAlias
-from typing import Any, Generic, NamedTuple, TypeVar, get_args, get_origin
+from typing import Generic, NamedTuple, TypeVar, get_args, get_origin
 
 from eth_abi import decode, encode
 from eth_hash.auto import keccak as keccak_256
-from eth_typing import ChecksumAddress, HexAddress, HexStr
+from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
 from ._request import Request
-from .types import BASIC_TYPES, Name, NoArgs
+from .types import BASIC_TYPES, Name, NoArgs, map_type_to_str
 from .utils import is_annotation
 
 T = TypeVar(
@@ -22,16 +22,6 @@ T = TypeVar(
     | HexAddress,
 )
 U = TypeVar("U")
-
-
-def map_name(name: Any) -> str:
-    """Convert a type to its solidity compatible format"""
-    return {
-        HexAddress: "address",
-        HexStr: "bytes",
-        ChecksumAddress: "address",
-        str: "string",
-    }.get(name, name.__name__)
 
 
 def convert_base_model(
@@ -63,7 +53,7 @@ def _convert_field_info(alias: str, field: FieldInfo, with_name: bool = False):
     elif type_origin == tuple:
         tuple_args = f"({','.join([convert(t) for t in get_args(field_type)])}) {name}"
         return tuple_args
-    return f"{map_name(field_type)} {name}".strip()
+    return f"{map_type_to_str(field_type)} {name}".strip()
 
 
 def convert(type, with_name: bool = False):
@@ -92,7 +82,7 @@ def convert(type, with_name: bool = False):
         return f"({','.join([convert(t) for t in type.__annotations__.values()])}) {name}".strip()
     elif isclass(type) and issubclass(type, BaseModel):
         return f"({convert_base_model(type, with_name=with_name, as_tuple=True)}) {name}".strip()
-    return f"{map_name(type)} {name}".strip()
+    return f"{map_type_to_str(type)} {name}".strip()
 
 
 class FuncSignature(BaseModel, Request, Generic[T, U]):
@@ -101,8 +91,6 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
 
     def get_identifier(self):
         """This works most of the time"""
-        input_arg, _ = self.__pydantic_generic_metadata__["args"]
-
         signature = f'{self.name}({",".join(self.get_inputs())})'
         return f"0x{keccak_256(signature.encode('utf-8')).hex()[:8]}"
 
