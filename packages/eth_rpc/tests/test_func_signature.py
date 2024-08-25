@@ -1,10 +1,9 @@
-import pytest
 from typing import Annotated
 
-from pydantic import BaseModel
-
+import pytest
 from eth_rpc import FuncSignature
 from eth_rpc.types import Name, map_type_to_str, primitives
+from pydantic import BaseModel
 
 
 class Inputs(BaseModel):
@@ -27,11 +26,21 @@ class Outputs(BaseModel):
 
 @pytest.mark.unit
 def test_func_signature():
-    func = FuncSignature[Inputs, Annotated[Outputs, Name("OUTPUT")]](name="swapExactTokensForETHWithPortfolios", alias="test_func")
+    func = FuncSignature[Inputs, Annotated[Outputs, Name("OUTPUT")]](
+        name="swapExactTokensForETHWithPortfolios", alias="test_func"
+    )
     # https://www.4byte.directory/signatures/?bytes4_signature=0x8b41f64c
     assert func.get_identifier() == "0x8b41f64c"
-    assert func.get_inputs() == ['uint256', 'uint256', 'address[]', 'address', 'uint256', 'address[]', 'uint256']
-    assert func.get_output() == ['bytes32[]', 'string']
+    assert func.get_inputs() == [
+        "uint256",
+        "uint256",
+        "address[]",
+        "address",
+        "uint256",
+        "address[]",
+        "uint256",
+    ]
+    assert func.get_output() == ["bytes32[]", "string"]
     assert func._get_name(Outputs.__annotations__["x"]) == "XX"
 
 

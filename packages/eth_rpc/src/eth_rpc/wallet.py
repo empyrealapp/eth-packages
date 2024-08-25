@@ -13,6 +13,7 @@ from eth_rpc.types import (
     SignedTransaction,
 )
 from eth_typing import HexAddress, HexStr
+from pydantic import ConfigDict
 
 from ._request import Request
 from ._transport import _force_get_global_rpc
@@ -56,6 +57,7 @@ class MockWallet(BaseWallet):
 
 class PrivateKeyWallet(BaseWallet):
     account: LocalAccount
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @staticmethod
     def get_pvt_key() -> HexStr:

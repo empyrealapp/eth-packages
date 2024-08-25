@@ -9,6 +9,7 @@ from eth_typing import HexAddress, HexStr
 class _ProtocolBase(Contract):
     def __init__(self, address: HexAddress, code_override: Optional[HexStr] = None):
         super().__init__(address=address, code_override=code_override)
+
         for alias, func in self._func_sigs.items():
             name = alias
             if is_annotation(func):

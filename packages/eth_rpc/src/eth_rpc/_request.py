@@ -1,7 +1,8 @@
 from copy import deepcopy
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from eth_rpc.types.args import EthCallParams, TraceArgs
+from pydantic import BaseModel, PrivateAttr
 
 from .types import BlockReference
 from .types.network import Network
@@ -10,15 +11,20 @@ if TYPE_CHECKING:
     from .rpc.core import RPC
 
 
-class Request:
-    _network: Network | None = None  # type: ignore
+class Request(BaseModel):
+    _network_: ClassVar[Network | None] = PrivateAttr(default=None)  # type: ignore
+    _network: Network | None = PrivateAttr(default=None)  # type: ignore
+
+    def model_post_init(self, __context: Any) -> None:
+        self._network = self.__class__._network_
+        return super().model_post_init(__context)
 
     def __class_getitem__(cls, params):
         if isinstance(params, Network):
-            cls._network = params
+            cls._network_ = params
         else:
             try:
-                super().__class_getitem__(cls, params)
+                return super().__class_getitem__(params)
             except AttributeError:
                 pass
         return cls

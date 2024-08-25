@@ -23,9 +23,7 @@ class HTTPClient(DualAsync):
         self, url, *args, sync: Literal[False] = ..., **kwargs
     ) -> Coroutine[Any, Any, Response]: ...
 
-    def get(
-        self, url, *args, sync: bool = False, **kwargs
-    ) -> MaybeAwaitable[Response]:
+    def get(self, url, *args, sync: bool = False, **kwargs) -> MaybeAwaitable[Response]:
         return run(self._request, "GET", url, *args, sync=sync, **kwargs)
 
     # PUT
@@ -37,9 +35,7 @@ class HTTPClient(DualAsync):
         self, url, *args, sync: Literal[False] = ..., **kwargs
     ) -> Coroutine[Any, Any, Response]: ...
 
-    def put(
-        self, url, *args, sync: bool = False, **kwargs
-    ) -> MaybeAwaitable[Response]:
+    def put(self, url, *args, sync: bool = False, **kwargs) -> MaybeAwaitable[Response]:
         return run(self._request, "PUT", url, *args, sync=sync, **kwargs)
 
     # POST

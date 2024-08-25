@@ -21,9 +21,8 @@ from eth_rpc.types import (
     HexInteger,
     MaybeAwaitable,
 )
-from eth_rpc.types import Network as NetworkType
 from eth_typing import HexAddress, HexStr, Primitives
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, Field
 
 from .._request import Request
 from .._transport import _force_get_default_network
@@ -43,9 +42,8 @@ T = TypeVar(
 U = TypeVar("U")
 
 
-class Contract(BaseModel, Request):
+class Contract(Request):
     _func_sigs: ClassVar[dict[str, ContractMethod]]
-    __network: ClassVar[type[NetworkType] | None] = PrivateAttr(default=None)  # type: ignore
 
     address: HexAddress
     functions: list[ContractFunc] = Field(default_factory=list)
@@ -67,11 +65,6 @@ class Contract(BaseModel, Request):
                 except AttributeError:
                     pass
         return func_sigs
-
-    def __class_getitem__(cls, params):
-        if isinstance(params, NetworkType):
-            cls.__network = params
-        return cls
 
     def __init_subclass__(cls, **kwargs) -> None:
         # TODO: I hate this slightly less
@@ -105,11 +98,11 @@ class Contract(BaseModel, Request):
             del cls.__annotations__[key]
 
     def model_post_init(self, __context):
-        network = self.__class__.__network or _force_get_default_network()
+        network = self.__class__._network_ or _force_get_default_network()
         self._network = network
-        self.__class__._network = None
 
     def __getattr__(self, attr):
+        """This was a kludge to help with adding functions dynamically as part of init_subclass"""
         f = [func for func in self.functions if func.alias == attr]
         if len(f) == 1:
             return f[0]

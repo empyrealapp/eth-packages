@@ -78,7 +78,7 @@ def convert(type, with_name: bool = False, with_indexed: bool = False):
     return f"{map_type(type)}{map_indexed(indexed)}{name}".strip()
 
 
-class Event(BaseModel, Request, Generic[T]):
+class Event(Request, Generic[T]):
     name: str
     anonymous: bool = False
 

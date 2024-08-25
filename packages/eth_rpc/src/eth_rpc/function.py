@@ -85,7 +85,7 @@ def convert(type, with_name: bool = False):
     return f"{map_type_to_str(type)} {name}".strip()
 
 
-class FuncSignature(BaseModel, Request, Generic[T, U]):
+class FuncSignature(Request, Generic[T, U]):
     alias: str | None = None
     name: str
 

@@ -1,16 +1,17 @@
 import asyncio
 import json
 import re
+from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
 from contextvars import ContextVar
-from typing import Generic, Optional, Protocol, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from eth_rpc import Block
 from eth_rpc.models import EventData, Log
 from eth_rpc.types import LogsArgs, LogsParams
 from eth_rpc.types import Network as NetworkType
 from eth_typing import HexAddress, HexStr
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from websockets.exceptions import ConnectionClosedError
 from websockets.legacy.client import WebSocketClientProtocol, connect
 
@@ -29,7 +30,8 @@ T = TypeVar("T", bound=BaseModel)
 U = TypeVar("U", bound=BaseModel)
 
 
-class Receiver(Protocol, Generic[T]):
+class Receiver(ABC, Generic[T]):
+    @abstractmethod
     async def put(self, event: EventData[T]) -> None: ...
 
 
@@ -43,6 +45,8 @@ class EventSubscriber(Request, Generic[U]):
     _start_block: Optional[int | BLOCK_STRINGS] = None
     _end_block: Optional[int | BLOCK_STRINGS] = None
     _addresses: Optional[list[HexAddress]] = None
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @property
     def network(self):
@@ -162,7 +166,7 @@ class EventSubscriber(Request, Generic[U]):
 
         # TODO: this is just a placeholder
         if len(result.topics) != (len(event.get_indexed()) + 1):
-            print("INDEX MISMATCH", result.transaction_hash, result.log_index)
+            # print("INDEX MISMATCH", result.transaction_hash, result.log_index)
             return None
 
         return EventData(
