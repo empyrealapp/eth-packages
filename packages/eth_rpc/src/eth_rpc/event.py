@@ -101,7 +101,7 @@ class Event(BaseModel, Request, Generic[T]):
             return super().__class_getitem__(params)
 
     def __getitem__(self, params):
-        if issubclass(params, Network):
+        if isinstance(params, Network):
             copy = self.model_copy()
             copy._network = params
         return copy
@@ -431,10 +431,10 @@ class Event(BaseModel, Request, Generic[T]):
 
 
 class AsyncSubscribeCallable(BaseModel):
-    network: type[Network]
+    network: Network
     event: Event
 
-    def __getitem__(self, network: type[Network]):
+    def __getitem__(self, network: Network):
         self.network = network
         return self
 
@@ -443,7 +443,7 @@ class AsyncSubscribeCallable(BaseModel):
     ) -> AsyncIterator[EventData]:
         # TODO: sometimes the topics match, but the indexed fields are different
 
-        if not (wss_uri := self.network.wss()):
+        if not (wss_uri := self.network.wss):
             raise ValueError("No wss set for network")
 
         async for w3_connection in connect(

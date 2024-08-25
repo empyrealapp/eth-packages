@@ -1,7 +1,6 @@
 from typing import Annotated, Optional
 
-from eth_rpc import ContractFunc
-from eth_rpc.contract import ProtocolBase
+from eth_rpc import ContractFunc, ProtocolBase
 from eth_rpc.types import METHOD, Name, NoArgs, primitives
 from eth_rpc.utils import to_32byte_hex
 from eth_typing import HexAddress, HexStr

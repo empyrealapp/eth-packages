@@ -1,12 +1,18 @@
 import os
 from typing import Annotated
 
+from pydantic import BaseModel
 import pytest
 from eth_rpc import ContractFunc, FuncSignature, set_alchemy_key
 from eth_rpc.contract.base import ProtocolBase
 from eth_rpc.networks import Arbitrum, Ethereum
 from eth_rpc.types import METHOD, Name, NoArgs, primitives
 from eth_typing import HexAddress, HexStr
+
+
+class AllowanceRequest(BaseModel):
+    owner: primitives.address
+    spender: primitives.address
 
 
 class Token(ProtocolBase):
@@ -20,6 +26,17 @@ class Token(ProtocolBase):
             Annotated[primitives.uint256, Name("_name")],
         ],
         Name("balanceOf"),
+    ] = METHOD
+    allowance: ContractFunc[
+        tuple[primitives.address, primitives.address],
+        primitives.uint256,
+    ] = METHOD
+    allowance2: Annotated[
+        ContractFunc[
+            AllowanceRequest,
+            primitives.uint256,
+        ],
+        Name("allowance"),
     ] = METHOD
 
 
@@ -64,3 +81,16 @@ async def test_contract() -> None:
         "0xF977814e90dA44bFA03b6295A0616a897441aceC"
     ).get(block_number=20_604_386)
     assert binance_balance == 6600822508869000
+
+    # check function with two args
+    allowance = await usdt.allowance(
+        "0x71AC0c3E825f095E56b81fBA11020f01893d4433",
+        "0x38C5412464A03EfDc3820d227b24316C11729E0a",
+    ).get(block_number=20604634)
+    assert allowance == 126967536
+    # check function using BaseModel for args
+    allowance = await usdt.allowance2(
+        "0x71AC0c3E825f095E56b81fBA11020f01893d4433",
+        "0x38C5412464A03EfDc3820d227b24316C11729E0a",
+    ).get(block_number=20604640)
+    assert allowance == 0

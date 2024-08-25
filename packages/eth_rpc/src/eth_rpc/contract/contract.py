@@ -69,7 +69,7 @@ class Contract(BaseModel, Request):
         return func_sigs
 
     def __class_getitem__(cls, params):
-        if issubclass(params, NetworkType):
+        if isinstance(params, NetworkType):
             cls.__network = params
         return cls
 

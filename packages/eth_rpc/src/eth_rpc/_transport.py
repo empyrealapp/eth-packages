@@ -14,18 +14,18 @@ if TYPE_CHECKING:
 
 
 class Transports(BaseModel):
-    default: type[Network] = Ethereum
-    networks: dict[int, type[Network]] = {}
+    default: Network = Ethereum
+    networks: dict[int, Network] = {}
     rpcs: dict[int, BaseRPC] = {}
     retries: int = 0
     id: int = 0
 
-    def get_network(self, id: int | None = None) -> type[Network] | None:
+    def get_network(self, id: int | None = None) -> Network | None:
         if not id:
             return self.default
         return self.networks.get(id)
 
-    def force_get_network(self, id: int | None = None) -> type[Network]:
+    def force_get_network(self, id: int | None = None) -> Network:
         network = self.get_network(id=id)
         if not network:
             raise ValueError("transport not found")
@@ -40,12 +40,12 @@ _selected_transports: ContextVar["Transports"] = ContextVar(
 )
 
 
-def _force_get_default_network() -> type[Network]:
+def _force_get_default_network() -> Network:
     transport = _selected_transports.get()
     return transport.default
 
 
-def _force_get_global_rpc(network: type[Network] | None = None) -> "RPC":
+def _force_get_global_rpc(network: Network | None = None) -> "RPC":
     from .rpc.core import RPC
 
     transport = _selected_transports.get()
@@ -59,30 +59,30 @@ def _force_get_global_rpc(network: type[Network] | None = None) -> "RPC":
     return transport.rpcs[network.chain_id]  # type: ignore
 
 
-def set_transport(networks: list[type[Network]], retries: int = 0):
+def set_transport(networks: list[Network], retries: int = 0):
     transport = _selected_transports.get()
     transport.default = networks[0]
     transport.networks = {network.chain_id: network for network in networks}
     transport.retries = retries
 
 
-def set_default_network(network: type[Network]):
+def set_default_network(network: Network):
     transport = _selected_transports.get()
     transport.default = network
     transport.networks[network.chain_id] = network
 
 
-def get_current_network() -> type[Network]:
+def get_current_network() -> Network:
     transport = _selected_transports.get()
     return transport.default
 
 
-def set_rpc_timeout(timeout: float, network: type[Network] | None = None):
+def set_rpc_timeout(timeout: float, network: Network | None = None) -> None:
     rpc = _force_get_global_rpc(network)
     rpc.set_timeout(timeout)
 
 
-def set_alchemy_key(alchemy_key, network: type[Network] = Ethereum):
+def set_alchemy_key(alchemy_key, network: Network = Ethereum):
     if not network.alchemy_str:
         raise ValueError("Network not supported by alchemy, set Network.alchemy_str")
     set_transport(

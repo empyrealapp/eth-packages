@@ -75,8 +75,8 @@ class EventSubscriber(Request, Generic[U]):
                     LogsArgs(
                         params=LogsParams(
                             address=addresses,
-                            from_block=start_block,  # type: ignore
-                            to_block=cur_end,  # type: ignore
+                            from_block=start_block,
+                            to_block=cur_end,
                             topics=self.get_topics(),
                         )
                     )

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class Request:
-    _network: type[Network] | None = None  # type: ignore
+    _network: Network | None = None  # type: ignore
 
     def __class_getitem__(cls, params):
         if issubclass(params, Network):
@@ -24,7 +24,7 @@ class Request:
         return cls
 
     def __getitem__(self, params):
-        if issubclass(params, Network):
+        if isinstance(params, Network):
             self = deepcopy(self)
             self._network = params
         return self

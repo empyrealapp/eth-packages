@@ -1,7 +1,6 @@
 from typing import Annotated, NamedTuple  # noqa: D100
 
-from eth_rpc import ContractFunc, get_current_network
-from eth_rpc.contract import ProtocolBase
+from eth_rpc import ContractFunc, ProtocolBase, get_current_network
 from eth_rpc.networks import Arbitrum, Ethereum
 from eth_rpc.types import METHOD, Name, Network, NoArgs, primitives
 from eth_typing import HexAddress, HexStr
@@ -32,7 +31,7 @@ class ChainlinkPriceOracle:
         ETH = HexAddress(HexStr("0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"))
 
     @classmethod
-    def for_network(cls, network: Network = get_current_network()):
+    def for_network(cls, network: type[Network] = get_current_network()):
         if network.chain_id == Ethereum.chain_id:
             return cls.Ethereum
         if network.chain_id == Arbitrum.chain_id:

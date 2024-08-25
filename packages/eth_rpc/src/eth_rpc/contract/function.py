@@ -48,7 +48,7 @@ class ContractFunc(Generic[T, U]):
     contract: Any  # Contract
     data: HexStr = HexStr("0x")
 
-    _network: type[NetworkType] | None = None
+    _network: NetworkType | None = None
 
     def __post_init__(self):
         self._network = self.contract._network
@@ -94,7 +94,9 @@ class ContractFunc(Generic[T, U]):
         elif len(args) == 1:
             new_self.data = self.func.encode_call(inputs=args[0])
         else:
-            raise ValueError("Can not provide more than 1 arg")
+            # assumed you provided the args
+            _args: T = cast(T, args)
+            new_self.data = self.func.encode_call(inputs=_args)
         return new_self
 
     def encode(self):
