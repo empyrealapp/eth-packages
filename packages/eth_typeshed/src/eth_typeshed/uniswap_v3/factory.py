@@ -1,8 +1,7 @@
 from typing import Annotated  # noqa: D100
 
 from eth_rpc import ContractFunc, ProtocolBase
-from eth_rpc.function import Name
-from eth_rpc.types import METHOD, primitives
+from eth_rpc.types import METHOD, Name, primitives
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel
 

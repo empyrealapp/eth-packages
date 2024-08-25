@@ -1,6 +1,7 @@
 from collections.abc import Awaitable
 from copy import deepcopy
 from typing import (
+    TYPE_CHECKING,
     Annotated,
     ClassVar,
     Literal,
@@ -26,9 +27,12 @@ from pydantic import BaseModel, Field
 
 from .._request import Request
 from .._transport import _force_get_default_network
-from ..function import FuncSignature
 from ..utils import run, to_hex_str
 from .function import ContractFunc
+
+if TYPE_CHECKING:
+    from .function import FuncSignature
+
 
 T = TypeVar(
     "T",
@@ -101,14 +105,7 @@ class Contract(Request):
         network = self.__class__._network_ or _force_get_default_network()
         self._network = network
 
-    def __getattr__(self, attr):
-        """This was a kludge to help with adding functions dynamically as part of init_subclass"""
-        f = [func for func in self.functions if func.alias == attr]
-        if len(f) == 1:
-            return f[0]
-        return super().__getattr__(attr)
-
-    def add_func(self, func: FuncSignature):
+    def add_func(self, func: "FuncSignature"):
         from .function import ContractFunc
 
         if func not in self.functions:

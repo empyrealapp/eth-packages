@@ -1,8 +1,7 @@
 from typing import Annotated
 
 from eth_rpc import ContractFunc, ProtocolBase
-from eth_rpc.function import Name, NoArgs
-from eth_rpc.types import METHOD, primitives
+from eth_rpc.types import METHOD, Name, NoArgs, primitives
 from eth_typing import HexAddress
 from pydantic import BaseModel
 

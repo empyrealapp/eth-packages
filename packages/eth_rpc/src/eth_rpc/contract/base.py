@@ -4,9 +4,12 @@ from eth_rpc import Contract, ContractFunc, FuncSignature
 from eth_rpc.types import Name
 from eth_rpc.utils import is_annotation
 from eth_typing import HexAddress, HexStr
+from pydantic import ConfigDict
 
 
 class _ProtocolBase(Contract):
+    model_config = ConfigDict(extra="allow")
+
     def __init__(self, address: HexAddress, code_override: Optional[HexStr] = None):
         super().__init__(address=address, code_override=code_override)
 
@@ -22,11 +25,13 @@ class _ProtocolBase(Contract):
                 args = func
             T, U = get_args(args)
 
-            self.functions.append(
+            setattr(
+                self,
+                alias,
                 ContractFunc[T, U](  # type: ignore
                     func=FuncSignature[T, U](name=name, alias=alias),  # type: ignore
                     contract=self,
-                )
+                ),
             )
 
 

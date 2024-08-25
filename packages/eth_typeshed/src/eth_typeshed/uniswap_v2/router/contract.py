@@ -1,8 +1,7 @@
 from typing import Annotated
 
 from eth_rpc import ContractFunc, ProtocolBase
-from eth_rpc.function import Name
-from eth_rpc.types import METHOD
+from eth_rpc.types import METHOD, Name
 
 from .types import (
     AddLiquidityETHRequest,

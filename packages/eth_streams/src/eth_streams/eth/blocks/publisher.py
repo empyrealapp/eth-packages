@@ -17,7 +17,8 @@ class BlockSink(Sink[list[Block]], Generic[T]):
             contract_event = BlockModel(
                 number=block.number,
                 timestamp=block.timestamp,
-                chain_id=block.network.chain_id,
+                # TODO: is block._network always set?
+                chain_id=block._network and block._network.chain_id or -1,
                 hash=block.hash,
                 parent_block_hash=block.parent_hash,
                 hot_block=False,

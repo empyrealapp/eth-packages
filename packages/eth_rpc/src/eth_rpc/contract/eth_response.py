@@ -1,12 +1,14 @@
 from collections.abc import Generator
 from dataclasses import dataclass
-from typing import Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel
 
-from ..function import FuncSignature
 from ..types import BASIC_TYPES
+
+if TYPE_CHECKING:
+    from .function import FuncSignature
 
 T = TypeVar(
     "T",
@@ -22,7 +24,7 @@ U = TypeVar("U")
 
 @dataclass
 class EthResponse(Generic[T, U]):
-    func: FuncSignature[T, U]
+    func: "FuncSignature[T, U]"
     result: HexStr
 
     @property

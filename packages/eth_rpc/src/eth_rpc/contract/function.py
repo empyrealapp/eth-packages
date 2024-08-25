@@ -21,12 +21,12 @@ from pydantic import BaseModel
 from .._transport import _force_get_global_rpc
 from ..block import Block
 from ..constants import ADDRESS_ZERO
-from ..function import FuncSignature
 from ..rpc.core import RPC
 from ..transaction import PreparedTransaction
 from ..utils import run
 from ..wallet import BaseWallet
 from .eth_response import EthResponse
+from .func_signature import FuncSignature
 
 # from .contract import Contract
 
