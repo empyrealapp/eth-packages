@@ -41,3 +41,8 @@ dev = [
 
 [tool.pytest.ini_options]
 python_paths = ["src"]
+
+[tool.mypy]
+plugins = [
+  "pydantic.mypy"
+]

@@ -306,7 +306,7 @@ class Event(Request, BaseModel, Generic[T]):
                 # this happens when an event has the same topic0, but different indexed events so it doesn't match up to the expected ABI
                 continue
 
-            event_data = EventData(
+            event_data = EventData[T](
                 name=self.name,
                 log=result,
                 event=self.process(
