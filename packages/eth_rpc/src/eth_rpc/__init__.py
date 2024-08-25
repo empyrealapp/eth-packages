@@ -15,8 +15,6 @@ from .models import EventData
 from .subscriber import EventSubscriber
 from .transaction import Transaction, TransactionReceipt
 
-Contract.model_rebuild()
-
 
 __all__ = [
     "Account",

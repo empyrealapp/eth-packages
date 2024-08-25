@@ -11,7 +11,7 @@ class RPCResponse(BaseModel, Generic[T]):
     jsonrpc: float
     id: int
     result: T
-    network: Optional[Network] = Field(None)
+    network: Optional[type[Network]] = Field(None)
 
     def model_post_init(self, __context):
         if isinstance(self.result, RPCModel):

@@ -7,8 +7,7 @@ from ._request import Request
 from .types import HexInteger, RPCResponseModel
 
 
-class Account(Request):
-    @classmethod
+class AccountRPC(Request):
     def get_balance(
         self, address: HexAddress, block_number: int | BLOCK_STRINGS = "latest"
     ) -> RPCResponseModel[GetAccountArgs, HexInteger]:
@@ -24,7 +23,6 @@ class Account(Request):
             ),
         )
 
-    @classmethod
     def get_account(
         self, address: HexAddress, block_number: int | BLOCK_STRINGS = "latest"
     ) -> RPCResponseModel[GetAccountArgs, AccountModel]:
@@ -39,3 +37,6 @@ class Account(Request):
                 ),
             ),
         )
+
+
+Account = AccountRPC()

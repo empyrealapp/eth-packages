@@ -9,7 +9,7 @@ class BaseRPC(BaseModel):
     _timeout: float = 10.0
     _retries: int = 3
 
-    network: Network
+    network: type[Network]
 
     index: itertools.count = Field(default_factory=lambda: itertools.count())
     client: httpx.AsyncClient = Field(default_factory=lambda: httpx.AsyncClient())
@@ -31,13 +31,13 @@ class BaseRPC(BaseModel):
 
     @property
     def wss(self) -> str:
-        if not (wss := self.network.wss):
+        if (wss := self.network.wss()) is None:
             raise ValueError("wss not set")
         return str(wss)
 
     @property
     def http(self) -> str:
-        if not (http := self.network.http):
+        if (http := self.network.http()) is None:
             raise ValueError("http not set")
         return str(http)
 

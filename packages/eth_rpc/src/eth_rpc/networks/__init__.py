@@ -1,9 +1,5 @@
-from .arbitrum import Arbitrum as ArbitrumNetwork
-from .ethereum import Ethereum as EthereumNetwork
-
-Arbitrum = ArbitrumNetwork()
-Ethereum = EthereumNetwork()
-
+from .arbitrum import Arbitrum
+from .ethereum import Ethereum
 
 Networks = {
     1: Ethereum,

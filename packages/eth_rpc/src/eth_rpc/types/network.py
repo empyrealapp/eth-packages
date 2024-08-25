@@ -1,6 +1,9 @@
+from typing import ClassVar, Optional, Union
+
 from eth_typing import HexAddress, HexStr
-from pydantic import AnyHttpUrl, BaseModel
+from pydantic import AnyHttpUrl, BaseModel, Field
 from pydantic.networks import AnyWebsocketUrl, Url
+from typing_extensions import TypeVar
 
 
 class BlockExplorer(BaseModel):
@@ -12,7 +15,7 @@ class BlockExplorer(BaseModel):
 
 class RpcUrl(BaseModel):
     http: AnyHttpUrl
-    wss: AnyWebsocketUrl | None = None
+    wss: Optional[AnyWebsocketUrl] = Field(default=None)
 
 
 class Rpcs(BaseModel):
@@ -21,49 +24,57 @@ class Rpcs(BaseModel):
 
 
 class Network(BaseModel):
-    chain_id: int
-    name: str
-    native_currency: str
-    rpc: Rpcs
-    block_explorer: BlockExplorer
-    alchemy_str: str | None = None
-    multicall3: HexAddress | None = HexAddress(
+    chain_id: ClassVar[int]
+    name: ClassVar[str]
+    native_currency: ClassVar[str]
+    rpc: ClassVar[Rpcs]
+    block_explorer: ClassVar[BlockExplorer]
+    alchemy_str: ClassVar[str | None] = None
+    multicall3: ClassVar[HexAddress | None] = HexAddress(
         HexStr("0xca11bde05977b3631167028862be2a173976ca11")
     )
-    ens_registry: HexAddress | None = HexAddress(
+    ens_registry: ClassVar[HexAddress | None] = HexAddress(
         HexStr("0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e")
     )
-    ens_universal_resolver: HexAddress | None = HexAddress(
+    ens_universal_resolver: ClassVar[HexAddress | None] = HexAddress(
         HexStr("0xce01f8eee7E479C928F8919abD53E553a36CeF67")
     )
-    apprx_block_time: float = 12.0
+    apprx_block_time: ClassVar[float] = 12.0
 
+    @classmethod
     def set(
-        self,
+        cls,
         http: str | None = None,
         wss: str | None = None,
         api_key: str | None = None,
     ):
         if http:
-            self.rpc.default.http = Url(http)
+            cls.rpc.default.http = Url(http)
         if wss:
-            self.rpc.default.wss = Url(wss)
+            cls.rpc.default.wss = Url(wss)
         if api_key:
-            self.block_explorer.api_key = api_key
-        return self
+            cls.block_explorer.api_key = api_key
+        return cls
 
-    @property
-    def http(self) -> str:
-        return str(self.rpc.default.http)
+    @classmethod
+    def http(cls) -> str | None:
+        if cls.rpc.default.http:
+            return str(cls.rpc.default.http)
+        return None
 
-    @property
-    def wss(self) -> str:
-        return str(self.rpc.default.wss)
+    @classmethod
+    def wss(cls) -> str | None:
+        if cls.rpc.default.wss:
+            return str(cls.rpc.default.wss)
+        return None
 
     def __hash__(self) -> int:
         return self.chain_id
 
     def __str__(self):
-        return f"<Network: {self.__class__.__name__}>"
+        return f"<Network: {self.name}>"
 
     __repr__ = __str__
+
+
+NetworkType = TypeVar("NetworkType", bound=type[Network], default=None)

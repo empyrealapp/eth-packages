@@ -1,32 +1,31 @@
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING
 
 from eth_rpc.types.args import EthCallParams, TraceArgs
 
 from .types import BlockReference
-from .types import Network as NetworkType
+from .types.network import Network
 
 if TYPE_CHECKING:
     from .rpc.core import RPC
 
 
 class Request:
-    _network: ClassVar[NetworkType | None] = None
+    _network: type[Network] | None = None  # type: ignore
 
-    def __class_getitem__(self, params):
-        if isinstance(params, NetworkType):
+    def __getitem__(self, params):
+        if issubclass(params, Network):
             self._network = params
-        return super().__class_getitem__(params)
+        return self
 
-    @classmethod
-    def _rpc(cls) -> "RPC":
+    def _rpc(self) -> "RPC":
         """
         This uses the default network, unless a network has been provided, then immediately unsets the network.
         This makes it safe for async code.
         """
         from ._transport import _force_get_global_rpc
 
-        network = cls._network
-        cls._network = None
+        network = self._network
+        # self._network = None
         response = _force_get_global_rpc(network)
         return response
 

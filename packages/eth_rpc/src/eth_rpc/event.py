@@ -371,6 +371,7 @@ class Event(Request, BaseModel, Generic[T]):
         """
         # TODO: sometimes the topics match, but the indexed fields are different
         network = _force_get_default_network()
+        print("network", network)
         return AsyncSubscribeCallable(
             network=network,
             event=self,
@@ -411,10 +412,10 @@ class Event(Request, BaseModel, Generic[T]):
 
 
 class AsyncSubscribeCallable(BaseModel):
-    network: Network
+    network: type[Network]
     event: Event
 
-    def __getitem__(self, network: Network):
+    def __getitem__(self, network: type[Network]):
         self.network = network
         return self
 
@@ -423,8 +424,11 @@ class AsyncSubscribeCallable(BaseModel):
     ) -> AsyncIterator[EventData]:
         # TODO: sometimes the topics match, but the indexed fields are different
 
+        if not (wss_uri := self.network.wss()):
+            raise ValueError("No wss set for network")
+
         async for w3_connection in connect(
-            self.network.wss,
+            wss_uri,
             ping_interval=60,
             ping_timeout=60,
             max_queue=10000,

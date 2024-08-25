@@ -18,7 +18,7 @@ class classproperty(object):
 
 class RPCModel(BaseModel):
     _metadata: dict[str, Any] = PrivateAttr(default_factory=dict)
-    _network: ClassVar[NetworkType | None] = PrivateAttr(None)
+    _network: ClassVar[Optional[NetworkType]] = PrivateAttr(None)
     __network: Optional[NetworkType] = PrivateAttr(default=None)
 
     model_config = ConfigDict(
@@ -31,7 +31,7 @@ class RPCModel(BaseModel):
     )
 
     @property
-    def network(self) -> NetworkType:  # noqa: F811
+    def network(self) -> NetworkType:
         from .._transport import _force_get_default_network
 
         network = self.__network or self._network
@@ -40,7 +40,7 @@ class RPCModel(BaseModel):
         return network
 
     def __class_getitem__(cls, params):
-        if isinstance(params, NetworkType):
+        if issubclass(params, NetworkType):
             cls._network = params
         return cls
 

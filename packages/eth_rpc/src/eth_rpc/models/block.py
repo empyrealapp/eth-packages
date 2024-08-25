@@ -1,3 +1,4 @@
+import zlib
 from datetime import datetime
 from typing import Optional
 
@@ -5,7 +6,7 @@ from eth_rpc.types import HexInteger
 from eth_typing import HexAddress, HexStr
 from pydantic import Field, field_validator
 
-from ..utils import RPCModel, load_datetime_string
+from ..utils import BloomFilter, RPCModel, load_datetime_string
 from .transaction import Transaction
 
 
@@ -35,3 +36,18 @@ class Block(RPCModel):
     normalize_timestamp = field_validator("timestamp", mode="before")(
         load_datetime_string
     )
+
+    def has_log(self, topic: HexStr):
+        t = bytes.fromhex(topic.replace("0x", ""))
+        return t in BloomFilter(self.logs_bloom)
+
+    def parent_block(self):
+        return self.load_by_hash(self.parent_hash)
+
+    def compress(self) -> bytes:
+        return zlib.compress(self.model_dump_json().encode("utf-8"))
+
+    def __repr__(self):
+        return f"<Block number={self.number}>"
+
+    __str__ = __repr__

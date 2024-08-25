@@ -47,7 +47,7 @@ class ContractFunc(Generic[T, U]):
     contract: Any  # Contract
     data: HexStr = HexStr("0x")
 
-    _network: NetworkType | None = None
+    _network: type[NetworkType] | None = None
 
     def __post_init__(self):
         self._network = self.contract._network
