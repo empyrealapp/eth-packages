@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict
 
 from .exceptions import UnsupportedChainIDException
-from .networks import Ethereum, get_network_by_chain_id
+from .networks import Ethereum, Networks, get_network_by_chain_id
 from .rpc.base import BaseRPC
 from .types import Network
 
@@ -59,9 +59,10 @@ def _force_get_global_rpc(network: Network | None = None) -> "RPC":
     return transport.rpcs[network.chain_id]  # type: ignore
 
 
-def set_transport(networks: list[Network], retries: int = 0):
+def set_transport(networks: list[Network], retries: int = 0, set_default: bool = False):
     transport = _selected_transports.get()
-    set_default_network(networks[0])
+    if set_default:
+        set_default_network(networks[0])
     transport.networks.update({network.chain_id: network for network in networks})
     transport.retries = retries
 
@@ -89,18 +90,22 @@ def set_alchemy_transport(alchemy_key: str, network: Network):
                 http=f"https://{network.alchemy_str}.g.alchemy.com/v2/{alchemy_key}",
                 wss=f"wss://{network.alchemy_str}.g.alchemy.com/v2/{alchemy_key}",
             )
-        ]
+        ],
     )
 
 
-def set_alchemy_key(alchemy_key: str, network: Network = Ethereum) -> None:
+def set_alchemy_key(alchemy_key: str, network: Network | None = None) -> None:
     """
     Set Alchemy as the rpc url.
     """
     # TODO: it'd be nice to set this for all networks if no network is provided
     if network and not network.alchemy_str:
         raise ValueError("Network not supported by alchemy, set Network.alchemy_str")
-    set_alchemy_transport(alchemy_key, network)
+    if network:
+        set_alchemy_transport(alchemy_key, network)
+    else:
+        for network in Networks.values():
+            set_alchemy_transport(alchemy_key, network)
 
 
 def configure_rpc_from_env():
