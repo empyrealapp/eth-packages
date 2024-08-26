@@ -6,25 +6,23 @@ from collections.abc import AsyncIterator
 from contextvars import ContextVar
 from typing import Generic, Optional, TypeVar
 
-from eth_rpc import Block
-from eth_rpc.models import EventData, Log
-from eth_rpc.types import LogsArgs, LogsParams
-from eth_rpc.types import Network as NetworkType
+from eth_rpc import Block, Event, EventData, Log, get_current_network
+from eth_rpc.types import (
+    BLOCK_STRINGS,
+    EvmDataDict,
+    JsonResponseWssResponse,
+    LogsArgs,
+    LogsParams,
+    SubscriptionResponse,
+)
 from eth_typing import HexAddress, HexStr
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from websockets.exceptions import ConnectionClosedError
 from websockets.legacy.client import WebSocketClientProtocol, connect
 
 from .._request import Request
 from .._transport import _force_get_global_rpc
 from ..constants import DEFAULT_CONTEXT, DEFAULT_EVENT
-from ..event import Event
-from ..types import (
-    BLOCK_STRINGS,
-    EvmDataDict,
-    JsonResponseWssResponse,
-    SubscriptionResponse,
-)
 
 T = TypeVar("T", bound=BaseModel)
 U = TypeVar("U", bound=BaseModel)
@@ -36,11 +34,9 @@ class Receiver(ABC, Generic[T]):
 
 
 class EventSubscriber(Request, Generic[U]):
-    receivers: dict[HexStr, list[Receiver]]
-    events: list[Event]
-    step_size: int | None
-
-    __network: NetworkType
+    receivers: dict[HexStr, list[Receiver[U]]] = Field(default_factory=dict)
+    events: list[Event] = Field(default_factory=list)
+    step_size: int | None = Field(default=None)
 
     _start_block: Optional[int | BLOCK_STRINGS] = None
     _end_block: Optional[int | BLOCK_STRINGS] = None
@@ -50,15 +46,7 @@ class EventSubscriber(Request, Generic[U]):
 
     @property
     def network(self):
-        return self.__network
-
-    def __init__(self, step_size: int | None = None):
-        from eth_rpc import get_current_network
-
-        self.receivers = {}
-        self.events = []
-        self.step_size = step_size
-        self.__network = self._network or get_current_network()
+        return self._network or get_current_network()
 
     def get_topics(self):
         """The nested list makes it so any match to topic0 will be selected"""
@@ -69,7 +57,7 @@ class EventSubscriber(Request, Generic[U]):
         start_block: int,
         end_block: int,
         addresses: list[HexAddress] = [],
-    ) -> AsyncIterator[EventData]:
+    ) -> AsyncIterator[EventData[U]]:
         topic_dict = {event.get_topic0: event for event in self.events}
         cur_end = start_block + self.step_size - 1 if self.step_size else end_block
 
@@ -88,6 +76,7 @@ class EventSubscriber(Request, Generic[U]):
             except ValueError as err:
                 # TODO: confirm this error is due to the cur_end being too far in the future
                 message = err.args[0]
+
                 if "Log response size exceeded." in message:
                     boundaries = re.findall("0x[0-9a-f]+", message)
                     if len(boundaries) != 2:
@@ -134,7 +123,7 @@ class EventSubscriber(Request, Generic[U]):
             for receiver in self.receivers[event_data.tx.topics[0]]:
                 await receiver.put(event_data)
 
-    def add_receiver(self, receiver: Receiver, events: list[Event]):
+    def add_receiver(self, receiver: Receiver, events: list[Event[U]]):
         for event in events:
             # add event to events list
             if event not in self.events:
@@ -169,7 +158,7 @@ class EventSubscriber(Request, Generic[U]):
             # print("INDEX MISMATCH", result.transaction_hash, result.log_index)
             return None
 
-        return EventData(
+        return EventData[U](
             name=event.name,
             log=result,
             event=event.process(
@@ -267,8 +256,6 @@ class EventSubscriber(Request, Generic[U]):
         start_block: int,
         addresses: list[HexAddress] = [],
     ):
-        from eth_rpc import Block
-
         should_publish_events = asyncio.Event()
         latest_block: ContextVar[int] = ContextVar("latest_block")
         task = asyncio.create_task(
@@ -289,7 +276,7 @@ class EventSubscriber(Request, Generic[U]):
         w3_connection: WebSocketClientProtocol,
         addresses: list[HexAddress],
         topics: list[HexStr],
-    ):
+    ) -> None:
         # this only handles a list of topic0s being subscribed together
         await w3_connection.send(
             json.dumps(
@@ -312,7 +299,7 @@ class EventSubscriber(Request, Generic[U]):
         start_block: int | BLOCK_STRINGS = 0,
         end_block: int | BLOCK_STRINGS = "latest",
         addresses: list[HexAddress] = [],
-    ) -> AsyncIterator[EventData]:
+    ) -> AsyncIterator[EventData[U]]:
         """This is used to set these values so you can use the iterator"""
 
         self._start_block = start_block
@@ -320,7 +307,7 @@ class EventSubscriber(Request, Generic[U]):
         self._addresses = addresses
         return self.__aiter__()
 
-    async def __aiter__(self) -> AsyncIterator[EventData]:
+    async def __aiter__(self) -> AsyncIterator[EventData[U]]:
         if not (
             self._start_block is not None
             and self._end_block is not None
