@@ -63,6 +63,7 @@ class MockWallet(BaseWallet):
 class PrivateKeyWallet(BaseWallet):
     private_key: HexStr
     _account: LocalAccount = PrivateAttr()
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def model_post_init(self, __context: Any) -> None:
@@ -80,7 +81,7 @@ class PrivateKeyWallet(BaseWallet):
 
     @classmethod
     def create_new(cls):
-        return cls(cls.get_pvt_key())
+        return cls(private_key=cls.get_pvt_key())
 
     def sign_transaction(self, tx: PreparedTransaction) -> SignedTransaction:
         signed_tx = self._account.sign_transaction(tx.model_dump())
