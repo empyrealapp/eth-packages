@@ -97,7 +97,6 @@ class Contract(Request):
                 cls._func_sigs[key] = cls_annotations[key]
                 del_keys.append(key)
         for key in del_keys:
-            delattr(cls, key)
             del cls.__annotations__[key]
 
     def add_func(self, func: "FuncSignature"):

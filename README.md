@@ -71,29 +71,29 @@ Rather than copying the abi into a JSON file, you can create a typed contract in
 ```python
 from typing import Annotated
 
-from eth_rpc.contract import ProtocolBase
+from eth_rpc.contract import ProtocolBase, ContractFunc
 from eth_rpc import Transaction, models
 from eth_rpc.wallet import PrivateKeyWallet
-from eth_rpc.types import METHOD, primitives
+from eth_rpc.types import Name, primitives
 
 
 class MyContract(ProtocolBase):
     foo: ContractFunc[
         list[primitives.address],  # input type is a list of addresses
         Annotated[bool, Name("success")],  # response type is a boolean
-    ] = METHOD  # setting this to METHOD is necessary to allow the class to generate the required plumbing
+    ]
 
 contract = MyContract(address="<Contract Address>")
 # create a wallet for yourself
 wallet = PrivateKeyWallet(private_key=os.environ["PK"])
 
 # call it without execution:
-response: bool = await contact.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', ...]).call(
+response: bool = await contract.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', ...]).call(
     from_=wallet.address,
 )
 
 # or call it with execution:
-tx_hash = await contact.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', ...]).execute(wallet)
+tx_hash = await contract.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', ...]).execute(wallet)
 tx: models.Transaction = await Transaction.get_by_hash(tx_hash)
 ```
 
