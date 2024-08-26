@@ -1,13 +1,13 @@
 import asyncio
-from eth_typing import HexAddress, HexStr
 import os
 
 from eth_rpc import set_alchemy_key
 from eth_rpc.utils import address_to_topic
+from eth_typeshed.constants import Factories
 from eth_typeshed.erc20 import ERC20
 from eth_typeshed.multicall import multicall
 from eth_typeshed.uniswap_v3 import V3PoolCreatedEvent, V3PoolCreatedEventType
-from eth_typeshed.constants import Factories
+from eth_typing import HexAddress, HexStr
 
 
 async def get_all_uniswap_v3_pools(token_address: HexAddress):
@@ -38,10 +38,14 @@ async def get_uniswap_v3_max_liquidity_pair(token_address: HexAddress):
     A helper function to get the highest liquidity pair on UniswapV3 for a token.
     """
     token = ERC20(address=token_address)
-    all_pools: list[V3PoolCreatedEventType] = await get_all_uniswap_v3_pools(token_address)
+    all_pools: list[V3PoolCreatedEventType] = await get_all_uniswap_v3_pools(
+        token_address
+    )
 
     # get the token balance of each pool to find the deepest liquidity pool
-    reserves = await multicall.execute(*[token.balance_of(pool.pool) for pool in all_pools])
+    reserves = await multicall.execute(
+        *[token.balance_of(pool.pool) for pool in all_pools]
+    )
 
     # zip together the pool with the reserves and find the highest reserve balance
     max_reserve = sorted(
