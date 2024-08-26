@@ -36,3 +36,8 @@ dev = [
     "eth-streams-py[test]",
     "eth-streams-py[build]",
 ]
+
+[tool.mypy]
+plugins = [
+  "pydantic.mypy"
+]

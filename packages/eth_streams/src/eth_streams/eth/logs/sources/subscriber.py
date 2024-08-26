@@ -1,6 +1,7 @@
 from collections.abc import AsyncIterator
 
-from eth_rpc import Block, Log, get_current_network
+from eth_rpc import Block, get_current_network
+from eth_rpc.models import Log
 from eth_rpc.types import BLOCK_STRINGS, Network
 from eth_streams.types import Envelope, Sink, Source, Topic
 from eth_streams.utils import get_implicit
@@ -36,8 +37,9 @@ class LogSubscriber(Source[Log], Sink[ReorgError], BaseModel):
             return log_source >> batcher
         return cls(**kwargs)
 
-    def __class_getitem__(self, network: Network):
-        self.network = network
+    def __class_getitem__(cls, network: Network):  # type: ignore
+        cls.network = network
+        return cls
 
     async def _notify(self, envelope: Envelope[ReorgError]):
         block_number = envelope.message.block_number
@@ -48,8 +50,8 @@ class LogSubscriber(Source[Log], Sink[ReorgError], BaseModel):
         self.reorg_block = reorg_block
 
     async def _get_current_block(self) -> int:
-        if self.start_block == "latest":
-            latest = int(await Block[self.network].get_number())  # type: ignore[name-defined]
+        if self.start_block in BLOCK_STRINGS.__dict__["__args__"]:
+            latest = (await Block[self.network].load_by_number(self.start_block)).number
         elif isinstance(self.start_block, int):
             latest = self.start_block
         else:

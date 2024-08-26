@@ -1,7 +1,8 @@
 from collections.abc import AsyncIterator
 from typing import Generic, TypeVar
 
-from eth_rpc import Event, EventData, Log, get_current_network
+from eth_rpc import Event, EventData, get_current_network
+from eth_rpc.models import Log
 from eth_rpc.types import Network
 from eth_streams.types import Envelope, Topic, Vertex
 from eth_streams.workers import Batch

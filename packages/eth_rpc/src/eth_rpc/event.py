@@ -11,7 +11,7 @@ from eth_abi import decode
 from eth_abi.exceptions import InsufficientDataBytes
 from eth_typing import HexAddress, HexStr
 from eth_utils import event_signature_to_log_topic
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, PrivateAttr, computed_field
 from websockets.exceptions import ConnectionClosedError
 from websockets.legacy.client import WebSocketClientProtocol, connect
 
@@ -22,6 +22,7 @@ from .exceptions import LogDecodeError, LogResponseExceededError
 from .models import EventData, Log
 from .types import (
     BLOCK_STRINGS,
+    BlockReference,
     EvmDataDict,
     Indexed,
     JsonResponseWssResponse,
@@ -77,7 +78,7 @@ def convert(type, with_name: bool = False, with_indexed: bool = False):
     return f"{map_type(type)}{map_indexed(indexed)}{name}".strip()
 
 
-class Event(Request, BaseModel, Generic[T]):
+class Event(Request, Generic[T]):
     name: str
     anonymous: bool = False
 
@@ -85,6 +86,13 @@ class Event(Request, BaseModel, Generic[T]):
     topic2_filter: Optional[HexStr | list[HexStr]] | IGNORE = IGNORE_VAL
     topic3_filter: Optional[HexStr | list[HexStr]] | IGNORE = IGNORE_VAL
     addresses_filter: list[HexAddress] = []
+
+    _output_type: BaseModel = PrivateAttr()
+
+    def model_post_init(self, __context):
+        EventType, *_ = self.__pydantic_generic_metadata__["args"]
+        self._output_type = EventType
+        self._network = self._network_
 
     @staticmethod
     def _matches(topic: HexStr, topic_filter: HexStr | list[HexStr] | None) -> bool:
@@ -233,8 +241,8 @@ class Event(Request, BaseModel, Generic[T]):
 
     def _get_logs(
         self,
-        start_block,
-        end_block,
+        start_block: BlockReference | int,
+        end_block: BlockReference | int,
         addresses: list[HexAddress] = [],
         topic1: Optional[HexStr | list[HexStr] | None] | IGNORE = IGNORE_VAL,
         topic2: Optional[HexStr | list[HexStr] | None] | IGNORE = IGNORE_VAL,
@@ -271,15 +279,18 @@ class Event(Request, BaseModel, Generic[T]):
         if topic1 != IGNORE_VAL:
             model.topic1_filter = topic1
         if topic2 != IGNORE_VAL:
+            model.topic1_filter = model.topic1_filter or None
             model.topic2_filter = topic2
         if topic3 != IGNORE_VAL:
+            model.topic1_filter = model.topic1_filter or None
+            model.topic2_filter = model.topic2_filter or None
             model.topic3_filter = topic3
         return model
 
     async def get_logs(
         self,
-        start_block,
-        end_block,
+        start_block: BlockReference | int,
+        end_block: BlockReference | int,
     ) -> AsyncIterator[EventData[T]]:
         cur_end = end_block
         try:
@@ -313,7 +324,7 @@ class Event(Request, BaseModel, Generic[T]):
                     result.topics,
                     result.data,
                 ),
-                network=self._network or get_current_network(),
+                network=self._network_ or get_current_network(),
             )
             yield event_data
 
@@ -423,8 +434,11 @@ class AsyncSubscribeCallable(BaseModel):
     ) -> AsyncIterator[EventData]:
         # TODO: sometimes the topics match, but the indexed fields are different
 
+        if not (wss_uri := self.network.wss):
+            raise ValueError("No wss set for network")
+
         async for w3_connection in connect(
-            self.network.wss,
+            wss_uri,
             ping_interval=60,
             ping_timeout=60,
             max_queue=10000,

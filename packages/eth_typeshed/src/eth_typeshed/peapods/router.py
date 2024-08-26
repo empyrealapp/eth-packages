@@ -1,6 +1,5 @@
-from eth_rpc.contract import ContractFunc
+from eth_rpc import ContractFunc, ProtocolBase
 from eth_rpc.types import METHOD, NoArgs, primitives
-from eth_typeshed._base import ProtocolBase
 from eth_typing import HexAddress
 from pydantic import BaseModel
 

@@ -6,11 +6,11 @@ from eth_streams.types import Source
 from eth_streams.utils import get_implicit
 from eth_streams.workers import Throttler
 from eth_typing import HexAddress
-from pydantic import ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from ..contract_event_vertex import ContractEventSink
 
-T = TypeVar("T")
+T = TypeVar("T", bound=BaseModel)
 
 
 class EventBackfillSource(Source[EventData[T]], Generic[T]):
@@ -18,7 +18,7 @@ class EventBackfillSource(Source[EventData[T]], Generic[T]):
         arbitrary_types_allowed=True,
     )
 
-    events: list[Event] = Field(default=list)
+    events: list[Event] = Field(default_factory=list)
     subscriber: EventSubscriber = Field(default_factory=EventSubscriber)
     addresses: list[HexAddress] = Field(default_factory=list)
 
@@ -58,7 +58,7 @@ class EventBackfillSource(Source[EventData[T]], Generic[T]):
                 sink = ContractEventSink(network=network)
             else:
                 sink = ContractEventSink()
-            log_source >> sink
+            log_source >> sink  # type: ignore
         return log_source
 
     async def put(self, event: EventData[T]) -> None:

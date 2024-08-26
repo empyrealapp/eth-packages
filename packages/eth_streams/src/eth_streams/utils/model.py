@@ -1,4 +1,5 @@
-from tortoise import Model, fields
+from tortoise import fields
+from tortoise.models import Model
 
 
 class EventModel(Model):

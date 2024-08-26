@@ -17,20 +17,19 @@ from .types import RPCResponseModel
 T = TypeVar("T")
 
 
-class Log(Request, LogModel):
+class LogRPC(Request):
     def __class_getitem__(self, params):
         if isinstance(params, NetworkType):
             self._network = params
         return self
 
-    @classmethod
     def load_by_number(
-        cls,
+        self,
         from_block: int | HexInt,
         to_block: int | HexInt | None = None,
-    ) -> RPCResponseModel[LogsArgs, list["Log"]]:
+    ) -> RPCResponseModel[LogsArgs, list["LogModel"]]:
         return RPCResponseModel(
-            cls._rpc().get_logs,
+            self._rpc().get_logs,
             LogsArgs(
                 params=LogsParams(
                     from_block=HexInt(from_block),
@@ -43,7 +42,7 @@ class Log(Request, LogModel):
     async def listen(
         cls,
         *,
-        queue: asyncio.Queue["Log"],
+        queue: asyncio.Queue["LogModel"],
         publish_logs: asyncio.Event = DEFAULT_EVENT,
     ):
         internal_queue: asyncio.Queue = asyncio.Queue()
@@ -100,13 +99,12 @@ class Log(Request, LogModel):
                     # w3_connection is an iterator, so make a new connection and continue listening
                     break
 
-    @classmethod
     async def subscribe_from(
         self,
         start_block: int | None = None,
         batch_size: int = 50,
-    ) -> AsyncIterator["Log"]:
-        queue = asyncio.Queue[Log]()
+    ) -> AsyncIterator[LogModel]:
+        queue = asyncio.Queue[LogModel]()
         should_publish_logs = asyncio.Event()
         asyncio.create_task(
             self.listen(
@@ -122,7 +120,7 @@ class Log(Request, LogModel):
         num = start_block
         while num <= latest:
             batch_end = min(num + batch_size, latest)
-            for log in await Log.load_by_number(num, batch_end):
+            for log in await self.load_by_number(num, batch_end):
                 yield log
             num += batch_size
 
@@ -131,3 +129,6 @@ class Log(Request, LogModel):
             log = await queue.get()
             if log.block_number > latest:
                 yield log
+
+
+Log = LogRPC()

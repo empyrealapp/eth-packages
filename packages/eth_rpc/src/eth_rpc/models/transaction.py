@@ -39,6 +39,12 @@ class Transaction(BaseTransaction):
     block_number: HexInteger
     transaction_index: HexInteger
 
+    def get_block(self, with_tx_data: bool = False):
+        """Load a block hash"""
+        from ..block import Block
+
+        return Block.load_by_hash(self.block_hash, with_tx_data=with_tx_data)
+
 
 class PendingTransaction(BaseTransaction):
     block_hash: HexStr | None = None  # not set on pending transactions

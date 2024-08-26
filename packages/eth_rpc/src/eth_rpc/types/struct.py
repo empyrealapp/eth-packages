@@ -2,7 +2,7 @@ from types import GenericAlias
 from typing import get_args
 
 from eth_abi import encode
-from eth_rpc.function import convert_base_model
+from eth_rpc.utils import convert_base_model
 from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import BaseModel
 

@@ -1,6 +1,6 @@
 import secrets
 from abc import ABC, abstractmethod
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
 from eth_account import Account
 from eth_account.account import LocalAccount, SignedMessage
@@ -13,6 +13,7 @@ from eth_rpc.types import (
     SignedTransaction,
 )
 from eth_typing import HexAddress, HexStr
+from pydantic import ConfigDict, PrivateAttr
 
 from ._request import Request
 from ._transport import _force_get_global_rpc
@@ -22,7 +23,9 @@ from .types import HexInteger, RPCResponseModel
 
 
 class BaseWallet(Request, ABC):
-    address: HexAddress
+    @property
+    @abstractmethod
+    def address(self) -> HexAddress: ...
 
     def get_nonce(self, block_number: int | BLOCK_STRINGS = "latest"):
         return RPCResponseModel(
@@ -47,15 +50,29 @@ class BaseWallet(Request, ABC):
 
 
 class MockWallet(BaseWallet):
-    def __init__(self, address: HexAddress):
-        self.address = address
+    _address: HexAddress = PrivateAttr()
+
+    @property
+    def address(self) -> HexAddress:
+        return self._address
 
     def sign_transaction(self, tx):
         raise NotImplementedError("Mock wallet can not sign")
 
 
 class PrivateKeyWallet(BaseWallet):
-    account: LocalAccount
+    private_key: HexStr
+    _account: LocalAccount = PrivateAttr()
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    def model_post_init(self, __context: Any) -> None:
+        self._account = Account.from_key(self.private_key)
+        return super().model_post_init(__context)
+
+    @property
+    def address(self) -> HexAddress:
+        return self._account.address
 
     @staticmethod
     def get_pvt_key() -> HexStr:
@@ -64,17 +81,10 @@ class PrivateKeyWallet(BaseWallet):
 
     @classmethod
     def create_new(cls):
-        return cls(cls.get_pvt_key())
-
-    @property
-    def address(self) -> HexAddress:  # type: ignore
-        return self.account.address
-
-    def __init__(self, private_key: HexStr):
-        self.account = Account.from_key(private_key)
+        return cls(private_key=cls.get_pvt_key())
 
     def sign_transaction(self, tx: PreparedTransaction) -> SignedTransaction:
-        signed_tx = self.account.sign_transaction(tx.model_dump())
+        signed_tx = self._account.sign_transaction(tx.model_dump())
         return SignedTransaction(
             raw_transaction=signed_tx[0].hex(),
             hash=signed_tx.hash.hex(),
@@ -172,4 +182,4 @@ class PrivateKeyWallet(BaseWallet):
         return self.send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction)).sync
 
     def sign_hash(self, hashed: bytes) -> SignedMessage:
-        return Account._sign_hash(hashed, self.account.key)
+        return Account._sign_hash(hashed, self._account.key)

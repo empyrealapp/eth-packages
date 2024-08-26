@@ -5,6 +5,7 @@ from typing import Any, Generic, Literal, Optional, TypeVar, cast, overload
 
 from eth_rpc.models import AccessListResponse
 from eth_rpc.types import (
+    BASIC_TYPES,
     BLOCK_STRINGS,
     CallWithBlockArgs,
     EthCallArgs,
@@ -14,18 +15,18 @@ from eth_rpc.types import (
 )
 from eth_rpc.types import Network as NetworkType
 from eth_rpc.types import RPCResponseModel
-from eth_typing import HexAddress, HexStr, Primitives
+from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel
 
 from .._transport import _force_get_global_rpc
 from ..block import Block
 from ..constants import ADDRESS_ZERO
-from ..function import FuncSignature
 from ..rpc.core import RPC
 from ..transaction import PreparedTransaction
 from ..utils import run
 from ..wallet import BaseWallet
 from .eth_response import EthResponse
+from .func_signature import FuncSignature
 
 # from .contract import Contract
 
@@ -33,9 +34,9 @@ T = TypeVar(
     "T",
     bound=tuple
     | BaseModel
-    | Primitives
-    | list[Primitives]
-    | tuple[Primitives, ...]
+    | BASIC_TYPES
+    | list[BASIC_TYPES]
+    | tuple[BASIC_TYPES, ...]
     | HexAddress,
 )
 U = TypeVar("U")
@@ -93,7 +94,9 @@ class ContractFunc(Generic[T, U]):
         elif len(args) == 1:
             new_self.data = self.func.encode_call(inputs=args[0])
         else:
-            raise ValueError("Can not provide more than 1 arg")
+            # assumed you provided the args
+            _args: T = cast(T, args)
+            new_self.data = self.func.encode_call(inputs=_args)
         return new_self
 
     def encode(self):

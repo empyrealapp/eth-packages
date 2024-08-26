@@ -3,9 +3,9 @@ from collections.abc import AsyncIterator
 from typing import Any, Generic, TypeVar, final
 
 from eth_rpc import ContractFunc
+from eth_rpc.contract.function import T as ArgType
 from eth_streams.types import Envelope, Topic, Vertex
 
-ArgType = TypeVar("ArgType")
 ResponseType = TypeVar("ResponseType")
 U = TypeVar("U")
 

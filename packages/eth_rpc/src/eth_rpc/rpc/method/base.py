@@ -12,7 +12,9 @@ from pydantic import BaseModel, ConfigDict, PrivateAttr
 if TYPE_CHECKING:
     from ..core import RPC
 
-Params = TypeVar("Params", bound=BaseModel | HexInt | HexStr | list[HexInt | HexStr])
+Params = TypeVar(
+    "Params", bound=BaseModel | HexInt | HexStr | list[HexInt | HexStr] | NoArgs
+)
 Response = TypeVar("Response")
 
 

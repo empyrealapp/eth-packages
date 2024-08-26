@@ -47,6 +47,6 @@ class Batcher(Vertex[T, Batch[T]]):
             len(self.batch) >= self.batch_size
             or envelope.message == StreamEvents.stopped
         ):
-            response = (self.default_topic, Batch(data=self.batch))
+            response = (self.default_topic, Batch[T](data=self.batch))
             self.batch = []
             yield response

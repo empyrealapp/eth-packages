@@ -1,7 +1,9 @@
+import pytest
 from eth_rpc.types.basic import HexInt, HexInteger
 from pydantic import BaseModel
 
 
+@pytest.mark.unit
 def test_hex_int() -> None:
     class MyNum(BaseModel):
         x: HexInt
@@ -11,6 +13,7 @@ def test_hex_int() -> None:
     assert my_num.model_dump() == {"x": 30}
 
 
+@pytest.mark.unit
 def test_hex_integer() -> None:
     class MyNum(BaseModel):
         x: HexInteger

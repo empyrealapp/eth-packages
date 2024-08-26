@@ -9,14 +9,12 @@ from ._transport import (
 from .account import Account
 from .block import Block
 from .contract import Contract, ContractFunc, EthResponse, FuncSignature
+from .contract.base import ProtocolBase
 from .event import Event
 from .log import Log
 from .models import EventData
 from .subscriber import EventSubscriber
 from .transaction import Transaction, TransactionReceipt
-
-Contract.model_rebuild()
-
 
 __all__ = [
     "Account",
@@ -29,6 +27,7 @@ __all__ = [
     "EventSubscriber",
     "FuncSignature",
     "Log",
+    "ProtocolBase",
     "Transaction",
     "TransactionReceipt",
     "configure_rpc_from_env",

@@ -1,5 +1,7 @@
+from typing import Optional
+
 from eth_typing import HexAddress, HexStr
-from pydantic import AnyHttpUrl, BaseModel
+from pydantic import AnyHttpUrl, BaseModel, Field
 from pydantic.networks import AnyWebsocketUrl, Url
 
 
@@ -12,7 +14,7 @@ class BlockExplorer(BaseModel):
 
 class RpcUrl(BaseModel):
     http: AnyHttpUrl
-    wss: AnyWebsocketUrl | None = None
+    wss: Optional[AnyWebsocketUrl] = Field(default=None)
 
 
 class Rpcs(BaseModel):
@@ -39,31 +41,35 @@ class Network(BaseModel):
     apprx_block_time: float = 12.0
 
     def set(
-        self,
+        cls,
         http: str | None = None,
         wss: str | None = None,
         api_key: str | None = None,
     ):
         if http:
-            self.rpc.default.http = Url(http)
+            cls.rpc.default.http = Url(http)
         if wss:
-            self.rpc.default.wss = Url(wss)
+            cls.rpc.default.wss = Url(wss)
         if api_key:
-            self.block_explorer.api_key = api_key
-        return self
+            cls.block_explorer.api_key = api_key
+        return cls
 
     @property
-    def http(self) -> str:
-        return str(self.rpc.default.http)
+    def http(cls) -> str | None:
+        if cls.rpc.default.http:
+            return str(cls.rpc.default.http)
+        return None
 
     @property
-    def wss(self) -> str:
-        return str(self.rpc.default.wss)
+    def wss(cls) -> str | None:
+        if cls.rpc.default.wss:
+            return str(cls.rpc.default.wss)
+        return None
 
     def __hash__(self) -> int:
         return self.chain_id
 
     def __str__(self):
-        return f"<Network: {self.__class__.__name__}>"
+        return f"<Network: {self.name}>"
 
     __repr__ = __str__

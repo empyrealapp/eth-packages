@@ -1,5 +1,7 @@
 from typing import NewType, Union
 
+from eth_typing import ChecksumAddress, HexAddress, HexStr
+
 int8 = NewType("int8", int)
 int16 = NewType("int16", int)
 int24 = NewType("int24", int)
@@ -242,8 +244,12 @@ BASIC_TYPES = Union[
     bytes32,
     bytes,
     string,
+    str,
     address,
     bool,
+    HexAddress,
+    ChecksumAddress,
+    HexStr,
 ]
 
 # in solidity, these can not be assigned to yet but can be declared

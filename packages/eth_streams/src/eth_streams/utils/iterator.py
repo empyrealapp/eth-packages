@@ -41,7 +41,7 @@ class EventIterator:
 
             pagination_full = len(ordered_events) == pagination_size
             for event in ordered_events:
-                EventType = self.event_map[event.topic0]
+                EventType: Event = self.event_map[event.topic0]
                 yield EventData(
                     name=event.name,
                     log=Log(

@@ -19,8 +19,9 @@ class V2Factory(BaseModel):
     _contract: UniswapV2Factory = PrivateAttr()
     address: HexAddress
 
-    def __class_getitem__(cls, network: Network):
+    def __class_getitem__(cls, network: Network):  # type: ignore
         cls._network = network
+        return cls
 
     def model_post_init(self, __context):
         self._contract = UniswapV2Factory(address=self.address)
@@ -42,5 +43,5 @@ class V2Factory(BaseModel):
             cls.pairs[key] = to_checksum_address(pair_address)
 
         return V2Pair.load(
-            pair_address=cls.pairs[key],
+            pair=cls.pairs[key],
         )

@@ -1,12 +1,11 @@
 from typing import Annotated
 
-from eth_rpc import ContractFunc
+from eth_rpc import ContractFunc, ProtocolBase
 from eth_rpc.types import METHOD, Name, primitives
 from eth_typeshed.erc20 import OwnerRequest
 from eth_typeshed.multicall import multicall
 from eth_typing import HexAddress, HexStr
 
-from .._base import ProtocolBase
 from .position import OwnerTokenRequest, Position
 
 NONFUNGIBLE_POSITION_MANAGER_ADDRESS = HexAddress(

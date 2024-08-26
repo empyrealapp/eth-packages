@@ -1,113 +1,39 @@
 from inspect import isclass
 from types import GenericAlias
-from typing import Any, Generic, NamedTuple, TypeVar, get_args, get_origin
+from typing import Generic, TypeVar, get_args
 
 from eth_abi import decode, encode
 from eth_hash.auto import keccak as keccak_256
-from eth_typing import ChecksumAddress, HexAddress, HexStr, Primitives
+from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel
-from pydantic.fields import FieldInfo
 
-from ._request import Request
-from .types import Name, NoArgs
-from .utils import is_annotation
+from .._request import Request
+from ..types import BASIC_TYPES, Name, NoArgs
+from ..utils import convert, convert_base_model, is_annotation
 
 T = TypeVar(
     "T",
     bound=tuple
     | BaseModel
-    | Primitives
-    | list[Primitives]
-    | tuple[Primitives, ...]
+    | BASIC_TYPES
+    | list[BASIC_TYPES]
+    | tuple[BASIC_TYPES, ...]
     | HexAddress,
 )
 U = TypeVar("U")
 
 
-def map_name(name: Any) -> str:
-    """Convert a type to its solidity compatible format"""
-    return {
-        HexAddress: "address",
-        HexStr: "bytes",
-        ChecksumAddress: "address",
-        str: "string",
-    }.get(name, name.__name__)
-
-
-def convert_base_model(
-    base: type[BaseModel], with_name: bool = False, as_tuple: bool = False
-):
-    lst = []
-    for key, field_info in base.model_fields.items():
-        lst.append(_convert_field_info(key, field_info, with_name=with_name))
-    if as_tuple:
-        return ",".join(lst)
-    return lst
-
-
-def _convert_field_info(alias: str, field: FieldInfo, with_name: bool = False):
-    name = "" if not with_name else alias
-    field_type = field.annotation
-
-    for metadata in field.metadata:
-        if isinstance(metadata, Name) and with_name:
-            name = metadata.value
-
-    type_origin = get_origin(field_type)
-    if type_origin == list:
-        list_type = get_args(field_type)[0]
-        converted_list_type = convert(list_type)
-        if isinstance(converted_list_type, list):
-            converted_list_type = f"({','.join(converted_list_type)})"
-        return f"{converted_list_type}[] {name}".strip()
-    elif type_origin == tuple:
-        tuple_args = f"({','.join([convert(t) for t in get_args(field_type)])}) {name}"
-        return tuple_args
-    return f"{map_name(field_type)} {name}".strip()
-
-
-def convert(type, with_name: bool = False):
-    name = ""
-    # unwrap annotations
-    if is_annotation(type):
-        type, *annotations = get_args(type)
-        if with_name:
-            for annotation in annotations:
-                if isinstance(annotation, Name):
-                    name = annotation.value
-
-    # if it's a list or a tuple
-    if isinstance(type, GenericAlias):
-        if get_origin(type) in [list, "list"]:
-            list_type = get_args(type)[0]
-            converted_list_type = convert(list_type)
-            # if the list type is a tuple:
-            if isinstance(converted_list_type, list):
-                converted_list_type = f"({','.join(converted_list_type)})"
-            return f"{converted_list_type}[] {name}".strip()
-        else:
-            tuple_args = [convert(t, with_name=with_name) for t in get_args(type)]
-            return tuple_args
-    elif getattr(type, "__orig_bases__", [None])[0] == NamedTuple:
-        return f"({','.join([convert(t) for t in type.__annotations__.values()])}) {name}".strip()
-    elif isclass(type) and issubclass(type, BaseModel):
-        return f"({convert_base_model(type, with_name=with_name, as_tuple=True)}) {name}".strip()
-    return f"{map_name(type)} {name}".strip()
-
-
-class FuncSignature(BaseModel, Request, Generic[T, U]):
+class FuncSignature(Request, Generic[T, U]):
     alias: str | None = None
     name: str
 
     def get_identifier(self):
         """This works most of the time"""
-        input_arg, _ = self.__pydantic_generic_metadata__["args"]
-
         signature = f'{self.name}({",".join(self.get_inputs())})'
         return f"0x{keccak_256(signature.encode('utf-8')).hex()[:8]}"
 
     def get_inputs(self):
-        from .types import Struct
+        from ..types import Struct
 
         inputs, _ = self.__pydantic_generic_metadata__["args"]
         if inputs is NoArgs:
@@ -163,7 +89,7 @@ class FuncSignature(BaseModel, Request, Generic[T, U]):
         return [self._get_name(output) for output in get_args(self._output)]
 
     def encode_call(self, *, inputs: T) -> HexStr:
-        from .types import Struct
+        from ..types import Struct
 
         identifier = self.get_identifier()
         # TODO: this is hard

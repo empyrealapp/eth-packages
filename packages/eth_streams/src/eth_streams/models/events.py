@@ -1,3 +1,5 @@
+from typing import Any
+
 from eth_typing import HexAddress
 from tortoise import Model, fields
 from tortoise.transactions import in_transaction
@@ -19,7 +21,7 @@ class ContractEvent(Model):
     name = fields.TextField()
     topic0 = fields.CharField(index=True, max_length=256)
     event_type = fields.CharField(index=True, max_length=256)
-    event_data = fields.JSONField()
+    event_data: dict[str, Any] = fields.JSONField()
     invalidated = fields.BooleanField(default=False)
     stage_id = fields.CharField(max_length=32, null=True)
     confirmed = fields.BooleanField(default=False)

@@ -1,6 +1,7 @@
 from collections.abc import Awaitable
 from copy import deepcopy
 from typing import (
+    TYPE_CHECKING,
     Annotated,
     ClassVar,
     Literal,
@@ -21,15 +22,17 @@ from eth_rpc.types import (
     HexInteger,
     MaybeAwaitable,
 )
-from eth_rpc.types import Network as NetworkType
 from eth_typing import HexAddress, HexStr, Primitives
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, Field
 
 from .._request import Request
 from .._transport import _force_get_default_network
-from ..function import FuncSignature
 from ..utils import run, to_hex_str
 from .function import ContractFunc
+
+if TYPE_CHECKING:
+    from .function import FuncSignature
+
 
 T = TypeVar(
     "T",
@@ -43,9 +46,8 @@ T = TypeVar(
 U = TypeVar("U")
 
 
-class Contract(BaseModel, Request):
+class Contract(Request):
     _func_sigs: ClassVar[dict[str, ContractMethod]]
-    _network: NetworkType | None = PrivateAttr(default=None)  # type: ignore
 
     address: HexAddress
     functions: list[ContractFunc] = Field(default_factory=list)
@@ -67,11 +69,6 @@ class Contract(BaseModel, Request):
                 except AttributeError:
                     pass
         return func_sigs
-
-    def __class_getitem__(self, params):
-        if isinstance(params, NetworkType):
-            self._network = params
-        return self
 
     def __init_subclass__(cls, **kwargs) -> None:
         # TODO: I hate this slightly less
@@ -104,22 +101,11 @@ class Contract(BaseModel, Request):
             delattr(cls, key)
             del cls.__annotations__[key]
 
-    def __init__(self, *args, code_override=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        # overwrite _rpc class method
-        network = self.__class__._network or _force_get_default_network()
+    def model_post_init(self, __context):
+        network = self.__class__._network_ or _force_get_default_network()
         self._network = network
-        self.__class__._network = None
-        self._rpc = self._rpc_
-        self.code_override = code_override
 
-    def __getattr__(self, attr):
-        f = [func for func in self.functions if func.alias == attr]
-        if len(f) == 1:
-            return f[0]
-        return super().__getattr__(attr)
-
-    def add_func(self, func: FuncSignature):
+    def add_func(self, func: "FuncSignature"):
         from .function import ContractFunc
 
         if func not in self.functions:

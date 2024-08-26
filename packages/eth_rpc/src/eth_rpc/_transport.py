@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict
 
+from .exceptions import UnsupportedChainIDException
 from .networks import Ethereum, get_network_by_chain_id
 from .rpc.base import BaseRPC
 from .types import Network
@@ -76,12 +77,12 @@ def get_current_network() -> Network:
     return transport.default
 
 
-def set_rpc_timeout(timeout: float, network: Network | None = None):
+def set_rpc_timeout(timeout: float, network: Network | None = None) -> None:
     rpc = _force_get_global_rpc(network)
     rpc.set_timeout(timeout)
 
 
-def set_alchemy_key(alchemy_key, network=Ethereum):
+def set_alchemy_key(alchemy_key, network: Network = Ethereum):
     if not network.alchemy_str:
         raise ValueError("Network not supported by alchemy, set Network.alchemy_str")
     set_transport(
@@ -105,7 +106,7 @@ def configure_rpc_from_env():
 
     network = get_network_by_chain_id(chain_id)
     if not network:
-        raise ValueError(f"Unsupported chain ID: {chain_id}")
+        raise UnsupportedChainIDException(f"Unsupported chain ID: {chain_id}")
 
     set_alchemy_key(alchemy_key, network=network)
     set_default_network(network)
