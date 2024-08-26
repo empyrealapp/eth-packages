@@ -9,7 +9,6 @@ from pydantic import PrivateAttr
 from .constants import ADMIN_SLOT, EIP1967_IMPLEMENTATION_SLOT, OZ_IMPLEMENTATION_SLOT
 from .types import (
     ApproveRequest,
-    OwnerRequest,
     OwnerSpenderRequest,
     TransferFromRequest,
     TransferRequest,
@@ -53,7 +52,7 @@ class ERC20Metadata(ProtocolBase):
         from eth_typeshed.multicall import multicall
 
         if not (self._name and self._symbol and self._decimals):
-            self._name, self._symbol, self._decimals = await multicall.execute_async(
+            self._name, self._symbol, self._decimals = await multicall.execute(
                 self.name(),
                 self.symbol(),
                 self.decimals(),
@@ -63,7 +62,7 @@ class ERC20Metadata(ProtocolBase):
 class ERC20(ERC20Metadata):
     balance_of: Annotated[
         ContractFunc[
-            OwnerRequest,
+            Annotated[primitives.address, Name("owner")],
             Annotated[primitives.uint256, Name("amount")],
         ],
         Name("balanceOf"),
@@ -122,12 +121,12 @@ class ERC20(ERC20Metadata):
             raise ValueError(list(storage.keys()))
         return list(storage.keys())[0]
 
-    def get_balance_slot(self, owner: HexAddress) -> Optional[HexStr]:
+    def get_balance_slot(self, owner: primitives.address) -> Optional[HexStr]:
         """
         Attempts to find the balance slot for an address.
         This will not work on tokens with irregular balance calculation.
         """
-        balance = self.balance_of(OwnerRequest(owner=owner)).sync.call().raw
+        balance = self.balance_of(owner).sync.call().raw
         result = self._get_debug_tracecall(
             self.address,
             data=f"0x70a08231000000000000000000000000{owner.replace('0x', '')}",
@@ -140,7 +139,7 @@ class ERC20(ERC20Metadata):
         # Unknown slot return None
         return None
 
-    def balance_state_diff(self, owner: HexAddress, balance: int) -> Optional[dict]:
+    def balance_state_diff(self, owner: primitives.address, balance: int) -> Optional[dict]:
         slot = self.get_balance_slot(owner)
         if slot:
             return {

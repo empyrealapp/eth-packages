@@ -92,13 +92,14 @@ class Event(Request, Generic[T]):
     def model_post_init(self, __context):
         EventType, *_ = self.__pydantic_generic_metadata__["args"]
         self._output_type = EventType
-        self._network = self.__class__._network
+        self._network = self._network_
+        # self._network = self.__class__._network
 
-    def __getitem__(self, params):
-        if isinstance(params, Network):
-            copy = self.model_copy()
-            copy._network = params
-        return copy
+    # def __getitem__(self, params):
+    #     if isinstance(params, Network):
+    #         copy = self.model_copy()
+    #         copy._network = params
+    #     return copy
 
     @staticmethod
     def _matches(topic: HexStr, topic_filter: HexStr | list[HexStr] | None) -> bool:
@@ -285,8 +286,11 @@ class Event(Request, Generic[T]):
         if topic1 != IGNORE_VAL:
             model.topic1_filter = topic1
         if topic2 != IGNORE_VAL:
+            model.topic1_filter = model.topic1_filter or None
             model.topic2_filter = topic2
         if topic3 != IGNORE_VAL:
+            model.topic1_filter = model.topic1_filter or None
+            model.topic2_filter = model.topic2_filter or None
             model.topic3_filter = topic3
         return model
 
@@ -327,7 +331,7 @@ class Event(Request, Generic[T]):
                     result.topics,
                     result.data,
                 ),
-                network=self._network or get_current_network(),
+                network=self._network_ or get_current_network(),
             )
             yield event_data
 
