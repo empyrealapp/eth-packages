@@ -34,6 +34,7 @@ class Request(BaseModel):
             self._network = params
         return self
 
+    @classmethod
     def _rpc(self) -> "RPC":
         """
         This uses the default network, unless a network has been provided
