@@ -26,7 +26,6 @@ from eth_typing import HexAddress, HexStr, Primitives
 from pydantic import BaseModel, Field
 
 from .._request import Request
-from .._transport import _force_get_default_network
 from ..utils import run, to_hex_str
 from .function import ContractFunc
 
@@ -101,13 +100,7 @@ class Contract(Request):
             delattr(cls, key)
             del cls.__annotations__[key]
 
-    def model_post_init(self, __context):
-        network = self.__class__._network_ or _force_get_default_network()
-        self._network = network
-
     def add_func(self, func: "FuncSignature"):
-        from .function import ContractFunc
-
         if func not in self.functions:
             self.functions.append(ContractFunc(func=func, contract=self))
 

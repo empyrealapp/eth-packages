@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from eth_rpc.types.args import EthCallParams, TraceArgs
 from pydantic import BaseModel, PrivateAttr
@@ -15,9 +15,9 @@ class Request(BaseModel):
     _network_: ClassVar[Network | None] = PrivateAttr(default=None)  # type: ignore
     _network: Network | None = PrivateAttr(default=None)  # type: ignore
 
-    def model_post_init(self, __context: Any) -> None:
-        self._network = self.__class__._network_
-        return super().model_post_init(__context)
+    def model_post_init(self, __context):
+        network = self.__class__._network_
+        self._network = network
 
     def __class_getitem__(cls, params):
         if isinstance(params, Network):
@@ -30,7 +30,7 @@ class Request(BaseModel):
         return cls
 
     def __getitem__(self, params):
-        if isinstance(params, Network):
+        if isinstance(params, Network) and self._network != params:
             self = deepcopy(self)
             self._network = params
         return self
