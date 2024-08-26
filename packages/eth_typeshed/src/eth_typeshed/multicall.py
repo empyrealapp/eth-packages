@@ -41,6 +41,7 @@ class TryResult(BaseModel, Generic[T]):
 
 
 class Multicall(ProtocolBase):
+    address: HexAddress = Field(default=MULTICALL3_ADDRESS)
     block_and_aggregate: Annotated[
         ContractFunc[
             MulticallRequest,

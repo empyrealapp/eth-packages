@@ -1,3 +1,4 @@
+from .base import ProtocolBase
 from .contract import Contract
 from .eth_response import EthResponse
 from .func_signature import FuncSignature, convert_base_model
@@ -8,5 +9,6 @@ __all__ = [
     "ContractFunc",
     "EthResponse",
     "FuncSignature",
+    "ProtocolBase",
     "convert_base_model",
 ]

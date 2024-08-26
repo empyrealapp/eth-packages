@@ -4,8 +4,7 @@ from typing import TYPE_CHECKING, ClassVar
 from eth_rpc.types.args import EthCallParams, TraceArgs
 from pydantic import BaseModel, PrivateAttr
 
-from .types import BlockReference
-from .types.network import Network
+from .types import BlockReference, Network
 
 if TYPE_CHECKING:
     from .rpc.core import RPC

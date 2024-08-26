@@ -1,17 +1,19 @@
-from typing import TYPE_CHECKING, Optional, get_args
+from typing import TYPE_CHECKING, get_args
 
-from eth_rpc import Contract, ContractFunc, FuncSignature
 from eth_rpc.types import Name
 from eth_rpc.utils import is_annotation
-from eth_typing import HexAddress, HexStr
 from pydantic import ConfigDict
+
+from .contract import Contract
+from .func_signature import FuncSignature
+from .function import ContractFunc
 
 
 class _ProtocolBase(Contract):
     model_config = ConfigDict(extra="allow")
 
-    def __init__(self, address: HexAddress, code_override: Optional[HexStr] = None):
-        super().__init__(address=address, code_override=code_override)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         for alias, func in self._func_sigs.items():
             name = alias

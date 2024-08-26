@@ -41,29 +41,29 @@ class Network(BaseModel):
     apprx_block_time: float = 12.0
 
     def set(
-        cls,
+        self,
         http: str | None = None,
         wss: str | None = None,
         api_key: str | None = None,
     ):
         if http:
-            cls.rpc.default.http = Url(http)
+            self.rpc.default.http = Url(http)
         if wss:
-            cls.rpc.default.wss = Url(wss)
+            self.rpc.default.wss = Url(wss)
         if api_key:
-            cls.block_explorer.api_key = api_key
-        return cls
+            self.block_explorer.api_key = api_key
+        return self
 
     @property
-    def http(cls) -> str | None:
-        if cls.rpc.default.http:
-            return str(cls.rpc.default.http)
+    def http(self) -> str | None:
+        if self.rpc.default.http:
+            return str(self.rpc.default.http)
         return None
 
     @property
-    def wss(cls) -> str | None:
-        if cls.rpc.default.wss:
-            return str(cls.rpc.default.wss)
+    def wss(self) -> str | None:
+        if self.rpc.default.wss:
+            return str(self.rpc.default.wss)
         return None
 
     def __hash__(self) -> int:
