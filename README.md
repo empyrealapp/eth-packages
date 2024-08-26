@@ -44,7 +44,9 @@ multicall = Multicall[Arbitrum]()
 )
 
 # get the balance of an address at a specific block
-balance = await usdt.balance_of('0xd8da6bf26964af9d7eed9e03e53415d37aa96045').get(block_number=246_802_382)
+balance = await usdt.balance_of('0xd8da6bf26964af9d7eed9e03e53415d37aa96045').get(
+    block_number=246_802_382,
+)
 
 # subscribe to transfer events on Arbitrum for USDT
 async for event in TransferEvent[Arbitrum].set_filter(
@@ -86,7 +88,9 @@ contract = MyContract(address="<Contract Address>")
 wallet = PrivateKeyWallet(private_key=os.environ["PK"])
 
 # call it without execution:
-response: bool = await contact.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', ...]).call(from_=wallet.address)
+response: bool = await contact.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', ...]).call(
+    from_=wallet.address,
+)
 
 # or call it with execution:
 tx_hash = await contact.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', ...]).execute(wallet)
