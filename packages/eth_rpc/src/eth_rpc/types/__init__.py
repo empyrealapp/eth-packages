@@ -133,7 +133,6 @@ __all__ = [
     "BlockReference",
     "Domain",
     "EIP712Model",
-    "Empty",
     "Indexed",
     "Name",
     "Network",

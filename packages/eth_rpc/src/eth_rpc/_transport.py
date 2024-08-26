@@ -61,8 +61,8 @@ def _force_get_global_rpc(network: Network | None = None) -> "RPC":
 
 def set_transport(networks: list[Network], retries: int = 0):
     transport = _selected_transports.get()
-    transport.default = networks[0]
-    transport.networks = {network.chain_id: network for network in networks}
+    set_default_network(networks[0])
+    transport.networks.update({network.chain_id: network for network in networks})
     transport.retries = retries
 
 
@@ -82,9 +82,7 @@ def set_rpc_timeout(timeout: float, network: Network | None = None) -> None:
     rpc.set_timeout(timeout)
 
 
-def set_alchemy_key(alchemy_key, network: Network = Ethereum):
-    if not network.alchemy_str:
-        raise ValueError("Network not supported by alchemy, set Network.alchemy_str")
+def set_alchemy_transport(alchemy_key: str, network: Network):
     set_transport(
         networks=[
             network.set(
@@ -93,6 +91,16 @@ def set_alchemy_key(alchemy_key, network: Network = Ethereum):
             )
         ]
     )
+
+
+def set_alchemy_key(alchemy_key: str, network: Network = Ethereum) -> None:
+    """
+    Set Alchemy as the rpc url.
+    """
+    # TODO: it'd be nice to set this for all networks if no network is provided
+    if network and not network.alchemy_str:
+        raise ValueError("Network not supported by alchemy, set Network.alchemy_str")
+    set_alchemy_transport(alchemy_key, network)
 
 
 def configure_rpc_from_env():

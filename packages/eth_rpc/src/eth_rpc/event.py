@@ -381,7 +381,7 @@ class Event(Request, Generic[T]):
         If no network is provided, it will use the default network.
         """
         # TODO: sometimes the topics match, but the indexed fields are different
-        network = _force_get_default_network()
+        network = self._network or _force_get_default_network()
         return AsyncSubscribeCallable(
             network=network,
             event=self,
