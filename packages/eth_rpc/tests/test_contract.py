@@ -5,7 +5,7 @@ import pytest
 from eth_rpc import ContractFunc, FuncSignature, set_alchemy_key
 from eth_rpc.contract.base import ProtocolBase
 from eth_rpc.networks import Arbitrum, Ethereum
-from eth_rpc.types import METHOD, Name, NoArgs, primitives
+from eth_rpc.types import Name, NoArgs, primitives
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel
 
@@ -19,25 +19,25 @@ class Token(ProtocolBase):
     name: ContractFunc[
         NoArgs,
         Annotated[primitives.string, Name("_name")],
-    ] = METHOD
+    ]
     balance_of: Annotated[
         ContractFunc[
             primitives.address,
             Annotated[primitives.uint256, Name("_name")],
         ],
         Name("balanceOf"),
-    ] = METHOD
+    ]
     allowance: ContractFunc[
         tuple[primitives.address, primitives.address],
         primitives.uint256,
-    ] = METHOD
+    ]
     allowance2: Annotated[
         ContractFunc[
             AllowanceRequest,
             primitives.uint256,
         ],
         Name("allowance"),
-    ] = METHOD
+    ]
 
 
 @pytest.mark.contract
