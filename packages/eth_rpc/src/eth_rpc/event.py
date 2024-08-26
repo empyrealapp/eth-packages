@@ -93,13 +93,6 @@ class Event(Request, Generic[T]):
         EventType, *_ = self.__pydantic_generic_metadata__["args"]
         self._output_type = EventType
         self._network = self._network_
-        # self._network = self.__class__._network
-
-    # def __getitem__(self, params):
-    #     if isinstance(params, Network):
-    #         copy = self.model_copy()
-    #         copy._network = params
-    #     return copy
 
     @staticmethod
     def _matches(topic: HexStr, topic_filter: HexStr | list[HexStr] | None) -> bool:

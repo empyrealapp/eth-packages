@@ -139,7 +139,9 @@ class ERC20(ERC20Metadata):
         # Unknown slot return None
         return None
 
-    def balance_state_diff(self, owner: primitives.address, balance: int) -> Optional[dict]:
+    def balance_state_diff(
+        self, owner: primitives.address, balance: int
+    ) -> Optional[dict]:
         slot = self.get_balance_slot(owner)
         if slot:
             return {
