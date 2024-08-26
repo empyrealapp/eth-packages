@@ -13,6 +13,11 @@ class _ProtocolBase(Contract):
     model_config = ConfigDict(extra="allow")
 
     def __init__(self, **kwargs):
+        """
+        This is how we make the ProtocolBase inject the ContractFunc via the type signature.
+        After a lot of research, this goes slightly outside of the bounds for type hinting,
+        but I think the improved expressiveness makes it fully worthwhile.
+        """
         super().__init__(**kwargs)
 
         for alias, func in self._func_sigs.items():
