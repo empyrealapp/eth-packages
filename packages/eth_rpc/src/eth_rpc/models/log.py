@@ -41,7 +41,7 @@ class EventData(BaseModel, Generic[T]):
     name: str
     log: Log
     event: T
-    network: Network
+    network: type[Network]
 
     @property
     def tx(self):

@@ -31,7 +31,7 @@ class ChainlinkPriceOracle:
         ETH = HexAddress(HexStr("0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"))
 
     @classmethod
-    def for_network(cls, network: Network | None = None):
+    def for_network(cls, network: type[Network] | None = None):
         if network is None:
             network = get_current_network()
         if network.chain_id == Ethereum.chain_id:

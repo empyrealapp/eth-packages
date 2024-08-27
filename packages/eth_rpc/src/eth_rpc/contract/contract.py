@@ -5,7 +5,6 @@ from typing import (
     Annotated,
     ClassVar,
     Literal,
-    Optional,
     TypeVar,
     get_args,
     get_origin,
@@ -28,6 +27,7 @@ from pydantic import BaseModel, Field
 from .._request import Request
 from ..utils import run, to_hex_str
 from .function import ContractFunc
+from .interface import ContractT
 
 if TYPE_CHECKING:
     from .function import FuncSignature
@@ -45,12 +45,9 @@ T = TypeVar(
 U = TypeVar("U")
 
 
-class Contract(Request):
+class Contract(ContractT, Request):
     _func_sigs: ClassVar[dict[str, ContractMethod]]
-
-    address: HexAddress
     functions: list[ContractFunc] = Field(default_factory=list)
-    code_override: Optional[HexStr] = Field(default=None)
 
     @property
     def sync(self) -> "ContractSync":
@@ -107,14 +104,14 @@ class Contract(Request):
         self, slot: int | HexStr, block_number="latest", sync: bool = False
     ):
         if sync:
-            return self._rpc().get_storage_at.sync(
+            return self.rpc().get_storage_at.sync(
                 GetStorageArgs(
                     storage_address=self.address,
                     slot_position=to_hex_str(slot),
                     block_number=block_number,
                 )
             )
-        return await self._rpc().get_storage_at(
+        return await self.rpc().get_storage_at(
             GetStorageArgs(
                 storage_address=self.address,
                 slot_position=to_hex_str(slot),
@@ -150,13 +147,13 @@ class Contract(Request):
     ) -> HexStr:
         if block_hash:
             if sync:
-                return self._rpc().get_code.sync(
+                return self.rpc().get_code.sync(
                     GetCodeArgs(
                         address=self.address,
                         block_hash=block_hash,
                     )
                 )
-            return await self._rpc().get_code(
+            return await self.rpc().get_code(
                 GetCodeArgs(
                     address=self.address,
                     block_hash=block_hash,
@@ -166,7 +163,7 @@ class Contract(Request):
         if block_number is None:
             block_number = "latest"
         if sync:
-            return self._rpc().get_code.sync(
+            return self.rpc().get_code.sync(
                 GetCodeArgs(
                     address=self.address,
                     block_number=(
@@ -176,7 +173,7 @@ class Contract(Request):
                     ),
                 )
             )
-        return await self._rpc().get_code(
+        return await self.rpc().get_code(
             GetCodeArgs(
                 address=self.address,
                 block_number=(

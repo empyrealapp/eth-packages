@@ -6,9 +6,8 @@ from eth_rpc.networks import Arbitrum, Ethereum
 @pytest.mark.unit
 def test_account_network() -> None:
     # Currently, block is a singleton
-    acct = Account[Arbitrum]
-    assert acct._network == Arbitrum
+    assert Account[Arbitrum]._network == Arbitrum
+    assert Account[Ethereum]._network == Ethereum
 
-    acct2 = Account[Ethereum]
+    acct: type[Account[Arbitrum]] = Account[Arbitrum]
     assert acct._network == Arbitrum
-    assert acct2._network == Ethereum

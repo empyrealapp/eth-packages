@@ -5,7 +5,6 @@ from typing import TypeVar
 
 from eth_rpc.models import Log as LogModel
 from eth_rpc.types import HexInt, LogsArgs, LogsParams
-from eth_rpc.types import Network as NetworkType
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 from websockets.legacy.client import connect
 
@@ -17,19 +16,15 @@ from .types import RPCResponseModel
 T = TypeVar("T")
 
 
-class LogRPC(Request):
-    def __class_getitem__(self, params):
-        if isinstance(params, NetworkType):
-            self._network = params
-        return self
-
+class Log(Request, LogModel):
+    @classmethod
     def load_by_number(
         self,
         from_block: int | HexInt,
         to_block: int | HexInt | None = None,
     ) -> RPCResponseModel[LogsArgs, list["LogModel"]]:
         return RPCResponseModel(
-            self._rpc().get_logs,
+            self.rpc().get_logs,
             LogsArgs(
                 params=LogsParams(
                     from_block=HexInt(from_block),
@@ -61,7 +56,7 @@ class LogRPC(Request):
     @classmethod
     async def _listen(cls):
         async for w3_connection in connect(
-            cls._rpc().wss,
+            cls.rpc().wss,
             ping_interval=60,
             ping_timeout=60,
             max_queue=10000,
@@ -99,6 +94,7 @@ class LogRPC(Request):
                     # w3_connection is an iterator, so make a new connection and continue listening
                     break
 
+    @classmethod
     async def subscribe_from(
         self,
         start_block: int | None = None,
@@ -129,6 +125,3 @@ class LogRPC(Request):
             log = await queue.get()
             if log.block_number > latest:
                 yield log
-
-
-Log = LogRPC()

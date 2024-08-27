@@ -41,9 +41,6 @@ class Block(RPCModel):
         t = bytes.fromhex(topic.replace("0x", ""))
         return t in BloomFilter(self.logs_bloom)
 
-    def parent_block(self):
-        return self.load_by_hash(self.parent_hash)
-
     def compress(self) -> bytes:
         return zlib.compress(self.model_dump_json().encode("utf-8"))
 

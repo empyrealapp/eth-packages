@@ -23,7 +23,7 @@ from eth_typeshed import *
 from eth_typeshed.erc20 import *
 
 set_alchemy_key("<ALCHEMY_KEY>")
-block = await Block[Ethereum].latest(with_tx_data=True)
+block: Block[Ethereum] = await Block[Ethereum].latest(with_tx_data=True)
 total_value = 0
 for tx in block.transactions:
     total_value += tx.value
@@ -72,7 +72,7 @@ Rather than copying the abi into a JSON file, you can create a typed contract in
 from typing import Annotated
 
 from eth_rpc.contract import ProtocolBase, ContractFunc
-from eth_rpc import Transaction, models
+from eth_rpc import Transaction
 from eth_rpc.wallet import PrivateKeyWallet
 from eth_rpc.types import Name, primitives
 
@@ -81,7 +81,7 @@ class MyContract(ProtocolBase):
     foo: ContractFunc[
         list[primitives.address],  # input type is a list of addresses
         Annotated[bool, Name("success")],  # response type is a boolean
-    ]
+    ] = METHOD  # this is necessary for the type checker to recognize it as a method
 
 contract = MyContract(address="<Contract Address>")
 # create a wallet for yourself
@@ -94,7 +94,7 @@ response: bool = await contract.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
 
 # or call it with execution:
 tx_hash = await contract.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', ...]).execute(wallet)
-tx: models.Transaction = await Transaction.get_by_hash(tx_hash)
+tx: Transaction[Ethereum] = await Transaction[Ethereum].get_by_hash(tx_hash)
 ```
 
 ## Contributing

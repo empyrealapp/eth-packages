@@ -70,6 +70,8 @@ async def test_contract() -> None:
         address=HexAddress(HexStr("0xdAC17F958D2ee523a2206206994597C13D831ec7"))
     )
     usdc = Token[Arbitrum](address="0xaf88d065e77c8cc2239327c5edb3a432268e5831")
+    assert usdt._network == Ethereum
+    assert usdc._network == Arbitrum
 
     assert await usdt.name().get() == "Tether USD"
     assert await usdc.name().get() == "USD Coin"

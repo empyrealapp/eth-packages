@@ -24,7 +24,7 @@ class RPCMethodBase(BaseModel, Generic[Params, Response]):
     index: Optional[itertools.count] = None
     retries: int = 10
     _rpc: "RPC" = PrivateAttr(None)
-    _network: Network | None = PrivateAttr(None)
+    _network: type[Network] | None = PrivateAttr(None)
 
     def set_rpc(self, rpc: "RPC") -> "RPCMethodBase":
         self._rpc = rpc

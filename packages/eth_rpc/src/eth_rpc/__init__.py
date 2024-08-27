@@ -8,13 +8,13 @@ from ._transport import (
 )
 from .account import Account
 from .block import Block
-from .contract import Contract, ContractFunc, EthResponse, FuncSignature
-from .contract.base import ProtocolBase
+from .contract import Contract, ContractFunc, EthResponse, FuncSignature, ProtocolBase
 from .event import Event
 from .log import Log
 from .models import EventData
 from .subscriber import EventSubscriber
 from .transaction import Transaction, TransactionReceipt
+from .wallet import PrivateKeyWallet
 
 __all__ = [
     "Account",
@@ -27,6 +27,7 @@ __all__ = [
     "EventSubscriber",
     "FuncSignature",
     "Log",
+    "PrivateKeyWallet",
     "ProtocolBase",
     "Transaction",
     "TransactionReceipt",

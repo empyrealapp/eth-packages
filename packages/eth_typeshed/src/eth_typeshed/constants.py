@@ -23,7 +23,7 @@ class Tokens:
         stables = [USDC, USDT]
 
     @classmethod
-    def for_network(cls, network: Network = get_current_network()):
+    def for_network(cls, network: type[Network] = get_current_network()):
         if network.chain_id == Ethereum.chain_id:
             return cls.Ethereum
         if network.chain_id == Arbitrum.chain_id:
@@ -45,7 +45,7 @@ class Routers:
         pod_router = Camelot
 
     @classmethod
-    def for_network(cls, network: Network = get_current_network()):
+    def for_network(cls, network: type[Network] = get_current_network()):
         if network.chain_id == Ethereum.chain_id:
             return cls.Ethereum
         if network.chain_id == Arbitrum.chain_id:
@@ -72,7 +72,7 @@ class Factories:
         all_factories = [UniswapV2, UniswapV3, Camelot_V2, Camelot_V3]
 
     @classmethod
-    def for_network(cls, network: Network = get_current_network()):
+    def for_network(cls, network: type[Network] = get_current_network()):
         if network.chain_id == Ethereum.chain_id:
             return cls.Ethereum
         if network.chain_id == Arbitrum.chain_id:

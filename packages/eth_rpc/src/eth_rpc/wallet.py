@@ -29,7 +29,7 @@ class BaseWallet(Request, ABC):
 
     def get_nonce(self, block_number: int | BLOCK_STRINGS = "latest"):
         return RPCResponseModel(
-            self._rpc().get_tx_count,
+            self.rpc().get_tx_count,
             GetAccountArgs(
                 address=self.address,
                 block_number=(
@@ -97,7 +97,7 @@ class PrivateKeyWallet(BaseWallet):
         self, tx: HexStr
     ) -> RPCResponseModel[RawTransaction, HexStr]:
         return RPCResponseModel(
-            self._rpc().send_raw_tx,
+            self.rpc().send_raw_tx,
             RawTransaction(
                 signed_tx=tx,
             ),
@@ -165,7 +165,7 @@ class PrivateKeyWallet(BaseWallet):
         data: HexStr = HexStr("0x"),
     ) -> RPCResponseModel[CallWithBlockArgs, HexInteger]:
         return RPCResponseModel(
-            self._rpc().estimate_gas,
+            self.rpc().estimate_gas,
             CallWithBlockArgs(
                 params=EthCallParams(
                     from_=self.address,

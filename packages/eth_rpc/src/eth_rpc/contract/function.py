@@ -12,9 +12,9 @@ from eth_rpc.types import (
     EthCallParams,
     HexInteger,
     MaybeAwaitable,
+    Network,
+    RPCResponseModel,
 )
-from eth_rpc.types import Network as NetworkType
-from eth_rpc.types import RPCResponseModel
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel
 
@@ -27,6 +27,7 @@ from ..utils import run
 from ..wallet import BaseWallet
 from .eth_response import EthResponse
 from .func_signature import FuncSignature
+from .interface import ContractT
 
 # from .contract import Contract
 
@@ -45,10 +46,10 @@ U = TypeVar("U")
 @dataclass
 class ContractFunc(Generic[T, U]):
     func: FuncSignature[T, U]
-    contract: Any  # Contract
+    contract: ContractT
     data: HexStr = HexStr("0x")
 
-    _network: NetworkType | None = None
+    _network: type[Network] | None = None
 
     def __post_init__(self):
         self._network = self.contract._network
@@ -79,9 +80,9 @@ class ContractFunc(Generic[T, U]):
         """
         from .._transport import _force_get_global_rpc
 
-        network = self._network
-        self._network = None
-        response = _force_get_global_rpc(network)
+        if self._network is None:
+            return _force_get_global_rpc(None)
+        response = _force_get_global_rpc(self._network)
         return response
 
     def __call__(

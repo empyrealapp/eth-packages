@@ -1,6 +1,6 @@
 from eth_hash.auto import keccak
 from eth_rpc.contract import ContractFunc, ProtocolBase
-from eth_rpc.networks import Ethereum
+from eth_rpc.networks.ethereum import Ethereum
 from eth_rpc.types import METHOD, BlockReference, Network, primitives
 
 
@@ -19,7 +19,9 @@ class Resolver(ProtocolBase):
 
 
 async def lookup_addr(
-    name: str, block_number: BlockReference = "latest", network: Network = Ethereum
+    name: str,
+    block_number: BlockReference = "latest",
+    network: type[Network] = Ethereum,
 ):
     hashed_name = hash_ens_name(name)
 

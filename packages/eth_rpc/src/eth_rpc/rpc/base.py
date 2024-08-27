@@ -9,7 +9,7 @@ class BaseRPC(BaseModel):
     _timeout: float = 10.0
     _retries: int = 3
 
-    network: Network
+    network: type[Network]
 
     index: itertools.count = Field(default_factory=lambda: itertools.count())
     client: httpx.AsyncClient = Field(default_factory=lambda: httpx.AsyncClient())
