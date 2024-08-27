@@ -22,4 +22,4 @@ class RPCModel(BaseModel):
     )
 
     def set_network(self, network: NetworkType | None):
-        self._network = network
+        object.__setattr__(self, "_network", network)

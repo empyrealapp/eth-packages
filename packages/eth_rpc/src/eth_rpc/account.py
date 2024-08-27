@@ -1,3 +1,6 @@
+from typing import Generic
+from typing_extensions import TypeVar
+
 from eth_rpc.models import Account as AccountModel
 from eth_rpc.types import BLOCK_STRINGS
 from eth_rpc.types.args import GetAccountArgs
@@ -6,13 +9,15 @@ from eth_typing import HexAddress
 from ._request import Request
 from .types import HexInteger, RPCResponseModel
 
+Network = TypeVar("Network", default=None)
 
-class AccountRPC(Request):
+
+class Account(Request, AccountModel, Generic[Network]):
     def get_balance(
         self, address: HexAddress, block_number: int | BLOCK_STRINGS = "latest"
     ) -> RPCResponseModel[GetAccountArgs, HexInteger]:
         return RPCResponseModel(
-            self._rpc().get_balance,
+            self.rpc().get_balance,
             GetAccountArgs(
                 address=address,
                 block_number=(
@@ -27,7 +32,7 @@ class AccountRPC(Request):
         self, address: HexAddress, block_number: int | BLOCK_STRINGS = "latest"
     ) -> RPCResponseModel[GetAccountArgs, AccountModel]:
         return RPCResponseModel(
-            self._rpc().get_account,
+            self.rpc().get_account,
             GetAccountArgs(
                 address=address,
                 block_number=(
@@ -37,6 +42,3 @@ class AccountRPC(Request):
                 ),
             ),
         )
-
-
-Account = AccountRPC()

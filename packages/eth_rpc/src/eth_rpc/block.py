@@ -4,10 +4,10 @@ import zlib
 from collections.abc import AsyncIterator
 from contextvars import ContextVar
 from datetime import datetime, timezone
-from typing import Literal
+from typing import Literal, Generic
+from typing_extensions import TypeVar
 
-from eth_rpc.models import Block as BlockModel
-from eth_rpc.models import FeeHistory
+from eth_rpc.models import Block as BlockModel, FeeHistory
 from eth_rpc.types.args import (
     BlockNumberArg,
     FeeHistoryArgs,
@@ -15,7 +15,6 @@ from eth_rpc.types.args import (
     GetBlockByNumberArgs,
 )
 from eth_typing import HexStr
-from typing_extensions import Self
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 from websockets.legacy.client import connect
 
@@ -28,22 +27,26 @@ SUBSCRIPTION_TYPE = Literal["newHeads", "newPendingTransactions"]
 DEFAULT_CONTEXT = ContextVar[int]("DEFAULT_CONTEXT")
 DEFAULT_CONTEXT.set(0)
 
+Network = TypeVar("Network", default=None)
 
-class BlockRPC(Request):
-    def priority_fee(self) -> RPCResponseModel[NoArgs, HexInteger]:
+
+class Block(BlockModel, Request, Generic[Network]):
+    @classmethod
+    def priority_fee(cls) -> RPCResponseModel[NoArgs, HexInteger]:
         return RPCResponseModel(
-            self._rpc().max_priority_fee_per_gas,
+            cls.rpc().max_priority_fee_per_gas,
         )
 
+    @classmethod
     def fee_history(
-        self,
+        cls,
         block_count: int = 4,
         lower_percentile: int = 25,
         upper_percentile: int = 75,
         block_number: BlockReference = "latest",
     ) -> RPCResponseModel[FeeHistoryArgs, FeeHistory]:
         return RPCResponseModel(
-            self._rpc().fee_history,
+            cls.rpc().fee_history,
             FeeHistoryArgs(
                 block_count=block_count,
                 block_number=block_number,
@@ -54,23 +57,25 @@ class BlockRPC(Request):
             ),
         )
 
+    @classmethod
     def get_block_transaction_count(
-        self, block_number: HexInteger
+        cls, block_number: HexInteger
     ) -> RPCResponseModel[BlockNumberArg, int]:
         return RPCResponseModel(
-            self._rpc().get_block_tx_count_by_number,
+            cls.rpc().get_block_tx_count_by_number,
             BlockNumberArg(
                 block_number=block_number,
             ),
         )
 
+    @classmethod
     def load_by_number(
-        self,
+        cls,
         block_number: int | HexInteger | BLOCK_STRINGS,
         with_tx_data: bool = False,
-    ) -> RPCResponseModel[GetBlockByNumberArgs, BlockModel]:
+    ) -> RPCResponseModel[GetBlockByNumberArgs, "Block[Network]"]:
         return RPCResponseModel(
-            self._rpc().get_block_by_number,
+            cls.rpc().get_block_by_number,
             GetBlockByNumberArgs(
                 block_number=(
                     HexInteger(block_number)
@@ -81,9 +86,10 @@ class BlockRPC(Request):
             ),
         )
 
-    def get_number(self) -> RPCResponseModel[NoArgs, HexInteger]:
+    @classmethod
+    def get_number(cls) -> RPCResponseModel[NoArgs, HexInteger]:
         return RPCResponseModel(
-            self._rpc().block_number,
+            cls.rpc().block_number,
         )
 
     @classmethod
@@ -93,7 +99,7 @@ class BlockRPC(Request):
         low: int | None = None,
         high: int | None = None,
         apprx_block_time=12,
-    ) -> Self:
+    ) -> "Block[Network]":
         """
         Searches for a block, finding the first block before a datetime.
         Recursively searches, using low and high as the boundaries for the binary search.
@@ -141,21 +147,24 @@ class BlockRPC(Request):
                 return await cls[Network].load_by_datetime(when, mid + 1, high)  # type: ignore
         return await cls[Network].load_by_number(high)  # type: ignore
 
+    @classmethod
     def latest(
-        self, with_tx_data: bool = False
-    ) -> RPCResponseModel[GetBlockByNumberArgs, "BlockModel"]:
-        return self.load_by_number("latest", with_tx_data=with_tx_data)
+        cls, with_tx_data: bool = False
+    ) -> RPCResponseModel[GetBlockByNumberArgs, "Block[Network]"]:
+        return cls.load_by_number("latest", with_tx_data=with_tx_data)
 
+    @classmethod
     def pending(
-        self, with_tx_data: bool = False
-    ) -> RPCResponseModel[GetBlockByNumberArgs, "BlockModel"]:
-        return self.load_by_number("pending", with_tx_data=with_tx_data)
+        cls, with_tx_data: bool = False
+    ) -> RPCResponseModel[GetBlockByNumberArgs, "Block[Network]"]:
+        return cls.load_by_number("pending", with_tx_data=with_tx_data)
 
+    @classmethod
     def load_by_hash(
-        self, block_hash: HexStr, with_tx_data: bool = False
-    ) -> RPCResponseModel[GetBlockByHashArgs, "BlockModel"]:
+        cls, block_hash: HexStr, with_tx_data: bool = False
+    ) -> RPCResponseModel[GetBlockByHashArgs, "Block[Network]"]:
         return RPCResponseModel(
-            self._rpc().get_block_by_hash,
+            cls.rpc().get_block_by_hash,
             GetBlockByHashArgs(
                 block_hash=block_hash,
                 with_tx_data=with_tx_data,
@@ -168,28 +177,29 @@ class BlockRPC(Request):
             return HexStr(hex(number))
         return HexStr(number)
 
+    @classmethod
     async def subscribe_from(
-        self,
+        cls,
         start_block: int | None = None,
         with_tx_data: bool = True,
-    ) -> AsyncIterator["BlockModel"]:
-        queue = asyncio.Queue[BlockModel]()
+    ) -> AsyncIterator["Block[Network]"]:
+        queue = asyncio.Queue[Block[Network]]()
         should_publish_blocks = asyncio.Event()
         asyncio.create_task(
-            self.listen(
+            cls.listen(
                 queue=queue,
                 publish_blocks=should_publish_blocks,
                 with_tx_data=with_tx_data,
             )
         )
-        latest = await Block.latest()
+        latest = await cls.latest()
         if not start_block:
             start_block = latest.number
         assert start_block
 
         # NOTE: you pull latest twice because there can be a backfill while you're populating
         for num in range(start_block, latest.number + 1):
-            yield await Block.load_by_number(num, with_tx_data=with_tx_data)
+            yield await cls.load_by_number(num, with_tx_data=with_tx_data)
 
         should_publish_blocks.set()
         while True:
@@ -197,8 +207,9 @@ class BlockRPC(Request):
             if block.number > latest.number:
                 yield block
 
+    @classmethod
     async def listen(
-        self,
+        cls,
         *,
         # TODO: typehinting this is tricky because the type of the Queue is conditional based on the subscription type
         queue: asyncio.Queue,
@@ -208,7 +219,7 @@ class BlockRPC(Request):
     ):
         internal_queue: asyncio.Queue = asyncio.Queue()
         flush_queue: bool = True
-        async for block in self._listen(
+        async for block in cls._listen(
             with_tx_data=with_tx_data, subscription_type=subscription_type
         ):
             if publish_blocks.is_set():
@@ -221,13 +232,14 @@ class BlockRPC(Request):
             else:
                 await internal_queue.put(block)
 
+    @classmethod
     async def _listen(  # noqa: C901
-        self,
+        cls,
         with_tx_data: bool = True,
         subscription_type: SUBSCRIPTION_TYPE = "newHeads",
     ):
         async for w3_connection in connect(
-            self._rpc().wss,
+            cls.rpc().wss,
             ping_interval=60,
             ping_timeout=60,
             max_queue=10000,
@@ -255,7 +267,7 @@ class BlockRPC(Request):
                         if not with_tx_data:
                             block_ = BlockModel(**result)
                         else:
-                            block_ = await self.load_by_hash(
+                            block_ = await cls.load_by_hash(
                                 result["hash"], with_tx_data=with_tx_data
                             )
                         yield block_
@@ -274,16 +286,17 @@ class BlockRPC(Request):
                     # w3_connection is an iterator, so make a new connection and continue listening
                     break
 
-    async def convert(self, block_value: BLOCK_STRINGS | int) -> int:
+    @classmethod
+    async def convert(cls, block_value: BLOCK_STRINGS | int) -> int:
         if isinstance(block_value, int):
             return block_value
-        block = await self.load_by_number(block_value)
+        block = await cls.load_by_number(block_value)
         return block.number
 
     @classmethod
-    def decompress(cls, raw_bytes: bytes) -> "BlockModel":
+    def decompress(cls, raw_bytes: bytes) -> "Block":
         """Convert gzip compressed block to a Block"""
-        return BlockModel.model_validate_json(zlib.decompress(raw_bytes))
+        return Block.model_validate_json(zlib.decompress(raw_bytes))
 
-
-Block = BlockRPC()
+    def parent_block(self) -> RPCResponseModel[GetBlockByHashArgs, "Block[Network]"]:
+        return self.load_by_hash(self.parent_hash)

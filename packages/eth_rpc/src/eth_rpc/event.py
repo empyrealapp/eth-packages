@@ -89,10 +89,10 @@ class Event(Request, Generic[T]):
 
     _output_type: BaseModel = PrivateAttr()
 
-    def model_post_init(self, __context):
+    def model_post_init(self, __context) -> None:
         EventType, *_ = self.__pydantic_generic_metadata__["args"]
         self._output_type = EventType
-        self._network = self._network_
+        return super().model_post_init(__context)
 
     @staticmethod
     def _matches(topic: HexStr, topic_filter: HexStr | list[HexStr] | None) -> bool:
@@ -256,7 +256,7 @@ class Event(Request, Generic[T]):
                 if topic3 != IGNORE_VAL:
                     topics.append(topic3)
         return RPCResponseModel(
-            self._rpc().get_logs,
+            self.rpc().get_logs,
             LogsArgs(
                 params=LogsParams(
                     address=addresses,
@@ -324,7 +324,7 @@ class Event(Request, Generic[T]):
                     result.topics,
                     result.data,
                 ),
-                network=self._network_ or get_current_network(),
+                network=self._network or get_current_network(),
             )
             yield event_data
 

@@ -1,6 +1,6 @@
 from eth_hash.auto import keccak
 from eth_rpc.contract import ContractFunc, ProtocolBase
-from eth_rpc.networks import Ethereum
+from eth_rpc.networks.ethereum import Ethereum
 from eth_rpc.types import METHOD, BlockReference, Network, primitives
 
 

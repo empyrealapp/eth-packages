@@ -7,18 +7,16 @@ from ._transport import (
     set_transport,
 )
 from .account import Account
-from .block import Block
-from .contract import Contract, ContractFunc, EthResponse, FuncSignature
-from .contract.base import ProtocolBase
+from .contract import Contract, ContractFunc, EthResponse, FuncSignature, ProtocolBase
 from .event import Event
 from .log import Log
 from .models import EventData
 from .subscriber import EventSubscriber
 from .transaction import Transaction, TransactionReceipt
 
+
 __all__ = [
     "Account",
-    "Block",
     "Contract",
     "ContractFunc",
     "EthResponse",

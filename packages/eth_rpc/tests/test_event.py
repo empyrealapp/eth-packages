@@ -19,7 +19,8 @@ TransferEvent = Event[TransferEventType](name="Transfer")
 
 @pytest.mark.unit
 @pytest.mark.event
-def test_log_network():
+def test_event_network():
+    print(TransferEvent[Ethereum])
     assert TransferEvent[Ethereum]._network == Ethereum
     assert TransferEvent[Arbitrum]._network == Arbitrum
     swap_topic = TransferEvent.get_topic0

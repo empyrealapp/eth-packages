@@ -107,14 +107,14 @@ class Contract(Request):
         self, slot: int | HexStr, block_number="latest", sync: bool = False
     ):
         if sync:
-            return self._rpc().get_storage_at.sync(
+            return self.rpc().get_storage_at.sync(
                 GetStorageArgs(
                     storage_address=self.address,
                     slot_position=to_hex_str(slot),
                     block_number=block_number,
                 )
             )
-        return await self._rpc().get_storage_at(
+        return await self.rpc().get_storage_at(
             GetStorageArgs(
                 storage_address=self.address,
                 slot_position=to_hex_str(slot),
@@ -150,13 +150,13 @@ class Contract(Request):
     ) -> HexStr:
         if block_hash:
             if sync:
-                return self._rpc().get_code.sync(
+                return self.rpc().get_code.sync(
                     GetCodeArgs(
                         address=self.address,
                         block_hash=block_hash,
                     )
                 )
-            return await self._rpc().get_code(
+            return await self.rpc().get_code(
                 GetCodeArgs(
                     address=self.address,
                     block_hash=block_hash,
@@ -166,7 +166,7 @@ class Contract(Request):
         if block_number is None:
             block_number = "latest"
         if sync:
-            return self._rpc().get_code.sync(
+            return self.rpc().get_code.sync(
                 GetCodeArgs(
                     address=self.address,
                     block_number=(
@@ -176,7 +176,7 @@ class Contract(Request):
                     ),
                 )
             )
-        return await self._rpc().get_code(
+        return await self.rpc().get_code(
             GetCodeArgs(
                 address=self.address,
                 block_number=(

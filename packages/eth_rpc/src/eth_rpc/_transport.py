@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict
 
 from .exceptions import UnsupportedChainIDException
-from .networks import Ethereum, Networks, get_network_by_chain_id
+from .networks import AllNetworks, get_network_by_chain_id
+from .networks.ethereum import Ethereum
 from .rpc.base import BaseRPC
 from .types import Network
 
@@ -104,7 +105,7 @@ def set_alchemy_key(alchemy_key: str, network: Network | None = None) -> None:
     if network:
         set_alchemy_transport(alchemy_key, network)
     else:
-        for network in Networks.values():
+        for network in AllNetworks.values():
             set_alchemy_transport(alchemy_key, network)
 
 

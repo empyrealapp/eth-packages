@@ -1,7 +1,7 @@
 from collections.abc import Awaitable
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Generic, Literal, Optional, TypeVar, cast, overload
+from typing import Any, Generic, Literal, Optional, TypeVar, cast, overload, get_args
 
 from eth_rpc.models import AccessListResponse
 from eth_rpc.types import (
@@ -79,7 +79,9 @@ class ContractFunc(Generic[T, U]):
         """
         from .._transport import _force_get_global_rpc
 
-        network = self._network
+        if self._network is None:
+            return _force_get_global_rpc(None)
+        network = get_args(self._network)[0].value
         self._network = None
         response = _force_get_global_rpc(network)
         return response

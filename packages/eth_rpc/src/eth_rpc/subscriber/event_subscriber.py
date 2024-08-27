@@ -6,7 +6,9 @@ from collections.abc import AsyncIterator
 from contextvars import ContextVar
 from typing import Generic, Optional, TypeVar
 
-from eth_rpc import Block, Event, EventData, Log, get_current_network
+from eth_rpc import Event, EventData, get_current_network
+from eth_rpc.block import Block
+from eth_rpc.log import Log
 from eth_rpc.types import (
     BLOCK_STRINGS,
     EvmDataDict,
@@ -63,7 +65,7 @@ class EventSubscriber(Request, Generic[U]):
 
         while True:
             try:
-                response = await self._rpc().get_logs(
+                response = await self.rpc().get_logs(
                     LogsArgs(
                         params=LogsParams(
                             address=addresses,

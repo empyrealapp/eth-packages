@@ -40,8 +40,8 @@ class Transaction(BaseTransaction):
     transaction_index: HexInteger
 
     def get_block(self, with_tx_data: bool = False):
+        from eth_rpc.block import Block
         """Load a block hash"""
-        from ..block import Block
 
         return Block.load_by_hash(self.block_hash, with_tx_data=with_tx_data)
 
