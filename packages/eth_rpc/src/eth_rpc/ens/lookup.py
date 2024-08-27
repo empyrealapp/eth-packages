@@ -19,7 +19,9 @@ class Resolver(ProtocolBase):
 
 
 async def lookup_addr(
-    name: str, block_number: BlockReference = "latest", network: Network = Ethereum
+    name: str,
+    block_number: BlockReference = "latest",
+    network: type[Network] = Ethereum,
 ):
     hashed_name = hash_ens_name(name)
 

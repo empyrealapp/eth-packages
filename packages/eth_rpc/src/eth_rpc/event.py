@@ -422,10 +422,10 @@ class Event(Request, Generic[T]):
 
 
 class AsyncSubscribeCallable(BaseModel):
-    network: Network
+    network: type[Network]
     event: Event
 
-    def __getitem__(self, network: Network):
+    def __getitem__(self, network: type[Network]):
         self.network = network
         return self
 

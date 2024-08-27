@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import ClassVar, Optional
 
 from eth_typing import HexAddress, HexStr
 from pydantic import AnyHttpUrl, BaseModel, Field
@@ -23,48 +23,48 @@ class Rpcs(BaseModel):
 
 
 class Network(BaseModel):
-    chain_id: int
-    name: str
-    native_currency: str
-    rpc: Rpcs
-    block_explorer: BlockExplorer
-    alchemy_str: str | None = None
-    multicall3: HexAddress | None = HexAddress(
+    http: ClassVar[Url]
+    wss: ClassVar[Url]
+
+    chain_id: ClassVar[int]
+    name: ClassVar[str]
+    native_currency: ClassVar[str]
+    rpc: ClassVar[Rpcs]
+    block_explorer: ClassVar[BlockExplorer]
+    alchemy_str: ClassVar[str | None] = None
+    multicall3: ClassVar[HexAddress | None] = HexAddress(
         HexStr("0xca11bde05977b3631167028862be2a173976ca11")
     )
-    ens_registry: HexAddress | None = HexAddress(
+    ens_registry: ClassVar[HexAddress | None] = HexAddress(
         HexStr("0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e")
     )
-    ens_universal_resolver: HexAddress | None = HexAddress(
+    ens_universal_resolver: ClassVar[HexAddress | None] = HexAddress(
         HexStr("0xce01f8eee7E479C928F8919abD53E553a36CeF67")
     )
-    apprx_block_time: float = 12.0
+    apprx_block_time: ClassVar[float] = 12.0
 
+    @classmethod
     def set(
-        self,
+        cls,
         http: str | None = None,
         wss: str | None = None,
         api_key: str | None = None,
     ):
         if http:
-            self.rpc.default.http = Url(http)
+            cls.rpc.default.http = Url(http)
+            cls.http = cls.rpc.default.http
         if wss:
-            self.rpc.default.wss = Url(wss)
+            cls.rpc.default.wss = Url(wss)
+            cls.wss = cls.rpc.default.wss
         if api_key:
-            self.block_explorer.api_key = api_key
-        return self
+            cls.block_explorer.api_key = api_key
+        return cls
 
-    @property
-    def http(self) -> str | None:
-        if self.rpc.default.http:
-            return str(self.rpc.default.http)
-        return None
-
-    @property
-    def wss(self) -> str | None:
-        if self.rpc.default.wss:
-            return str(self.rpc.default.wss)
-        return None
+    def __init_subclass__(cls, **kwargs):
+        if cls.rpc.default.http:
+            cls.http = cls.rpc.default.http
+        if cls.rpc.default.wss:
+            cls.wss = cls.rpc.default.wss
 
     def __hash__(self) -> int:
         return self.chain_id

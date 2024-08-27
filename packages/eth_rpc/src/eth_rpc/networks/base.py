@@ -1,21 +1,23 @@
+from typing import ClassVar
+
 from eth_rpc.types import BlockExplorer, Network, Rpcs, RpcUrl
 from pydantic.networks import Url
 
-Base = Network(
-    chain_id=8453,
-    name="Base",
-    native_currency="ETH",
-    rpc=Rpcs(
+
+class Base(Network):
+    chain_id: ClassVar[int] = 8453
+    name: ClassVar[str] = "Base"
+    native_currency: ClassVar[str] = "ETH"
+    rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
             http=Url("https://base.llamarpc.com	"),
-            wss=Url("wss://base-rpc.publicnode.com"),
+            wss=None,
         )
-    ),
-    block_explorer=BlockExplorer(
+    )
+    block_explorer: ClassVar[BlockExplorer] = BlockExplorer(
         name="Basescan",
         url="https://basescan.org",
         api_url="https://api.basescan.org/api",
-    ),
-    alchemy_str="base-mainnet",
-    apprx_block_time=2,
-)
+    )
+    alchemy_str: ClassVar[str | None] = "base-mainnet"
+    apprx_block_time: ClassVar[float] = 2.0

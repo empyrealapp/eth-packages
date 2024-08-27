@@ -5,7 +5,6 @@ from typing import (
     Annotated,
     ClassVar,
     Literal,
-    Optional,
     TypeVar,
     get_args,
     get_origin,
@@ -28,6 +27,7 @@ from pydantic import BaseModel, Field
 from .._request import Request
 from ..utils import run, to_hex_str
 from .function import ContractFunc
+from .interface import ContractT
 
 if TYPE_CHECKING:
     from .function import FuncSignature
@@ -45,12 +45,9 @@ T = TypeVar(
 U = TypeVar("U")
 
 
-class Contract(Request):
+class Contract(ContractT, Request):
     _func_sigs: ClassVar[dict[str, ContractMethod]]
-
-    address: HexAddress
     functions: list[ContractFunc] = Field(default_factory=list)
-    code_override: Optional[HexStr] = Field(default=None)
 
     @property
     def sync(self) -> "ContractSync":

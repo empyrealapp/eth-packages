@@ -1,10 +1,6 @@
 from copy import deepcopy
-from typing import (  # type: ignore
-    TYPE_CHECKING,
-    ClassVar,
-    _LiteralGenericAlias,
-    get_args,
-)
+from inspect import isclass
+from typing import TYPE_CHECKING, ClassVar
 
 from eth_rpc.types.args import EthCallParams, TraceArgs
 from pydantic import BaseModel, PrivateAttr
@@ -17,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class Request(BaseModel):
-    _network: ClassVar[Network | None] = PrivateAttr(default=None)  # type: ignore
+    _network: ClassVar[type[Network] | None] = PrivateAttr(default=None)
 
     def model_post_init(self, __context):
         network = self.__class__._network
@@ -26,11 +22,9 @@ class Request(BaseModel):
         object.__setattr__(self, "rpc", self._rpc)
 
     def __class_getitem__(cls, params):
-        if isinstance(params, _LiteralGenericAlias):
-            maybe_network = get_args(params)[0]
-            if isinstance(maybe_network.value, Network):
-                cls._network = params
-                return cls
+        if isclass(params) and issubclass(params, Network):
+            cls._network = params
+            return cls
         else:
             try:
                 return super().__class_getitem__(params)
@@ -39,12 +33,10 @@ class Request(BaseModel):
         return cls
 
     def __getitem__(self, params):
-        if isinstance(params, _LiteralGenericAlias):
-            maybe_network = get_args(params)[0]
-            if isinstance(maybe_network.value, Network):
-                if self._network != params:
-                    self = deepcopy(self)
-                    object.__setattr__(self, "_network", params)
+        if isclass(params) and issubclass(params, Network):
+            if self._network != params:
+                self = deepcopy(self)
+                object.__setattr__(self, "_network", params)
         return self
 
     def _rpc(self) -> "RPC":
@@ -53,8 +45,7 @@ class Request(BaseModel):
         """
         if self._network is None:
             return _force_get_global_rpc()
-        network = get_args(self._network)[0].value
-        response = _force_get_global_rpc(network)
+        response = _force_get_global_rpc(self._network)
         return response
 
     @classmethod
@@ -66,8 +57,7 @@ class Request(BaseModel):
 
         if cls._network is None:
             return _force_get_global_rpc()
-        network = get_args(cls._network)[0].value
-        response = _force_get_global_rpc(network)
+        response = _force_get_global_rpc(cls._network)
         return response
 
     def _get_debug_tracecall(
