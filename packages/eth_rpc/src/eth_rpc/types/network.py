@@ -23,8 +23,8 @@ class Rpcs(BaseModel):
 
 
 class Network(BaseModel):
-    http: ClassVar[Url]
-    wss: ClassVar[Url]
+    http: ClassVar[str]
+    wss: ClassVar[str]
 
     chain_id: ClassVar[int]
     name: ClassVar[str]
@@ -52,10 +52,10 @@ class Network(BaseModel):
     ):
         if http:
             cls.rpc.default.http = Url(http)
-            cls.http = cls.rpc.default.http
+            cls.http = str(cls.rpc.default.http)
         if wss:
             cls.rpc.default.wss = Url(wss)
-            cls.wss = cls.rpc.default.wss
+            cls.wss = str(cls.rpc.default.wss)
         if api_key:
             cls.block_explorer.api_key = api_key
         return cls
