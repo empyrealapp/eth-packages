@@ -1,10 +1,10 @@
 from typing import Generic
-from typing_extensions import TypeVar
 
 from eth_rpc.models import Account as AccountModel
 from eth_rpc.types import BLOCK_STRINGS
 from eth_rpc.types.args import GetAccountArgs
 from eth_typing import HexAddress
+from typing_extensions import TypeVar
 
 from ._request import Request
 from .types import HexInteger, RPCResponseModel

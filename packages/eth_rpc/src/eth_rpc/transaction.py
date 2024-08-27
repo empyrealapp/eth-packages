@@ -3,7 +3,6 @@ import json
 import logging
 from collections.abc import AsyncIterator
 from typing import Generic, Optional, cast
-from typing_extensions import TypeVar
 
 from eth_rpc.models import AccessList, PendingTransaction
 from eth_rpc.models import Transaction as TransactionModel
@@ -16,6 +15,7 @@ from eth_rpc.types.args import (
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
+from typing_extensions import TypeVar
 from websockets.exceptions import ConnectionClosedError
 from websockets.legacy.client import WebSocketClientProtocol, connect
 

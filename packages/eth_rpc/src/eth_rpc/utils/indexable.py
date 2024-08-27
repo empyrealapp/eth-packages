@@ -1,5 +1,5 @@
-from typing_extensions import TypeVar
 from pydantic._internal._model_construction import ModelMetaclass
+from typing_extensions import TypeVar
 
 T = TypeVar("T")
 

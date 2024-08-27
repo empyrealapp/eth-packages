@@ -1,7 +1,7 @@
 from collections.abc import Awaitable
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Generic, Literal, Optional, TypeVar, cast, overload, get_args
+from typing import Any, Generic, Literal, Optional, TypeVar, cast, get_args, overload
 
 from eth_rpc.models import AccessListResponse
 from eth_rpc.types import (

@@ -1,5 +1,10 @@
 from copy import deepcopy
-from typing import TYPE_CHECKING, ClassVar, get_args, _LiteralGenericAlias  # type: ignore
+from typing import (  # type: ignore
+    TYPE_CHECKING,
+    ClassVar,
+    _LiteralGenericAlias,
+    get_args,
+)
 
 from eth_rpc.types.args import EthCallParams, TraceArgs
 from pydantic import BaseModel, PrivateAttr

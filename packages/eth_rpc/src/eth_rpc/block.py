@@ -4,10 +4,10 @@ import zlib
 from collections.abc import AsyncIterator
 from contextvars import ContextVar
 from datetime import datetime, timezone
-from typing import Literal, Generic
-from typing_extensions import TypeVar
+from typing import Generic, Literal
 
-from eth_rpc.models import Block as BlockModel, FeeHistory
+from eth_rpc.models import Block as BlockModel
+from eth_rpc.models import FeeHistory
 from eth_rpc.types.args import (
     BlockNumberArg,
     FeeHistoryArgs,
@@ -15,6 +15,7 @@ from eth_rpc.types.args import (
     GetBlockByNumberArgs,
 )
 from eth_typing import HexStr
+from typing_extensions import TypeVar
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 from websockets.legacy.client import connect
 

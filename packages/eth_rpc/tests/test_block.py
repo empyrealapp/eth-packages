@@ -1,9 +1,9 @@
 import os
 
 import pytest
-from eth_rpc.networks import Arbitrum, Ethereum
-from eth_rpc.block import Block
 from eth_rpc import set_alchemy_key
+from eth_rpc.block import Block
+from eth_rpc.networks import Arbitrum, Ethereum
 
 
 @pytest.mark.unit
