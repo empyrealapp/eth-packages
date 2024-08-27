@@ -18,16 +18,20 @@ The following example assumes the user has an alchemy key, which is the key used
 
 ```python
 from eth_rpc import *
+from eth_rpc.ens import lookup_addr
 from eth_rpc.networks import Arbitrum, Base, Ethereum
 from eth_typeshed import *
 from eth_typeshed.erc20 import *
 
 set_alchemy_key("<ALCHEMY_KEY>")
+# get the latest block on ethereum
 block: Block[Ethereum] = await Block[Ethereum].latest(with_tx_data=True)
+# calculate the total value of all transactions in a block
 total_value = 0
 for tx in block.transactions:
     total_value += tx.value
-block2 = await Block[Arbitrum].latest()
+# get the latest block on arbitrum
+block2: Block[Arbitrum] = await Block[Arbitrum].latest()
 
 # create an ERC20 contract object on Arbitrum and access its name, symbol and decimals
 usdt = ERC20[Arbitrum](address='0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9')
@@ -43,8 +47,9 @@ multicall = Multicall[Arbitrum]()
     usdt.decimals(),
 )
 
-# get the balance of an address at a specific block
-balance = await usdt.balance_of('0xd8da6bf26964af9d7eed9e03e53415d37aa96045').get(
+# get vitalik's usdt balance at a specific block
+vitalik_addr = await lookup_addr('vitalik.eth')
+balance = await usdt.balance_of(vitalik_addr).get(
     block_number=246_802_382,
 )
 
@@ -74,7 +79,7 @@ from typing import Annotated
 from eth_rpc.contract import ProtocolBase, ContractFunc
 from eth_rpc import Transaction
 from eth_rpc.wallet import PrivateKeyWallet
-from eth_rpc.types import Name, primitives
+from eth_rpc.types import HexStr, Name, primitives
 
 
 class MyContract(ProtocolBase):
@@ -93,7 +98,7 @@ response: bool = await contract.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
 )
 
 # or call it with execution:
-tx_hash = await contract.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', ...]).execute(wallet)
+tx_hash: HexStr = await contract.foo(['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', ...]).execute(wallet)
 tx: Transaction[Ethereum] = await Transaction[Ethereum].get_by_hash(tx_hash)
 ```
 
