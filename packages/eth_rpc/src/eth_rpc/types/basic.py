@@ -1,7 +1,5 @@
-from types import GenericAlias
 from typing import Annotated, Any, Literal, get_args
 
-from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import (
     BaseModel,
     GetCoreSchemaHandler,
@@ -48,23 +46,3 @@ def hex_int_wrap(v: Any, nxt: SerializerFunctionWrapHandler) -> str:
 # TODO: make this a BlockNumber type and support block strings too
 HexInteger = Annotated[HexInt, WrapSerializer(hex_int_wrap)]
 BlockReference = HexInteger | BLOCK_STRINGS
-
-
-def map_type_to_str(type_: Any) -> str:
-    """Convert a type to its solidity compatible format"""
-    mapping = {
-        str: "string",
-        int: "uint256",  # defaults to uint
-        HexAddress: "address",
-        ChecksumAddress: "address",
-        HexStr: "bytes",
-    }
-    if type_ in mapping:
-        return mapping[type_]
-    if str(type_) in ALL_PRIMITIVES:
-        return str(type_)
-    # handle list type
-    if isinstance(type_, GenericAlias):
-        (arg,) = get_args(type_)
-        return f"{map_type_to_str(arg)}[]"
-    return type_.__name__

@@ -2,7 +2,8 @@ from typing import Annotated
 
 import pytest
 from eth_rpc import FuncSignature
-from eth_rpc.types import Name, map_type_to_str, primitives
+from eth_rpc.types import Name, primitives
+from eth_rpc.utils import convert_to_primitive_type_string
 from pydantic import BaseModel
 
 
@@ -46,7 +47,7 @@ def test_func_signature():
 
 @pytest.mark.unit
 def test_map_to_str():
-    assert map_type_to_str(primitives.address) == "address"
-    assert map_type_to_str(str) == "string"
-    assert map_type_to_str(list[str]) == "string[]"
-    assert map_type_to_str(list[primitives.bytes32]) == "bytes32[]"
+    assert convert_to_primitive_type_string(primitives.address) == "address"
+    assert convert_to_primitive_type_string(str) == "string"
+    assert convert_to_primitive_type_string(list[str]) == "string[]"
+    assert convert_to_primitive_type_string(list[primitives.bytes32]) == "bytes32[]"

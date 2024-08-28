@@ -15,6 +15,7 @@ from .model import RPCModel
 from .streams import acombine, combine, ordered_iterator, sort_key
 from .types import is_annotation
 
+
 __all__ = [
     "BloomFilter",
     "RPCModel",

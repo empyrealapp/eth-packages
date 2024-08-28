@@ -46,3 +46,6 @@ python_paths = ["src"]
 plugins = [
   "pydantic.mypy"
 ]
+
+[project.scripts]
+eth_rpc = "eth_rpc.main_cli:cli"

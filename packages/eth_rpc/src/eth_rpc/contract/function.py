@@ -672,7 +672,7 @@ class ContractFuncSync(ContractFunc[T, U]):
         value: int = 0,
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
-        use_access_list: bool = True,
+        use_access_list: bool = False,
     ) -> PreparedTransaction:
         return super().prepare(
             wallet,
@@ -692,7 +692,7 @@ class ContractFuncSync(ContractFunc[T, U]):
         value: int = 0,
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
-        use_access_list: bool = True,
+        use_access_list: bool = False,
     ) -> HexStr:
         return super().execute(
             wallet,

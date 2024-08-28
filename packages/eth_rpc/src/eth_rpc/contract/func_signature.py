@@ -8,7 +8,7 @@ from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel
 
 from .._request import Request
-from ..types import BASIC_TYPES, Name, NoArgs
+from ..types import BASIC_TYPES, Name, NoArgs, Struct
 from ..utils import convert, convert_base_model, is_annotation
 
 T = TypeVar(
@@ -93,12 +93,12 @@ class FuncSignature(Request, Generic[T, U]):
 
         identifier = self.get_identifier()
         # TODO: this is hard
+        if inputs == ():
+            return identifier
+
         if isinstance(inputs, BaseModel):
             if isinstance(inputs, Struct):
-                input_data = encode(
-                    self.get_inputs(),
-                    [tuple(inputs.model_dump().values())],
-                ).hex()
+                input_data = inputs.to_bytes().hex()
             else:
                 input_data = encode(
                     self.get_inputs(),
@@ -120,7 +120,14 @@ class FuncSignature(Request, Generic[T, U]):
             output = [output]
             decoded_output = decode(output, bytes.fromhex(result.removeprefix("0x")))[0]
         else:
-            decoded_output = decode(output, bytes.fromhex(result.removeprefix("0x")))
+            if isclass(self._output) and issubclass(self._output, Struct):
+                converted_output_tuple = ",".join(output)
+                output = [f"({converted_output_tuple})"]
+                decoded_output = decode(output, bytes.fromhex(result.removeprefix("0x")))
+                fields = dict(zip(self._output.model_fields.keys(), decoded_output[0]))
+                return self._output(**fields)  # type: ignore
+            else:
+                decoded_output = decode(output, bytes.fromhex(result.removeprefix("0x")))
 
         # NOTE: https://github.com/pydantic/pydantic/discussions/5970
         # TODO: this is discussed to see if its a bug or not.  Annotations are a class but can't be checked as a subclass

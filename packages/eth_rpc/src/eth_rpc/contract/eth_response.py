@@ -2,7 +2,7 @@ from collections.abc import Generator
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from eth_typing import HexAddress, HexStr
+from eth_typing import HexStr
 from pydantic import BaseModel
 
 from ..types import BASIC_TYPES
@@ -17,7 +17,6 @@ T = TypeVar(
     | BASIC_TYPES
     | list[BASIC_TYPES]
     | tuple[BASIC_TYPES, ...]
-    | HexAddress,
 )
 U = TypeVar("U")
 

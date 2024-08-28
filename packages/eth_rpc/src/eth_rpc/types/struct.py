@@ -1,14 +1,8 @@
-from types import GenericAlias
-from typing import get_args
+from inspect import isclass
+from typing import get_args, get_origin
 
-from eth_abi import encode
-from eth_rpc.utils import convert_base_model
-from eth_typing import ChecksumAddress, HexAddress, HexStr
+from eth_abi import encode, decode
 from pydantic import BaseModel
-
-from . import primitives
-
-ALL_PRIMITIVES = [x for x in dir(primitives) if x[0].islower() and x[0] != "_"]
 
 
 class Struct(BaseModel):
@@ -23,38 +17,62 @@ class Struct(BaseModel):
         that is a struct with two fields
     """
 
-    @staticmethod
-    def transform(type_):
-        mapping = {
-            str: "string",
-            int: "uint256",  # defaults to uint
-            HexAddress: "address",
-            ChecksumAddress: "address",
-            HexStr: "bytes",
-        }
-        if type_ in mapping:
-            return mapping[type_]
-        if str(type_) in ALL_PRIMITIVES:
-            return str(type_)
-        # handle list type
-        if isinstance(type_, GenericAlias):
-            (arg,) = get_args(type_)
-            return f"{arg.__name__}[]"
-        return type_.__name__
+    @classmethod
+    def to_tuple_type(cls):
+        lst = cls.to_type_list()
+        return f"({','.join(lst)})"
+
+    @classmethod
+    def to_type_list(cls):
+        from eth_rpc.utils.types2 import transform_primitive
+
+        lst = []
+        for _, field in cls.model_fields.items():
+            type_ = field.annotation
+            lst.append(transform_primitive(type_))
+        return lst
+
+    @classmethod
+    def convert(cls, arg):
+        if isinstance(arg, list):
+            return [cls.convert(a) for a in arg]
+        elif isinstance(arg, tuple):
+            return tuple(cls.convert(a) for a in arg)
+        elif isinstance(arg, Struct):
+            return tuple(cls.convert(getattr(arg, a)) for a in arg.model_fields)
+        return arg
 
     def to_bytes(self):
-        # TODO: this should be able to handle recursive types, it will fail if the depth is more than 2
-        types = ",".join(convert_base_model(self.__class__))
+        types = self.to_tuple_type()
         values = []
         for _, value in self:
-            # this generally works, but should be revisited
-            if (
-                isinstance(value, list)
-                and len(value) > 0
-                and isinstance(value[0], Struct)
-            ):
-                value = [tuple(v.model_dump().values()) for v in value]
-            elif isinstance(value, Struct):
-                value = tuple(value.model_dump().values())
-            values.append(value)
-        return encode([f"({types})"], [tuple(values)])
+            values.append(self.convert(value))
+        return encode([types], [tuple(values)])
+
+    @classmethod
+    def cast(cls, type_, args):
+        if get_origin(type_) == list:
+            (type_,) = get_args(type_)
+            return [cls.cast(type_, arg) for arg in args]
+        elif get_origin(type_) == tuple:
+            tuple_types = get_args(type_)
+            return tuple(cls.cast(type_, arg) for type_, arg in zip(tuple_types, args))
+        elif isclass(type_) and issubclass(type_, Struct):
+            fields = type_.model_fields
+            model_dict = {}
+            for (name, field), arg in zip(fields.items(), args):
+                model_dict[name] = cls.cast(field.annotation, arg)
+            return type_(**model_dict)
+        return args
+
+    @classmethod
+    def from_bytes(cls, bytes_: bytes):
+        types = cls.to_tuple_type()
+        decoded = decode([types], bytes_)
+        zipped = dict(zip(cls.model_fields.keys(), decoded[0]))
+        fields = [field.annotation for field in cls.model_fields.values()]
+
+        response = {}
+        for field, (name, value) in zip(fields, zipped.items()):
+            response[name] = cls.cast(field, value)
+        return cls(**response)

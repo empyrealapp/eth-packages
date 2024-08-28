@@ -32,7 +32,6 @@ from .basic import (
     BlockReference,
     HexInt,
     HexInteger,
-    map_type_to_str,
 )
 from .event import Indexed, Name
 from .network import BlockExplorer, Network, Rpcs, RpcUrl
@@ -41,6 +40,7 @@ from .response import NoArgs, RPCResponseModel
 from .struct import Struct
 from .transaction import SignedTransaction
 from .typed_data import Domain, EIP712Model
+from . import primitives
 
 T = TypeVar("T")
 MaybeAwaitable = Union[T, Awaitable[T]]
@@ -142,5 +142,5 @@ __all__ = [
     "RpcUrl",
     "SignedTransaction",
     "Struct",
-    "map_type_to_str",
+    "primitives",
 ]
