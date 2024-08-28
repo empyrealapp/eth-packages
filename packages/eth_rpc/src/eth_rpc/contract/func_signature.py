@@ -9,7 +9,8 @@ from pydantic import BaseModel
 
 from .._request import Request
 from ..types import BASIC_TYPES, Name, NoArgs, Struct
-from ..utils import convert, convert_base_model, is_annotation
+from ..utils import convert_with_name, is_annotation
+from ..utils.types import transform_primitive
 
 T = TypeVar(
     "T",
@@ -43,12 +44,12 @@ class FuncSignature(Request, Generic[T, U]):
             and isclass(inputs)
             and issubclass(inputs, BaseModel)
         ):
-            converted_inputs = convert_base_model(inputs)
+            converted_inputs = transform_primitive(inputs)
             if issubclass(inputs, Struct):
                 converted_input_tuple = ",".join(converted_inputs)
                 return [f"({converted_input_tuple})"]
         else:
-            converted_inputs = convert(inputs)
+            converted_inputs = convert_with_name(inputs)
         if not isinstance(converted_inputs, list):
             return [converted_inputs]
         return converted_inputs
@@ -80,9 +81,9 @@ class FuncSignature(Request, Generic[T, U]):
             and not isinstance(outputs, GenericAlias)
             and issubclass(outputs, BaseModel)
         ):
-            converted_outputs = convert_base_model(outputs)
+            converted_outputs = transform_primitive(outputs)
         else:
-            converted_outputs = convert(outputs)
+            converted_outputs = transform_primitive(outputs)
         return converted_outputs
 
     def get_output_name(self):
@@ -121,11 +122,7 @@ class FuncSignature(Request, Generic[T, U]):
             decoded_output = decode(output, bytes.fromhex(result.removeprefix("0x")))[0]
         else:
             if isclass(self._output) and issubclass(self._output, Struct):
-                converted_output_tuple = ",".join(output)
-                output = [f"({converted_output_tuple})"]
-                decoded_output = decode(output, bytes.fromhex(result.removeprefix("0x")))
-                fields = dict(zip(self._output.model_fields.keys(), decoded_output[0]))
-                return self._output(**fields)  # type: ignore
+                return self._output.from_bytes(bytes.fromhex(result.removeprefix("0x")))
             else:
                 decoded_output = decode(output, bytes.fromhex(result.removeprefix("0x")))
 

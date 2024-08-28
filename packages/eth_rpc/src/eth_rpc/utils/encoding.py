@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
 from ..types import Name
-from .types import is_annotation
+from .types import is_annotation, transform_primitive
 
 ALL_PRIMITIVES = [x for x in dir(primitives) if x[0].islower() and x[0] != "_"]
 
@@ -47,34 +47,14 @@ def convert_base_model(
     """Converts a basemodel to an argument string"""
     lst = []
     for key, field_info in base.model_fields.items():
-        lst.append(_convert_field_info(key, field_info, with_name=with_name))
+        field_type = field_info.annotation
+        lst.append(transform_primitive(field_type, with_name=with_name, name=key))
     if as_tuple:
         return ",".join(lst)
     return lst
 
 
-def _convert_field_info(alias: str, field: FieldInfo, with_name: bool = False):
-    name = "" if not with_name else alias
-    field_type = field.annotation
-
-    for metadata in field.metadata:
-        if isinstance(metadata, Name) and with_name:
-            name = metadata.value
-
-    type_origin = get_origin(field_type)
-    if type_origin == list:
-        list_type = get_args(field_type)[0]
-        converted_list_type = convert(list_type)
-        if isinstance(converted_list_type, list):
-            converted_list_type = f"({','.join(converted_list_type)})"
-        return f"{converted_list_type}[] {name}".strip()
-    elif type_origin == tuple:
-        tuple_args = f"({','.join([convert(t) for t in get_args(field_type)])}) {name}".strip()
-        return tuple_args
-    return f"{map_type_to_str(field_type)} {name}".strip()
-
-
-def convert(type, with_name: bool = False):
+def convert_with_name(type, with_name: bool = False):
     name = ""
     # unwrap annotations
     if is_annotation(type):
@@ -88,19 +68,19 @@ def convert(type, with_name: bool = False):
     if isinstance(type, GenericAlias):
         if get_origin(type) in [list, "list"]:
             list_type = get_args(type)[0]
-            converted_list_type = convert(list_type)
+            converted_list_type = convert_with_name(list_type)
             # if the list type is a tuple:
             if isinstance(converted_list_type, list):
                 converted_list_type = f"({','.join(converted_list_type)})"
             return f"{converted_list_type}[] {name}".strip()
         else:
-            tuple_args = [convert(t, with_name=with_name) for t in get_args(type)]
+            tuple_args = [convert_with_name(t, with_name=with_name) for t in get_args(type)]
             return tuple_args
     elif getattr(type, "__orig_bases__", [None])[0] == NamedTuple:
-        return f"({','.join([convert(t) for t in type.__annotations__.values()])}) {name}".strip()
+        return f"({','.join([convert_with_name(t) for t in type.__annotations__.values()])}) {name}".strip()
     elif isclass(type) and issubclass(type, BaseModel):
         return f"({convert_base_model(type, with_name=with_name, as_tuple=True)}) {name}".strip()
-    return f"{map_type_to_str(type)} {name}".strip()
+    return f"{transform_primitive(type)} {name}".strip()
 
 
 def map_type_to_str(type_: Any) -> str:

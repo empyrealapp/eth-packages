@@ -24,7 +24,7 @@ class Struct(BaseModel):
 
     @classmethod
     def to_type_list(cls):
-        from eth_rpc.utils.types2 import transform_primitive
+        from eth_rpc.utils.types import transform_primitive
 
         lst = []
         for _, field in cls.model_fields.items():

@@ -1,5 +1,7 @@
-from eth_rpc.types import Struct
-from eth_rpc.utils.encoding import convert_base_model
+from typing import Annotated
+
+from eth_rpc.types import Name, Struct
+from eth_rpc.utils.encoding import convert_base_model, convert_with_name
 
 
 class A(Struct):
@@ -50,9 +52,16 @@ def test_load_struct():
 
 def test_convert_base_model():
     assert convert_base_model(A) == ['uint256', 'string', 'bool[]']
-    assert convert_base_model(B) == ['(uint256,string,bool[])[]', 'A', 'bool']
+    assert convert_base_model(B) == ['(uint256,string,bool[])[]', '(uint256,string,bool[])', 'bool']
     assert convert_base_model(C) == [
-        '((uint256,string,bool[]),((uint256,string,bool[])[],A,bool),((uint256,string,bool[])[],A,bool)[])',
-        '((uint256,string,bool[])[],A,bool)[]',
+        '((uint256,string,bool[]),((uint256,string,bool[])[],(uint256,string,bool[]),bool),((uint256,string,bool[])[],(uint256,string,bool[]),bool)[])',
+        '((uint256,string,bool[])[],(uint256,string,bool[]),bool)[]',
         'string',
     ]
+
+
+def test_convert_with_name():
+    assert convert_with_name(tuple[
+        Annotated[bool, Name("x")],
+        list[int]
+    ], True) == ["bool x", "uint256[]"]
