@@ -1,7 +1,7 @@
 from inspect import isclass
 from typing import get_args, get_origin
 
-from eth_abi import encode, decode
+from eth_abi import decode, encode
 from pydantic import BaseModel
 
 

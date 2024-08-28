@@ -77,7 +77,9 @@ def convert_with_name(type, with_name: bool = False):
                 converted_list_type = f"({','.join(converted_list_type)})"
             return f"{converted_list_type}[] {name}".strip()
         else:
-            tuple_args = [convert_with_name(t, with_name=with_name) for t in get_args(type)]
+            tuple_args = [
+                convert_with_name(t, with_name=with_name) for t in get_args(type)
+            ]
             return tuple_args
     elif getattr(type, "__orig_bases__", [None])[0] == NamedTuple:
         return f"({','.join([convert_with_name(t) for t in type.__annotations__.values()])}) {name}".strip()

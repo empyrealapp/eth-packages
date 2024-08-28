@@ -1,26 +1,27 @@
-from inspect import isclass
 import math
+from inspect import isclass
 from types import GenericAlias
 from typing import Annotated, get_args, get_origin
 
+from eth_rpc.types import NoArgs, Struct, primitives
+from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import BaseModel, BeforeValidator, WrapSerializer
 
-from eth_typing import ChecksumAddress, HexAddress, HexStr
-from eth_rpc.types import NoArgs, Struct, primitives
-
 ALL_PRIMITIVES = [x for x in dir(primitives) if x[0].islower() and x[0] != "_"]
+
 
 def is_annotation(type_):
     return get_origin(type_) is Annotated
 
 
-def transform_primitive(type_, with_name: bool = False, name: str = ''):
+def transform_primitive(type_, with_name: bool = False, name: str = ""):
     if type_ in [(), NoArgs]:
         return None
     type_ = _transform_primitive(type_)
     if with_name:
         return f"{type_} {name}"
     return type_
+
 
 def _transform_primitive(type_):
     mapping = {
@@ -43,9 +44,7 @@ def _transform_primitive(type_):
             return f"{transform_primitive(arg)}[]"
         elif get_origin(type_) == tuple:
             args = get_args(type_)
-            tuple_args = ','.join(
-                transform_primitive(a) for a in args
-            )
+            tuple_args = ",".join(transform_primitive(a) for a in args)
             return f"({tuple_args})"
         else:
             raise ValueError(f"Unknown GenericAlias: {type_}")
@@ -63,16 +62,20 @@ def _transform_primitive(type_):
 
 def number_to_bytes(number):
     nibble_count = int(math.log(number, 256)) + 1
-    hex_string = '{:0{}x}'.format(number, nibble_count * 2)
+    hex_string = "{:0{}x}".format(number, nibble_count * 2)
     return bytes.fromhex(hex_string)
 
 
 def hex_str_to_bytes(v, info):
     if isinstance(v, bytes):
         return v
-    elif v == '':
-        return b''
+    elif v == "":
+        return b""
     return number_to_bytes(int(v, 16))
 
 
-Bytes32Hex = Annotated[primitives.bytes32, BeforeValidator(hex_str_to_bytes), WrapSerializer(lambda x, y, z: x.hex())]
+Bytes32Hex = Annotated[
+    primitives.bytes32,
+    BeforeValidator(hex_str_to_bytes),
+    WrapSerializer(lambda x, y, z: x.hex()),
+]

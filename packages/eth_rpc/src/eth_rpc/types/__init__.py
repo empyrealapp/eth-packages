@@ -5,6 +5,7 @@ from typing import Any, NewType, Optional, TypedDict, TypeVar, Union
 from eth_typing import HexAddress, HexStr, TypeStr
 from pydantic import BaseModel, Field
 
+from . import primitives
 from .args import (  # noqa: F401
     AlchemyBlockReceipt,
     AlchemyParams,
@@ -26,13 +27,7 @@ from .args import (  # noqa: F401
     TraceArgs,
     TransactionRequest,
 )
-from .basic import (
-    ALL_PRIMITIVES,
-    BLOCK_STRINGS,
-    BlockReference,
-    HexInt,
-    HexInteger,
-)
+from .basic import ALL_PRIMITIVES, BLOCK_STRINGS, BlockReference, HexInt, HexInteger
 from .event import Indexed, Name
 from .network import BlockExplorer, Network, Rpcs, RpcUrl
 from .primitives import BASIC_TYPES, BYTES_TYPES
@@ -40,7 +35,6 @@ from .response import NoArgs, RPCResponseModel
 from .struct import Struct
 from .transaction import SignedTransaction
 from .typed_data import Domain, EIP712Model
-from . import primitives
 
 T = TypeVar("T")
 MaybeAwaitable = Union[T, Awaitable[T]]

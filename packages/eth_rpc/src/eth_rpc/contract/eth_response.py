@@ -12,11 +12,7 @@ if TYPE_CHECKING:
 
 T = TypeVar(
     "T",
-    bound=tuple
-    | BaseModel
-    | BASIC_TYPES
-    | list[BASIC_TYPES]
-    | tuple[BASIC_TYPES, ...]
+    bound=tuple | BaseModel | BASIC_TYPES | list[BASIC_TYPES] | tuple[BASIC_TYPES, ...],
 )
 U = TypeVar("U")
 
