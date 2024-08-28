@@ -1,14 +1,15 @@
 from inspect import isclass
 from types import GenericAlias
-from typing import get_args
+from typing import get_args, get_origin
 
 from eth_abi import encode
 from eth_hash.auto import keccak
-from eth_typing import HexAddress
+from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import Field
 
 from .primitives import bytes32
 from .struct import Struct
+from .basic import ALL_PRIMITIVES
 
 
 class EIP712Model(Struct):
@@ -17,6 +18,25 @@ class EIP712Model(Struct):
         """Override this if you want the struct name to be different from the class name"""
         return cls.__name__
 
+    @staticmethod
+    def transform(type_):
+        mapping = {
+            str: "string",
+            int: "uint256",  # defaults to uint
+            HexAddress: "address",
+            ChecksumAddress: "address",
+            HexStr: "bytes",
+        }
+        if type_ in mapping:
+            return mapping[type_]
+        if str(type_) in ALL_PRIMITIVES:
+            return str(type_)
+        # handle list type
+        if isinstance(type_, GenericAlias):
+            (arg,) = get_args(type_)
+            return f"{arg.__name__}[]"
+        return type_.__name__
+
     @classmethod
     def type_string(cls):
         type_string = ""
@@ -24,8 +44,12 @@ class EIP712Model(Struct):
             name = field_data.serialization_alias or name
             type_ = field_data.annotation
             if isinstance(type_, GenericAlias):
-                (arg,) = get_args(type_)
-                type_str = f"{cls.transform(arg)}[]"
+                if get_origin(type_) == list:
+                    (arg,) = get_args(type_)
+                    type_str = f"{cls.transform(arg)}[]"
+                elif get_origin(type_) == tuple:
+                    args = get_args(type_)
+                    type_str = f"({','.join([cls.transform(arg) for arg in args])})"
             else:
                 type_str = cls.transform(type_)
             type_string += f"{type_str} {name},"

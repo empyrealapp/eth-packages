@@ -73,6 +73,3 @@ def test_convert_with_name():
         Annotated[bool, Name("x")],
         list[int]
     ], True) == ["bool x", "uint256[]"]
-
-    print(convert_with_name(C, True))
-    print(convert_with_name(D, True))

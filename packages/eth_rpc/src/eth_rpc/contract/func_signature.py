@@ -1,6 +1,6 @@
 from inspect import isclass
 from types import GenericAlias
-from typing import Generic, TypeVar, get_args
+from typing import Generic, TypeVar, get_args, get_origin
 
 from eth_abi import decode, encode
 from eth_hash.auto import keccak as keccak_256
@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from .._request import Request
 from ..types import BASIC_TYPES, Name, NoArgs, Struct
-from ..utils import convert_with_name, is_annotation
+from ..utils import is_annotation
 from ..utils.types import transform_primitive
 
 T = TypeVar(
@@ -49,12 +49,12 @@ class FuncSignature(Request, Generic[T, U]):
                 converted_input_tuple = ",".join(converted_inputs)
                 return [f"({converted_input_tuple})"]
         else:
-            if isinstance(inputs, list):
-                converted_inputs = [transform_primitive(input) for input in inputs]
-            elif isinstance(inputs, tuple):
-                converted_inputs = [transform_primitive(input) for input in inputs]
+            if get_origin(inputs) == list:
+                return [transform_primitive(inputs)]
+            elif get_origin(inputs) == tuple:
+                return tuple(transform_primitive(input) for input in get_args(inputs))
             else:
-                converted_inputs = convert_with_name(inputs)
+                converted_inputs = transform_primitive(inputs)
         if not isinstance(converted_inputs, list):
             return [converted_inputs]
         return converted_inputs

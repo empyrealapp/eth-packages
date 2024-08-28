@@ -51,3 +51,13 @@ def test_map_to_str():
     assert transform_primitive(str) == "string"
     assert transform_primitive(list[str]) == "string[]"
     assert transform_primitive(list[primitives.bytes32]) == "bytes32[]"
+
+
+@pytest.mark.unit
+def test_func_signature_types():
+    func = FuncSignature[
+        tuple[list[int], bool],
+        list[str],
+    ](name="func")
+    assert func.get_inputs() == ('uint256[]', 'bool')
+    assert func.get_output() == 'string[]'
