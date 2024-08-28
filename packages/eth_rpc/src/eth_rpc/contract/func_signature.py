@@ -129,7 +129,9 @@ class FuncSignature(Request, Generic[T, U]):
             if isclass(self._output) and issubclass(self._output, Struct):
                 return self._output.from_bytes(bytes.fromhex(result.removeprefix("0x")))
             else:
-                decoded_output = decode(output, bytes.fromhex(result.removeprefix("0x")))
+                decoded_output = decode(
+                    output, bytes.fromhex(result.removeprefix("0x"))
+                )
 
         # NOTE: https://github.com/pydantic/pydantic/discussions/5970
         # TODO: this is discussed to see if its a bug or not.  Annotations are a class but can't be checked as a subclass

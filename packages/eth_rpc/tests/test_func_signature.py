@@ -59,5 +59,5 @@ def test_func_signature_types():
         tuple[list[int], bool],
         list[str],
     ](name="func")
-    assert func.get_inputs() == ('uint256[]', 'bool')
-    assert func.get_output() == 'string[]'
+    assert func.get_inputs() == ("uint256[]", "bool")
+    assert func.get_output() == "string[]"

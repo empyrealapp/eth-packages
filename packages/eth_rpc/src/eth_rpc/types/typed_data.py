@@ -7,9 +7,9 @@ from eth_hash.auto import keccak
 from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import Field
 
+from .basic import ALL_PRIMITIVES
 from .primitives import bytes32
 from .struct import Struct
-from .basic import ALL_PRIMITIVES
 
 
 class EIP712Model(Struct):
