@@ -1,5 +1,7 @@
 from typing import Annotated
 
+from pydantic import BaseModel
+
 from eth_rpc.types import Name, Struct
 from eth_rpc.utils.encoding import convert_base_model, convert_with_name
 
@@ -13,11 +15,17 @@ class A(Struct):
 class B(Struct):
     a: list[A]
     b: A
-    c: bool
+    c: Annotated[bool, Name('BOOL')]
 
 
 class C(Struct):
-    a: tuple[A, B, list[B]]
+    a: Annotated[tuple[A, B, list[B]], Name('tuples')]
+    d: list[B]
+    e: str
+
+
+class D(BaseModel):
+    a: Annotated[tuple[A, B, list[B]], Name('tuples')]
     d: list[B]
     e: str
 
@@ -65,3 +73,6 @@ def test_convert_with_name():
         Annotated[bool, Name("x")],
         list[int]
     ], True) == ["bool x", "uint256[]"]
+
+    print(convert_with_name(C, True))
+    print(convert_with_name(D, True))

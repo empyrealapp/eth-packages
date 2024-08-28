@@ -49,7 +49,12 @@ class FuncSignature(Request, Generic[T, U]):
                 converted_input_tuple = ",".join(converted_inputs)
                 return [f"({converted_input_tuple})"]
         else:
-            converted_inputs = convert_with_name(inputs)
+            if isinstance(inputs, list):
+                converted_inputs = [transform_primitive(input) for input in inputs]
+            elif isinstance(inputs, tuple):
+                converted_inputs = [transform_primitive(input) for input in inputs]
+            else:
+                converted_inputs = convert_with_name(inputs)
         if not isinstance(converted_inputs, list):
             return [converted_inputs]
         return converted_inputs

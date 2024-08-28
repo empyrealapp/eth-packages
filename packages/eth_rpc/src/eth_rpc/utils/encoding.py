@@ -1,14 +1,12 @@
 from inspect import isclass
 from types import GenericAlias
-from typing import Any
 from typing import NamedTuple, Optional, get_args, get_origin
 
 from eth_abi import encode
 from eth_rpc.types import primitives
-from eth_typing import ChecksumAddress, HexAddress, HexStr
+from eth_typing import HexStr
 from eth_utils import to_bytes, to_hex
 from pydantic import BaseModel
-from pydantic.fields import FieldInfo
 
 from ..types import Name
 from .types import is_annotation, transform_primitive
@@ -48,7 +46,13 @@ def convert_base_model(
     lst = []
     for key, field_info in base.model_fields.items():
         field_type = field_info.annotation
-        lst.append(transform_primitive(field_type, with_name=with_name, name=key))
+        lst.append(
+            transform_primitive(
+                field_type,
+                with_name=with_name,
+                name=key,
+            )
+        )
     if as_tuple:
         return ",".join(lst)
     return lst
@@ -63,7 +67,6 @@ def convert_with_name(type, with_name: bool = False):
             for annotation in annotations:
                 if isinstance(annotation, Name):
                     name = annotation.value
-
     # if it's a list or a tuple
     if isinstance(type, GenericAlias):
         if get_origin(type) in [list, "list"]:
@@ -81,24 +84,3 @@ def convert_with_name(type, with_name: bool = False):
     elif isclass(type) and issubclass(type, BaseModel):
         return f"({convert_base_model(type, with_name=with_name, as_tuple=True)}) {name}".strip()
     return f"{transform_primitive(type)} {name}".strip()
-
-
-def map_type_to_str(type_: Any) -> str:
-    """Convert a type to its solidity compatible format, preserving struct names"""
-
-    mapping = {
-        str: "string",
-        int: "uint256",  # defaults to uint
-        HexAddress: "address",
-        ChecksumAddress: "address",
-        HexStr: "bytes",
-    }
-    if type_ in mapping:
-        return mapping[type_]
-    if str(type_) in ALL_PRIMITIVES:
-        return str(type_)
-    # handle list type
-    if isinstance(type_, GenericAlias):
-        (arg,) = get_args(type_)
-        return f"{map_type_to_str(arg)}[]"
-    return type_.__name__
