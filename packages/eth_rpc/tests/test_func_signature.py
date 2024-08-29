@@ -2,7 +2,7 @@ from typing import Annotated
 
 import pytest
 from eth_rpc import FuncSignature
-from eth_rpc.types import Struct, Name, primitives
+from eth_rpc.types import Name, Struct, primitives
 from eth_rpc.utils.types import transform_primitive
 from pydantic import BaseModel
 

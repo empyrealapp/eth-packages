@@ -22,7 +22,7 @@ class EIP712Model(Struct):
     def transform(type_):
         mapping = {
             str: "string",
-            int: "uint256",  # defaults to uint
+            int: "uint256",  # defaults to uint256
             HexAddress: "address",
             ChecksumAddress: "address",
             HexStr: "bytes",

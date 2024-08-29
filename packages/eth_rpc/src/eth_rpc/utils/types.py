@@ -2,7 +2,7 @@ from inspect import isclass
 from types import GenericAlias
 from typing import Annotated, get_args, get_origin
 
-from eth_rpc.types import NoArgs, Struct, ALL_PRIMITIVES
+from eth_rpc.types import ALL_PRIMITIVES, NoArgs, Struct
 from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import BaseModel
 

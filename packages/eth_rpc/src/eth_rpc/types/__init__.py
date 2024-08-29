@@ -27,7 +27,14 @@ from .args import (  # noqa: F401
     TraceArgs,
     TransactionRequest,
 )
-from .basic import ALL_PRIMITIVES, BLOCK_STRINGS, BlockReference, Bytes32Hex, HexInt, HexInteger
+from .basic import (
+    ALL_PRIMITIVES,
+    BLOCK_STRINGS,
+    BlockReference,
+    Bytes32Hex,
+    HexInt,
+    HexInteger,
+)
 from .event import Indexed, Name
 from .network import BlockExplorer, Network, Rpcs, RpcUrl
 from .primitives import BASIC_TYPES, BYTES_TYPES

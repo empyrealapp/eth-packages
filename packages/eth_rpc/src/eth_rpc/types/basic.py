@@ -20,6 +20,7 @@ class HexInt(int):
     """
     This enables an integer to load from a hex str to an int, or to be loaded as an int directly
     """
+
     @classmethod
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
