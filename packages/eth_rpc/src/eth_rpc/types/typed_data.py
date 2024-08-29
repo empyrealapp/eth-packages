@@ -50,7 +50,11 @@ class EIP712Model(Struct):
             return cls._get_nested_types(get_args(type_)[0])
         elif get_origin(type_) == tuple:
             args = get_args(type_)
-            return [item for subl in [cls._get_nested_types(arg) for arg in args] for item in subl]
+            return [
+                item
+                for subl in [cls._get_nested_types(arg) for arg in args]
+                for item in subl
+            ]
         elif get_origin(type_) == Annotated:
             return cls._get_nested_types(get_args(type_)[0])
         elif isclass(type_) and issubclass(type_, EIP712Model):
@@ -65,7 +69,9 @@ class EIP712Model(Struct):
             name = field_data.serialization_alias or name
             type_ = field_data.annotation
 
+            print("TYPE::::", type_)
             if isinstance(type_, GenericAlias):
+                print("??", type_)
                 if get_origin(type_) == list:
                     (arg,) = get_args(type_)
                     type_str = f"{cls.transform(arg)}[]"
