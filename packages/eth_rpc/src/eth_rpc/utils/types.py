@@ -67,4 +67,4 @@ def to_hex_str(number: int | str) -> HexStr:
 def to_bytes32(input_: int | HexStr):
     if isinstance(input_, str):
         return encode(["bytes32"], [bytes.fromhex(input_.lstrip("0x"))])
-    return encode(['bytes32'], [input_.to_bytes()])
+    return encode(["bytes32"], [input_.to_bytes()])
