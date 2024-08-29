@@ -126,3 +126,14 @@ def configure_rpc_from_env():
 
     set_alchemy_key(alchemy_key, network=network)
     set_default_network(network)
+
+
+def set_rpc_url(network: Network, http: str | None = None, wss: str | None = None):
+    set_transport(
+        networks=[
+            network.set(
+                http=http,
+                wss=wss,
+            )
+        ],
+    )

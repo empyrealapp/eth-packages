@@ -4,6 +4,7 @@ from ._transport import (
     set_alchemy_key,
     set_default_network,
     set_rpc_timeout,
+    set_rpc_url,
     set_transport,
 )
 from .account import Account
@@ -39,4 +40,5 @@ __all__ = [
     "set_default_network",
     "set_transport",
     "set_rpc_timeout",
+    "set_rpc_url",
 ]

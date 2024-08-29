@@ -23,13 +23,20 @@ from eth_rpc.networks import Arbitrum, Base, Ethereum
 from eth_typeshed import *
 from eth_typeshed.erc20 import *
 
+# set your alchemy key globaly to configure it for all networks
 set_alchemy_key("<ALCHEMY_KEY>")
+
+# or set the RPC url for a network directly
+set_rpc_url(Ethereum, "<MY PRIVATE RPC URL>")
+
 # get the latest block on ethereum
 block: Block[Ethereum] = await Block[Ethereum].latest(with_tx_data=True)
+
 # calculate the total value of all transactions in a block
 total_value = 0
 for tx in block.transactions:
     total_value += tx.value
+
 # get the latest block on arbitrum
 block2: Block[Arbitrum] = await Block[Arbitrum].latest()
 
