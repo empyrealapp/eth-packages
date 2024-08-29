@@ -39,6 +39,9 @@ jobs:
           tox -e build_eth_protocols
           tox -e build_eth_streams
 
+        env:
+          ALCHEMY_KEY: ${{ secrets.ALCHEMY_KEY }}
+
       - name: Publish eth_rpc Package
         env:
           TWINE_USERNAME: __token__
