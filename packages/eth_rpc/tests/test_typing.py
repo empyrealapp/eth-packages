@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from eth_rpc.types import Name, Struct
-from eth_rpc.utils.encoding import convert_base_model, convert_with_name
+from eth_rpc.utils.encoding import convert_base_model
 from pydantic import BaseModel
 
 
@@ -68,11 +68,4 @@ def test_convert_base_model():
         "((uint256,string,bool[]),((uint256,string,bool[])[],(uint256,string,bool[]),bool),((uint256,string,bool[])[],(uint256,string,bool[]),bool)[])",
         "((uint256,string,bool[])[],(uint256,string,bool[]),bool)[]",
         "string",
-    ]
-
-
-def test_convert_with_name():
-    assert convert_with_name(tuple[Annotated[bool, Name("x")], list[int]], True) == [
-        "bool x",
-        "uint256[]",
     ]

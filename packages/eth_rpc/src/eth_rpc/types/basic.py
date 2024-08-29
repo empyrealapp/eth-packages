@@ -1,7 +1,8 @@
+import math
 from typing import Annotated, Any, Literal, get_args
 
 from pydantic import (
-    BaseModel,
+    BeforeValidator,
     GetCoreSchemaHandler,
     SerializerFunctionWrapHandler,
     ValidationInfo,
@@ -13,9 +14,6 @@ from . import primitives
 
 ALL_PRIMITIVES = [x for x in dir(primitives) if x[0].islower() and x[0] != "_"]
 BLOCK_STRINGS = Literal["latest", "earliest", "pending", "safe", "finalized"]
-
-
-class Empty(BaseModel): ...
 
 
 class HexInt(int):
@@ -46,3 +44,24 @@ def hex_int_wrap(v: Any, nxt: SerializerFunctionWrapHandler) -> str:
 # TODO: make this a BlockNumber type and support block strings too
 HexInteger = Annotated[HexInt, WrapSerializer(hex_int_wrap)]
 BlockReference = HexInteger | BLOCK_STRINGS
+
+
+def number_to_bytes(number):
+    nibble_count = int(math.log(number, 256)) + 1
+    hex_string = "{:0{}x}".format(number, nibble_count * 2)
+    return bytes.fromhex(hex_string)
+
+
+def hex_str_to_bytes(v, info):
+    if isinstance(v, bytes):
+        return v
+    elif v == "":
+        return b""
+    return number_to_bytes(int(v, 16))
+
+
+Bytes32Hex = Annotated[
+    primitives.bytes32,
+    BeforeValidator(hex_str_to_bytes),
+    WrapSerializer(lambda x, y, z: x.hex()),
+]

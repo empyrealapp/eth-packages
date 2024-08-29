@@ -3,8 +3,6 @@ from .bloom import BloomFilter
 from .datetime import convert_datetime_to_iso_8601, load_datetime_string
 from .dual_async import handle_maybe_awaitable, run
 from .encoding import (
-    convert_base_model,
-    convert_with_name,
     encode_to_bytes,
     encode_to_string,
     hex_to_int,
@@ -23,9 +21,7 @@ __all__ = [
     "address_to_bytes32",
     "address_to_topic",
     "combine",
-    "convert_base_model",
     "convert_datetime_to_iso_8601",
-    "convert_with_name",
     "encode_to_string",
     "encode_to_bytes",
     "handle_maybe_awaitable",

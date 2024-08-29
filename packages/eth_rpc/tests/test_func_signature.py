@@ -2,7 +2,7 @@ from typing import Annotated
 
 import pytest
 from eth_rpc import FuncSignature
-from eth_rpc.types import Name, primitives
+from eth_rpc.types import Struct, Name, primitives
 from eth_rpc.utils.types import transform_primitive
 from pydantic import BaseModel
 
@@ -25,6 +25,19 @@ class Outputs(BaseModel):
     y: str
 
 
+class DisputeNested(Struct):
+    a: list[primitives.address]
+    b: list[primitives.uint256]
+    c: primitives.uint256
+    d: primitives.uint16
+
+
+class DisputeInput(BaseModel):
+    first: DisputeNested
+    second: primitives.address
+    third: primitives.address
+
+
 @pytest.mark.unit
 def test_func_signature():
     func = FuncSignature[Inputs, Annotated[Outputs, Name("OUTPUT")]](
@@ -43,6 +56,24 @@ def test_func_signature():
     ]
     assert func.get_output() == ["bytes32[]", "string"]
     assert func._get_name(Outputs.__annotations__["x"]) == "XX"
+
+    func = FuncSignature[
+        tuple[int, list[primitives.address], list[bytes]],
+        bool,
+    ](name="makeProxyArbitraryTransactions")
+    assert func.get_identifier() == "0xbe430874"
+
+    func = FuncSignature[
+        tuple[list[primitives.address], list[primitives.uint96], list[bool]],
+        bool,
+    ](name="onBridgeOperatorsAdded")
+    assert func.get_identifier() == "0x8f851d8a"
+
+    func3 = FuncSignature[
+        DisputeInput,
+        bool,
+    ](name="distribute")
+    assert func3.get_identifier() == "0x2d3f5537"
 
 
 @pytest.mark.unit

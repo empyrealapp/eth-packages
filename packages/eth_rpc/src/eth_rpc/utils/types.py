@@ -1,13 +1,10 @@
-import math
 from inspect import isclass
 from types import GenericAlias
 from typing import Annotated, get_args, get_origin
 
-from eth_rpc.types import NoArgs, Struct, primitives
+from eth_rpc.types import NoArgs, Struct, ALL_PRIMITIVES
 from eth_typing import ChecksumAddress, HexAddress, HexStr
-from pydantic import BaseModel, BeforeValidator, WrapSerializer
-
-ALL_PRIMITIVES = [x for x in dir(primitives) if x[0].islower() and x[0] != "_"]
+from pydantic import BaseModel
 
 
 def is_annotation(type_):
@@ -58,24 +55,3 @@ def _transform_primitive(type_):
         args = [arg.annotation for arg in type_.model_fields.values()]
         return [transform_primitive(arg) for arg in args]
     return transform_primitive(type_)
-
-
-def number_to_bytes(number):
-    nibble_count = int(math.log(number, 256)) + 1
-    hex_string = "{:0{}x}".format(number, nibble_count * 2)
-    return bytes.fromhex(hex_string)
-
-
-def hex_str_to_bytes(v, info):
-    if isinstance(v, bytes):
-        return v
-    elif v == "":
-        return b""
-    return number_to_bytes(int(v, 16))
-
-
-Bytes32Hex = Annotated[
-    primitives.bytes32,
-    BeforeValidator(hex_str_to_bytes),
-    WrapSerializer(lambda x, y, z: x.hex()),
-]
