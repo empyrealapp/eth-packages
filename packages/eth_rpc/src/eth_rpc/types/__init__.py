@@ -27,14 +27,21 @@ from .args import (  # noqa: F401
     TraceArgs,
     TransactionRequest,
 )
-from .basic import ALL_PRIMITIVES, BLOCK_STRINGS, BlockReference, HexInt, HexInteger
+from .basic import (
+    ALL_PRIMITIVES,
+    BLOCK_STRINGS,
+    BlockReference,
+    Bytes32Hex,
+    HexInt,
+    HexInteger,
+)
 from .event import Indexed, Name
 from .network import BlockExplorer, Network, Rpcs, RpcUrl
 from .primitives import BASIC_TYPES, BYTES_TYPES
 from .response import NoArgs, RPCResponseModel
 from .struct import Struct
 from .transaction import SignedTransaction
-from .typed_data import Domain, EIP712Model
+from .typed_data import Domain, EIP712Model, hash_eip712_bytes
 
 T = TypeVar("T")
 MaybeAwaitable = Union[T, Awaitable[T]]
@@ -125,6 +132,7 @@ __all__ = [
     "BLOCK_STRINGS",
     "BlockExplorer",
     "BlockReference",
+    "Bytes32Hex",
     "Domain",
     "EIP712Model",
     "Indexed",
@@ -136,5 +144,6 @@ __all__ = [
     "RpcUrl",
     "SignedTransaction",
     "Struct",
+    "hash_eip712_bytes",
     "primitives",
 ]

@@ -1,13 +1,11 @@
-import math
 from inspect import isclass
 from types import GenericAlias
 from typing import Annotated, get_args, get_origin
 
-from eth_rpc.types import NoArgs, Struct, primitives
+from eth_abi import encode
+from eth_rpc.types import ALL_PRIMITIVES, NoArgs, Struct
 from eth_typing import ChecksumAddress, HexAddress, HexStr
-from pydantic import BaseModel, BeforeValidator, WrapSerializer
-
-ALL_PRIMITIVES = [x for x in dir(primitives) if x[0].islower() and x[0] != "_"]
+from pydantic import BaseModel
 
 
 def is_annotation(type_):
@@ -60,22 +58,13 @@ def _transform_primitive(type_):
     return transform_primitive(type_)
 
 
-def number_to_bytes(number):
-    nibble_count = int(math.log(number, 256)) + 1
-    hex_string = "{:0{}x}".format(number, nibble_count * 2)
-    return bytes.fromhex(hex_string)
+def to_hex_str(number: int | str) -> HexStr:
+    if isinstance(number, int):
+        return HexStr(hex(number))
+    return HexStr(number)
 
 
-def hex_str_to_bytes(v, info):
-    if isinstance(v, bytes):
-        return v
-    elif v == "":
-        return b""
-    return number_to_bytes(int(v, 16))
-
-
-Bytes32Hex = Annotated[
-    primitives.bytes32,
-    BeforeValidator(hex_str_to_bytes),
-    WrapSerializer(lambda x, y, z: x.hex()),
-]
+def to_bytes32(input_: int | HexStr):
+    if isinstance(input_, str):
+        return encode(["bytes32"], [bytes.fromhex(input_.lstrip("0x"))])
+    return encode(["bytes32"], [input_.to_bytes()])

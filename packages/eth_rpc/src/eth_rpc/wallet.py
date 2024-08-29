@@ -183,3 +183,18 @@ class PrivateKeyWallet(BaseWallet):
 
     def sign_hash(self, hashed: bytes) -> SignedMessage:
         return Account._sign_hash(hashed, self._account.key)
+
+    @staticmethod
+    def rsv_to_signature(r: int, s: int, v: int) -> HexStr:
+        rr = hex(r)[2:].zfill(64)
+        ss = hex(s)[2:].zfill(64)
+        vv = hex(v)[2:]
+        return HexStr("0x" + rr + ss + vv)
+
+    @staticmethod
+    def signature_to_rsv(signature: HexStr) -> tuple[int, int, int]:
+        v = signature[-2:]
+        s = signature[-66:-2]
+        r = signature[:-66].lstrip("0x")
+
+        return int(r, 16), int(s, 16), int(v, 16)

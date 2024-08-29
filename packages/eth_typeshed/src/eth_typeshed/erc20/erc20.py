@@ -2,7 +2,7 @@ from typing import Annotated, Optional
 
 from eth_rpc import ContractFunc, ProtocolBase
 from eth_rpc.types import METHOD, Name, NoArgs, primitives
-from eth_rpc.utils import to_32byte_hex
+from eth_rpc.utils import to_bytes32
 from eth_typing import HexAddress, HexStr
 from pydantic import PrivateAttr
 
@@ -147,7 +147,7 @@ class ERC20(ERC20Metadata):
             return {
                 self.address: {
                     "stateDiff": {
-                        slot: to_32byte_hex(balance),
+                        slot: to_bytes32(balance),
                     },
                 },
             }
@@ -161,7 +161,7 @@ class ERC20(ERC20Metadata):
             return {
                 self.address: {
                     "stateDiff": {
-                        slot: to_32byte_hex(amount),
+                        slot: to_bytes32(amount),
                     }
                 },
             }
