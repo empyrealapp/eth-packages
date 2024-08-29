@@ -14,6 +14,7 @@ from .log import Log
 from .models import EventData
 from .subscriber import EventSubscriber
 from .transaction import Transaction, TransactionReceipt
+from .types import Network
 from .wallet import PrivateKeyWallet
 
 __all__ = [
@@ -27,6 +28,7 @@ __all__ = [
     "EventSubscriber",
     "FuncSignature",
     "Log",
+    "Network",
     "PrivateKeyWallet",
     "ProtocolBase",
     "Transaction",
