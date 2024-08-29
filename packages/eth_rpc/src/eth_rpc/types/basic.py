@@ -17,6 +17,9 @@ BLOCK_STRINGS = Literal["latest", "earliest", "pending", "safe", "finalized"]
 
 
 class HexInt(int):
+    """
+    This enables an integer to load from a hex str to an int, or to be loaded as an int directly
+    """
     @classmethod
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
@@ -34,16 +37,11 @@ class HexInt(int):
         return int(v)
 
 
+# wraps an int to a hex, or preserves the block_string
 def hex_int_wrap(v: Any, nxt: SerializerFunctionWrapHandler) -> str:
     if v in get_args(BLOCK_STRINGS):
         return v
     return hex(v)
-
-
-# A Custom Integer type that loads from hex string and serializes to hex string
-# TODO: make this a BlockNumber type and support block strings too
-HexInteger = Annotated[HexInt, WrapSerializer(hex_int_wrap)]
-BlockReference = HexInteger | BLOCK_STRINGS
 
 
 def number_to_bytes(number):
@@ -59,6 +57,13 @@ def hex_str_to_bytes(v, info):
         return b""
     return number_to_bytes(int(v, 16))
 
+
+# A Custom Integer type that loads from hex string and serializes to hex string
+# TODO: make this a BlockNumber type and support block strings too
+HexInteger = Annotated[HexInt, WrapSerializer(hex_int_wrap)]
+
+# references to a block, either the rpc terms or a HexInteger
+BlockReference = HexInteger | BLOCK_STRINGS
 
 Bytes32Hex = Annotated[
     primitives.bytes32,

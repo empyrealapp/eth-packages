@@ -9,8 +9,7 @@ from pydantic import BaseModel
 
 from .._request import Request
 from ..types import BASIC_TYPES, Name, NoArgs, Struct
-from ..utils import is_annotation
-from ..utils.types import transform_primitive
+from ..utils import is_annotation, transform_primitive
 
 T = TypeVar(
     "T",

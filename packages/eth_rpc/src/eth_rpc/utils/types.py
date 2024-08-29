@@ -55,3 +55,9 @@ def _transform_primitive(type_):
         args = [arg.annotation for arg in type_.model_fields.values()]
         return [transform_primitive(arg) for arg in args]
     return transform_primitive(type_)
+
+
+def to_hex_str(number: int | str) -> HexStr:
+    if isinstance(number, int):
+        return HexStr(hex(number))
+    return HexStr(number)
