@@ -3,6 +3,7 @@ from types import GenericAlias
 from typing import get_args, get_origin
 
 from eth_abi import encode
+from eth_account import Account
 from eth_hash.auto import keccak
 from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import Field
@@ -38,11 +39,14 @@ class EIP712Model(Struct):
         return type_.__name__
 
     @classmethod
-    def type_string(cls):
-        type_string = ""
+    def type_string(cls) -> bytes:
+        type_string: str = ""
+        nested_types: list[bytes] = []
         for name, field_data in cls.model_fields.items():
             name = field_data.serialization_alias or name
             type_ = field_data.annotation
+            if isclass(type_) and issubclass(type_, EIP712Model):
+                nested_types.append(type_.type_string())
             if isinstance(type_, GenericAlias):
                 if get_origin(type_) == list:
                     (arg,) = get_args(type_)
@@ -53,10 +57,10 @@ class EIP712Model(Struct):
             else:
                 type_str = cls.transform(type_)
             type_string += f"{type_str} {name},"
-        encoded_typestr = f'{cls.struct_name()}({type_string.rstrip(",")})'.encode(
-            "utf-8"
+        encoded_typestr: bytes = (
+            f'{cls.struct_name()}({type_string.rstrip(",")})'.encode("utf-8")
         )
-        return encoded_typestr
+        return encoded_typestr + b"".join(set(nested_types))
 
     @classmethod
     def typehash(cls):
@@ -65,7 +69,6 @@ class EIP712Model(Struct):
     def hash(self) -> bytes32:
         types = ["bytes32"]
         values = [self.__class__.typehash()]
-
         for name, field_data in self.model_fields.items():
             type_ = field_data.annotation
             value = getattr(self, name)
@@ -108,6 +111,16 @@ class EIP712Model(Struct):
 
     def model_dump(self, by_alias=True, **kwargs):
         return super().model_dump(by_alias=by_alias, **kwargs)
+
+    @staticmethod
+    def recover(
+        message: bytes,
+        vrs: tuple[int, HexStr, HexStr] | None = None,
+        signature: bytes | None = None,
+    ):
+        if vrs:
+            return Account._recover_hash(message, vrs=vrs)
+        return Account._recover_hash(message, signature=signature)
 
 
 class Domain(EIP712Model):

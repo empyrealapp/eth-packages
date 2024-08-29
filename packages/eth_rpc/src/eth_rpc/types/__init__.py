@@ -41,7 +41,7 @@ from .primitives import BASIC_TYPES, BYTES_TYPES
 from .response import NoArgs, RPCResponseModel
 from .struct import Struct
 from .transaction import SignedTransaction
-from .typed_data import Domain, EIP712Model
+from .typed_data import Domain, EIP712Model, hash_eip712_bytes
 
 T = TypeVar("T")
 MaybeAwaitable = Union[T, Awaitable[T]]
@@ -144,5 +144,6 @@ __all__ = [
     "RpcUrl",
     "SignedTransaction",
     "Struct",
+    "hash_eip712_bytes",
     "primitives",
 ]
