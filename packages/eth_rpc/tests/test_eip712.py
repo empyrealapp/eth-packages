@@ -10,8 +10,15 @@ class First(EIP712Model):
 
 
 class Second(EIP712Model):
-    first: First
+    first_: list[First] = Field(serialization_alias="first")
     second: tuple[bool, str]
+
+
+def test_type_string():
+    assert (
+        Second.type_string()
+        == b"Second(First[] first,(bool,string) second)First(uint256 x,bool[] y)"
+    )
 
 
 def test_domain_hash():
@@ -28,7 +35,7 @@ def test_domain_hash():
 
     assert (
         Second.type_string()
-        == b"Second(First first,(bool,string) second)First(uint256 x,bool[] y)"
+        == b"Second(First[] first,(bool,string) second)First(uint256 x,bool[] y)"
     )
 
 
