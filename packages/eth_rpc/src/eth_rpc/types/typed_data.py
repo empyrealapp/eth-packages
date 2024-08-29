@@ -1,6 +1,6 @@
 from inspect import isclass
 from types import GenericAlias
-from typing import get_args, get_origin
+from typing import Annotated, get_args, get_origin
 
 from eth_abi import encode
 from eth_account import Account
@@ -39,14 +39,32 @@ class EIP712Model(Struct):
         return type_.__name__
 
     @classmethod
+    def get_nested_types(cls):
+        for _, field in cls.model_fields.items():
+            for item in cls._get_nested_types(field.annotation):
+                yield item
+
+    @classmethod
+    def _get_nested_types(cls, type_) -> list:
+        if get_origin(type_) == list:
+            return cls._get_nested_types(get_args(type_)[0])
+        elif get_origin(type_) == tuple:
+            args = get_args(type_)
+            return [item for subl in [cls._get_nested_types(arg) for arg in args] for item in subl]
+        elif get_origin(type_) == Annotated:
+            return cls._get_nested_types(get_args(type_)[0])
+        elif isclass(type_) and issubclass(type_, EIP712Model):
+            return [type_.type_string()] + list(type_.get_nested_types())
+        return []
+
+    @classmethod
     def type_string(cls) -> bytes:
         type_string: str = ""
-        nested_types: list[bytes] = []
+        nested_types = list(cls.get_nested_types())
         for name, field_data in cls.model_fields.items():
             name = field_data.serialization_alias or name
             type_ = field_data.annotation
-            if isclass(type_) and issubclass(type_, EIP712Model):
-                nested_types.append(type_.type_string())
+
             if isinstance(type_, GenericAlias):
                 if get_origin(type_) == list:
                     (arg,) = get_args(type_)
