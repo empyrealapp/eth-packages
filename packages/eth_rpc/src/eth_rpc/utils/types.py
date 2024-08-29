@@ -2,6 +2,7 @@ from inspect import isclass
 from types import GenericAlias
 from typing import Annotated, get_args, get_origin
 
+from eth_abi import encode
 from eth_rpc.types import ALL_PRIMITIVES, NoArgs, Struct
 from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import BaseModel
@@ -61,3 +62,9 @@ def to_hex_str(number: int | str) -> HexStr:
     if isinstance(number, int):
         return HexStr(hex(number))
     return HexStr(number)
+
+
+def to_bytes32(input_: int | HexStr):
+    if isinstance(input_, str):
+        return encode(["bytes32"], [bytes.fromhex(input_.lstrip("0x"))])
+    return encode(['bytes32'], [input_.to_bytes()])

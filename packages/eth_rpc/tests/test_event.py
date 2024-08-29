@@ -39,7 +39,7 @@ def test_event_network():
 
 @pytest.mark.asyncio(scope="session")
 @pytest.mark.event
-async def test_log_lookup():
+async def test_event_lookup():
     set_alchemy_key(os.environ["ALCHEMY_KEY"])
     eth_ = TransferEvent[Ethereum]
     logs = await eth_._get_logs(10_000_000, 10_000_001)
