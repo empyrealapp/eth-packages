@@ -402,7 +402,7 @@ class ContractFunc(Generic[T, U]):
         value: int = 0,
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
-        use_access_list: bool = True,
+        use_access_list: bool = False,
         sync: bool = False,
         buffer: float = 1.25,
     ) -> PreparedTransaction:
@@ -497,7 +497,7 @@ class ContractFunc(Generic[T, U]):
         value: int = 0,
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
-        use_access_list: bool = True,
+        use_access_list: bool = False,
         sync: bool = False,
     ) -> MaybeAwaitable[PreparedTransaction]:
         return run(
@@ -519,7 +519,7 @@ class ContractFunc(Generic[T, U]):
         value: int = 0,
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
-        use_access_list: bool = True,
+        use_access_list: bool = False,
         sync: bool = True,
     ) -> HexStr:
         if sync is True:
@@ -583,8 +583,8 @@ class ContractFunc(Generic[T, U]):
         value: int = 0,
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
-        use_access_list: bool = True,
-        sync: bool = True,
+        use_access_list: bool = False,
+        sync: bool = False,
     ) -> MaybeAwaitable[HexStr]:
         return run(
             self._execute,
