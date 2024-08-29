@@ -69,9 +69,7 @@ class EIP712Model(Struct):
             name = field_data.serialization_alias or name
             type_ = field_data.annotation
 
-            print("TYPE::::", type_)
             if isinstance(type_, GenericAlias):
-                print("??", type_)
                 if get_origin(type_) == list:
                     (arg,) = get_args(type_)
                     type_str = f"{cls.transform(arg)}[]"
