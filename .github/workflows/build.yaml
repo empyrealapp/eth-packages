@@ -37,3 +37,7 @@ jobs:
           tox -e build_eth_typeshed
           tox -e build_eth_protocols
           tox -e build_eth_streams
+
+        env:
+          ALCHEMY_KEY: ${{ secrets.ALCHEMY_KEY }}
+  
