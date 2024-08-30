@@ -111,7 +111,7 @@ class RPC(BaseRPC):
                 pass
 
         for name, method in rpc_methods:
-            new_method = method.copy()
+            new_method = method.model_copy()
             setattr(self, name, new_method.set_rpc(self).set_network(self.network))
 
         return super().model_post_init(__context)
