@@ -34,7 +34,7 @@ class NonfungiblePositionManager(ProtocolBase):
     ] = METHOD
 
     async def get_all_indices(self, owner: HexAddress) -> list[int]:
-        balance = await self.balance_of(OwnerRequest(owner=owner)).get_async()
+        balance = await self.balance_of(OwnerRequest(owner=owner)).get()
         calls = []
         for i in range(balance):
             calls.append(

@@ -217,7 +217,7 @@ class UniswapV3Pool(ProtocolBase):
 
     async def get_tick_range(self, lower: int, upper: int) -> list[ProcessedTick]:
         if not self._tick_spacing:
-            self._tick_spacing = await self.tick_spacing().get_async()
+            self._tick_spacing = await self.tick_spacing().get()
         assert self._tick_spacing
         return await self.get_ticks(range(lower, upper, self._tick_spacing))
 

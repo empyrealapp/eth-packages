@@ -214,12 +214,12 @@ class EventSubscriber(Request, Generic[U]):
                     OSError,  # No route to host
                     asyncio.exceptions.IncompleteReadError,  # TODO: should this be handled differently?
                 ) as err:
-                    print("CONNECT ERROR:", err)
+                    print("Connection Error:", err)
                     await asyncio.sleep(3)
                     # we're in an iterator, so make a new connection and continue listening
                     break
                 except Exception as e:
-                    print("WEIRD ERR????", e)
+                    print("Unknown Error:", e)
                     await asyncio.sleep(3)
                     # we're in an iterator, so make a new connection and continue listening
                     break

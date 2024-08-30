@@ -61,7 +61,7 @@ balance = await usdt.balance_of(vitalik_addr).get(
 )
 
 # subscribe to transfer events on Arbitrum for USDT
-async for event in TransferEvent[Arbitrum].set_filter(
+async for event in TransferEvent[Base].set_filter(
     addresses=[usdt.address]
 ).subscribe():
     data = event.event

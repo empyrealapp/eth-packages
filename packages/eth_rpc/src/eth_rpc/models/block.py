@@ -1,10 +1,11 @@
 import zlib
 from datetime import datetime
-from typing import Optional
+from typing import Annotated, Optional
 
 from eth_rpc.types import HexInteger
+from eth_rpc.utils import convert_datetime_to_iso_8601
 from eth_typing import HexAddress, HexStr
-from pydantic import Field, field_validator
+from pydantic import Field, PlainSerializer, field_validator
 
 from ..utils import BloomFilter, RPCModel, load_datetime_string
 from .transaction import Transaction
@@ -28,7 +29,7 @@ class Block(RPCModel):
     sha3_uncles: HexStr
     size: HexInteger
     state_root: HexStr
-    timestamp: datetime
+    timestamp: Annotated[datetime, PlainSerializer(convert_datetime_to_iso_8601)]
     total_difficulty: Optional[HexInteger] = None
     transactions_root: HexStr
     uncles: list[HexStr] = Field(default_factory=list)
