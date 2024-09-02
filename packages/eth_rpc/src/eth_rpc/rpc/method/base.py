@@ -30,7 +30,7 @@ class RPCMethodBase(BaseModel, Generic[Params, Response]):
         self._rpc = rpc
         return self
 
-    def set_network(self, network: Optional["Network"]) -> "RPCMethodBase":
+    def set_network(self, network: Optional[type[Network]]) -> "RPCMethodBase":
         self._network = network
         return self
 

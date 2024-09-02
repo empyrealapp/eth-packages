@@ -93,7 +93,7 @@ class MyContract(ProtocolBase):
     foo: ContractFunc[
         list[primitives.address],  # input type is a list of addresses
         Annotated[bool, Name("success")],  # response type is a boolean
-    ] = METHOD  # this is necessary for the type checker to recognize it as a method
+    ] = METHOD # this is necessary for the type checker to recognize it as a contract method
 
 contract = MyContract(address="<Contract Address>")
 # create a wallet for yourself

@@ -22,9 +22,14 @@ async def test_transaction_load() -> None:
     assert tx.block_number == 20590874
     assert tx.gas_price == 2800000000
 
-    tx = await Transaction[Arbitrum].get_by_hash(
+    tx2 = await Transaction[Arbitrum].get_by_hash(
         HexStr("0x71183e2c32180bceca2696496e98a6d2805b03676df2cf0ab5189f9169514b16")
     )
-    assert tx
-    assert tx.block_number == 242473407
-    assert tx.gas_price == 13000000
+    assert tx2
+    assert tx2
+    assert tx2.block_number == 242473407
+    assert tx2.gas_price == 13000000
+
+    # make sure they keep their networks
+    assert tx._network == Ethereum
+    assert tx2._network == Arbitrum

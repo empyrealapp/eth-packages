@@ -1,6 +1,7 @@
 from collections.abc import Awaitable
 from dataclasses import dataclass
-from typing import Any, NewType, Optional, TypedDict, TypeVar, Union
+from typing import Any, NewType, Optional, TypedDict, Union
+from typing_extensions import TypeVar
 
 from eth_typing import HexAddress, HexStr, TypeStr
 from pydantic import BaseModel, Field
@@ -49,7 +50,7 @@ MaybeAwaitable = Union[T, Awaitable[T]]
 METHOD = Field(init=False)
 VersionNumber = NewType("VersionNumber", str)
 EventType = NewType("EventType", BaseModel)
-
+NetworkT = TypeVar("NetworkT", default=None)
 
 class ContractMethod:
     init: bool = False
@@ -138,6 +139,7 @@ __all__ = [
     "Indexed",
     "Name",
     "Network",
+    "NetworkT",
     "NoArgs",
     "RPCResponseModel",
     "Rpcs",

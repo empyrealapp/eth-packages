@@ -15,23 +15,20 @@ from eth_rpc.types.args import (
     GetBlockByNumberArgs,
 )
 from eth_typing import HexStr
-from typing_extensions import TypeVar
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 from websockets.legacy.client import connect
 
 from ._request import Request
 from .constants import DEFAULT_EVENT
 from .models import Transaction as TransactionModel
-from .types import BLOCK_STRINGS, BlockReference, HexInteger, NoArgs, RPCResponseModel
+from .types import BLOCK_STRINGS, BlockReference, HexInteger, Network, NetworkT, NoArgs, RPCResponseModel
 
 SUBSCRIPTION_TYPE = Literal["newHeads", "newPendingTransactions"]
 DEFAULT_CONTEXT = ContextVar[int]("DEFAULT_CONTEXT")
 DEFAULT_CONTEXT.set(0)
 
-Network = TypeVar("Network", default=None)
 
-
-class Block(BlockModel, Request, Generic[Network]):
+class Block(BlockModel, Request, Generic[NetworkT]):
     @classmethod
     def priority_fee(cls) -> RPCResponseModel[NoArgs, HexInteger]:
         return RPCResponseModel(
