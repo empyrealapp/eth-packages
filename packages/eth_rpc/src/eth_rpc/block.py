@@ -21,7 +21,15 @@ from websockets.legacy.client import connect
 from ._request import Request
 from .constants import DEFAULT_EVENT
 from .models import Transaction as TransactionModel
-from .types import BLOCK_STRINGS, BlockReference, HexInteger, Network, NetworkT, NoArgs, RPCResponseModel
+from .types import (
+    BLOCK_STRINGS,
+    BlockReference,
+    HexInteger,
+    Network,
+    NetworkT,
+    NoArgs,
+    RPCResponseModel,
+)
 
 SUBSCRIPTION_TYPE = Literal["newHeads", "newPendingTransactions"]
 DEFAULT_CONTEXT = ContextVar[int]("DEFAULT_CONTEXT")
