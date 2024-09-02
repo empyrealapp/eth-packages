@@ -20,4 +20,4 @@ class Linea(Network):
         api_url="https://api.lineascan.build/api",
     )
     alchemy_str: ClassVar[str | None] = "linea-mainnet"
-    apprx_block_time: ClassVar[float] = 2.
+    apprx_block_time: ClassVar[float] = 2.0

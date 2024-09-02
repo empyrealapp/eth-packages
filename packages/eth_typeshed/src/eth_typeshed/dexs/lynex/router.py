@@ -1,9 +1,8 @@
 from typing import Annotated
 
-from pydantic import BaseModel
-
 from eth_rpc import ContractFunc, ProtocolBase
 from eth_rpc.types import Name, primitives
+from pydantic import BaseModel
 
 
 class Route(BaseModel):

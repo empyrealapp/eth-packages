@@ -177,7 +177,9 @@ class PrivateKeyWallet(BaseWallet):
             ),
         )
 
-    def transfer(self, to: HexAddress, value: int) -> RPCResponseModel[RawTransaction, HexStr]:
+    def transfer(
+        self, to: HexAddress, value: int
+    ) -> RPCResponseModel[RawTransaction, HexStr]:
         prepared_tx = self.prepare(to=to, value=value)
         signed_tx = self.sign_transaction(prepared_tx)
         return self.send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction))
