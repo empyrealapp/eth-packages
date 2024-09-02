@@ -1,12 +1,14 @@
 from .arbitrum import Arbitrum
 from .base import Base, BaseSepolia
 from .ethereum import Ethereum
+from .linea import Linea
 
 Networks = {
     1: Ethereum,
     8453: Base,
     84532: BaseSepolia,
     42161: Arbitrum,
+    59144: Linea,
 }
 
 
@@ -19,5 +21,6 @@ __all__ = [
     "Base",
     "BaseSepolia",
     "Ethereum",
+    "Linea",
     "Networks",
 ]

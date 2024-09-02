@@ -13,12 +13,14 @@ from .events import (
 )
 from .factory import GetPairRequest, UniswapV2Factory
 from .pair import UniswapV2Pair
+from .router import UniswapV2Router
 
 __all__ = [
     "GetPairRequest",
     "UniswapV2Factory",
     "UniswapV2FactoryAddresses",
     "UniswapV2Pair",
+    "UniswapV2Router",
     "V2SwapEventType",
     "V2SyncEventType",
     "V2PairCreatedEventType",

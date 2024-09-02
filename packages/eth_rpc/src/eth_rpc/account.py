@@ -13,6 +13,7 @@ Network = TypeVar("Network", default=None)
 
 
 class Account(Request, AccountModel, Generic[Network]):
+    @classmethod
     def get_balance(
         self, address: HexAddress, block_number: int | BLOCK_STRINGS = "latest"
     ) -> RPCResponseModel[GetAccountArgs, HexInteger]:
@@ -28,6 +29,7 @@ class Account(Request, AccountModel, Generic[Network]):
             ),
         )
 
+    @classmethod
     def get_account(
         self, address: HexAddress, block_number: int | BLOCK_STRINGS = "latest"
     ) -> RPCResponseModel[GetAccountArgs, AccountModel]:
