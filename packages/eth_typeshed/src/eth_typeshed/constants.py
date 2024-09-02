@@ -44,6 +44,9 @@ class Routers:
 
         pod_router = Camelot
 
+    class Linea:
+        Lynex = HexAddress(HexStr("0x610D2f07b7EdC67565160F587F37636194C34E74"))
+
     @classmethod
     def for_network(cls, network: type[Network] = get_current_network()):
         if network.chain_id == Ethereum.chain_id:
@@ -70,6 +73,9 @@ class Factories:
 
         pod_factory = Camelot_V2
         all_factories = [UniswapV2, UniswapV3, Camelot_V2, Camelot_V3]
+
+    class Linea:
+        Lynex = HexAddress(HexStr("0xBc7695Fd00E3b32D08124b7a4287493aEE99f9ee"))
 
     @classmethod
     def for_network(cls, network: type[Network] = get_current_network()):

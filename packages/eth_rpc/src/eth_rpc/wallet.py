@@ -2,7 +2,7 @@ import secrets
 from abc import ABC, abstractmethod
 from typing import Any, Literal, Optional
 
-from eth_account import Account
+from eth_account import Account as EthAccount
 from eth_account.account import LocalAccount, SignedMessage
 from eth_rpc.types import (
     BLOCK_STRINGS,
@@ -17,6 +17,7 @@ from pydantic import ConfigDict, PrivateAttr
 
 from ._request import Request
 from ._transport import _force_get_global_rpc
+from .account import Account
 from .block import Block
 from .transaction import PreparedTransaction
 from .types import HexInteger, RPCResponseModel
@@ -67,7 +68,7 @@ class PrivateKeyWallet(BaseWallet):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def model_post_init(self, __context: Any) -> None:
-        self._account = Account.from_key(self.private_key)
+        self._account = EthAccount.from_key(self.private_key)
         return super().model_post_init(__context)
 
     @property
@@ -176,13 +177,18 @@ class PrivateKeyWallet(BaseWallet):
             ),
         )
 
-    def transfer(self, to: HexAddress, value: int):
+    def transfer(
+        self, to: HexAddress, value: int
+    ) -> RPCResponseModel[RawTransaction, HexStr]:
         prepared_tx = self.prepare(to=to, value=value)
         signed_tx = self.sign_transaction(prepared_tx)
-        return self.send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction)).sync
+        return self.send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction))
 
     def sign_hash(self, hashed: bytes) -> SignedMessage:
-        return Account._sign_hash(hashed, self._account.key)
+        return EthAccount._sign_hash(hashed, self._account.key)  # type: ignore
+
+    async def balance(self, block_number: int | BLOCK_STRINGS = "latest") -> int:
+        return await Account.get_balance(self.address, block_number=block_number)
 
     @staticmethod
     def rsv_to_signature(r: int, s: int, v: int) -> HexStr:

@@ -58,3 +58,18 @@ class RemoveLiquidityResponse(BaseModel):
 class RemoveLiquidityETHResponse(BaseModel):
     amount_token: Annotated[primitives.uint256, Name("amountToken")]
     amount_eth: Annotated[primitives.uint256, Name("amountETH")]
+
+
+class EthSwapRequest(BaseModel):
+    amount_out_min: primitives.uint256
+    route: list[primitives.address]
+    to: primitives.address
+    deadline: primitives.uint256
+
+
+class TokenSwapRequest(BaseModel):
+    amount_in: primitives.uint256
+    amount_out_min: primitives.uint256
+    route: list[primitives.address]
+    to: primitives.address
+    deadline: primitives.uint256
