@@ -20,7 +20,7 @@ from ._transport import _force_get_global_rpc
 from .account import Account
 from .block import Block
 from .transaction import PreparedTransaction
-from .types import HexInteger, MaybeAwaitable, RPCResponseModel
+from .types import HexInteger, RPCResponseModel
 
 
 class BaseWallet(Request, ABC):
@@ -177,14 +177,10 @@ class PrivateKeyWallet(BaseWallet):
             ),
         )
 
-    def transfer(self, to: HexAddress, value: int, sync: bool = False) -> MaybeAwaitable[HexStr]:
+    def transfer(self, to: HexAddress, value: int) -> RPCResponseModel[RawTransaction, HexStr]:
         prepared_tx = self.prepare(to=to, value=value)
         signed_tx = self.sign_transaction(prepared_tx)
-        if sync:
-            return self.send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction))
-        return self.send_raw_transaction(
-            HexStr("0x" + signed_tx.raw_transaction)
-        )
+        return self.send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction))
 
     def sign_hash(self, hashed: bytes) -> SignedMessage:
         return Account._sign_hash(hashed, self._account.key)  # type: ignore

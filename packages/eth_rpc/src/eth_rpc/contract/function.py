@@ -241,7 +241,6 @@ class ContractFunc(Generic[T, U]):
             state_diff[self.address] = {
                 "code": self.contract.code_override
             } | contract_state
-        # TODO: make this handle sync or async
         if sync:
             response = self._rpc().eth_call.sync(
                 EthCallArgs(
