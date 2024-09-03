@@ -61,6 +61,7 @@ def test_func_signature():
         tuple[int, list[primitives.address], list[bytes]],
         bool,
     ](name="makeProxyArbitraryTransactions")
+    assert func.get_inputs() == ("uint256", "address[]", "bytes[]")
     assert func.get_identifier() == "0xbe430874"
 
     func = FuncSignature[
@@ -92,3 +93,22 @@ def test_func_signature_types():
     ](name="func")
     assert func.get_inputs() == ("uint256[]", "bool")
     assert func.get_output() == "string[]"
+
+
+@pytest.mark.unit
+def test_func_encode() -> None:
+    class Data(Struct):
+        name: str
+        valid: bool
+
+    func = FuncSignature[
+        tuple[primitives.bytes32, list[Data]],
+        None,
+    ](name="func")
+    assert func.get_inputs() == ("bytes32", "(string,bool)[]")
+    func.encode_call(
+        inputs=(
+            primitives.bytes32(b"123"),
+            [Data(name="test", valid=True), Data(name="test2", valid=False)],
+        )
+    )

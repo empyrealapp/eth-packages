@@ -17,7 +17,7 @@ T = TypeVar(
     | BaseModel
     | BASIC_TYPES
     | list[BASIC_TYPES]
-    | tuple[BASIC_TYPES, ...]
+    | tuple[BASIC_TYPES | Struct, ...]
     | HexAddress,
 )
 U = TypeVar("U")
@@ -93,6 +93,16 @@ class FuncSignature(Request, Generic[T, U]):
     def get_output_name(self):
         return [self._get_name(output) for output in get_args(self._output)]
 
+    @classmethod
+    def _encode(cls, value):
+        if isinstance(value, tuple):
+            return tuple(cls._encode(val) for val in value)
+        elif isinstance(value, list):
+            return [cls._encode(val) for val in value]
+        elif isinstance(value, BaseModel):
+            return tuple(cls._encode(val) for val in value.model_dump().values())
+        return value
+
     def encode_call(self, *, inputs: T) -> HexStr:
         from ..types import Struct
 
@@ -109,10 +119,16 @@ class FuncSignature(Request, Generic[T, U]):
                     self.get_inputs(),
                     list(inputs.model_dump().values()),
                 ).hex()
-        elif not isinstance(inputs, tuple):
-            input_data = encode(self.get_inputs(), [inputs]).hex()
+        elif isinstance(inputs, tuple):
+            input_data = encode(
+                self.get_inputs(), [self._encode(val) for val in inputs]
+            ).hex()
+        elif isinstance(inputs, list):
+            input_data = encode(
+                self.get_inputs(), [[self._encode(val) for val in inputs]]
+            ).hex()
         else:
-            input_data = encode(self.get_inputs(), inputs).hex()
+            input_data = encode(self.get_inputs(), [inputs]).hex()
         return HexStr(f"{identifier}{input_data}")
 
     def decode_result(self, result: HexStr) -> U:
