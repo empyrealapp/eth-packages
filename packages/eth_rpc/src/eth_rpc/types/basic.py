@@ -48,7 +48,7 @@ def hex_int_wrap(v: Any, nxt: SerializerFunctionWrapHandler) -> str:
 def number_to_bytes(number):
     nibble_count = int(math.log(number, 256)) + 1
     hex_string = "{:0{}x}".format(number, nibble_count * 2)
-    return bytes.fromhex(hex_string)
+    return bytes.fromhex(hex_string)[:32]
 
 
 def hex_str_to_bytes(v, info):
