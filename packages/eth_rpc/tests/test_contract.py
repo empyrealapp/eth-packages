@@ -150,7 +150,7 @@ def test_decode_struct() -> None:
 
 
 @pytest.mark.unit
-def test_decode_basemodel():
+def test_decode_basemodel() -> None:
     class SubStruct(Struct):
         x: bool
         y: list[primitives.uint256]
@@ -175,7 +175,7 @@ def test_decode_basemodel():
             NoArgs,
             MyStruct,
         ](name="computeAddress"),
-        result=bytes_.hex(),
+        result=HexStr(bytes_.hex()),
     )
     decoded = response.decode()
-    print(decoded)
+    assert decoded == my_struct
