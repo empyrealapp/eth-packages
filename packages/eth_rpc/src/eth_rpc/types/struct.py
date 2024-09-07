@@ -69,7 +69,7 @@ class Struct(BaseModel):
     @classmethod
     def from_bytes(cls, data_: bytes | HexStr):
         if isinstance(data_, str):
-            bytes_ = bytes.fromhex(data_.removeprefix('0x'))
+            bytes_ = bytes.fromhex(data_.removeprefix("0x"))
         else:
             bytes_ = data_
         types = cls.to_tuple_type()

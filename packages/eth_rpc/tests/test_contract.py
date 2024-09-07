@@ -1,11 +1,10 @@
 import os
 from typing import Annotated
 
-from eth_abi import encode
-
 import pytest
+from eth_abi import encode
 from eth_rpc import ContractFunc, FuncSignature, set_alchemy_key
-from eth_rpc.contract import ProtocolBase, EthResponse
+from eth_rpc.contract import EthResponse, ProtocolBase
 from eth_rpc.networks import Arbitrum, Ethereum
 from eth_rpc.types import METHOD, Name, NoArgs, Struct, primitives
 from eth_typing import HexAddress, HexStr
@@ -107,10 +106,12 @@ def test_multi_arg_func() -> None:
             tuple[primitives.bytes32, primitives.bytes32, int],
             primitives.address,
         ](name="computeAddress"),
-        result=HexStr('0x0000000000000000000000008284ff4a6881edfa14435e1b140c9430e3a0ec5d'),
+        result=HexStr(
+            "0x0000000000000000000000008284ff4a6881edfa14435e1b140c9430e3a0ec5d"
+        ),
     )
 
-    assert response.decode() == '0x8284ff4a6881edfa14435e1b140c9430e3a0ec5d'
+    assert response.decode() == "0x8284ff4a6881edfa14435e1b140c9430e3a0ec5d"
 
 
 @pytest.mark.unit
@@ -124,9 +125,12 @@ def test_decode_struct() -> None:
         b: str
         c: list[SubStruct]
 
-    my_struct = MyStruct(a=[1, 2, 3], b='test', c=[SubStruct(x=True, y=[1, 2, 3])])
+    my_struct = MyStruct(a=[1, 2, 3], b="test", c=[SubStruct(x=True, y=[1, 2, 3])])
 
-    bytes_ = encode(('(uint256[],string,(bool,uint256[])[])',), [([1, 2, 3], 'test', [(True, [1, 2, 3])])])
+    bytes_ = encode(
+        ("(uint256[],string,(bool,uint256[])[])",),
+        [([1, 2, 3], "test", [(True, [1, 2, 3])])],
+    )
     assert my_struct.to_bytes().hex() == bytes_.hex()
 
     response = EthResponse(
@@ -140,7 +144,7 @@ def test_decode_struct() -> None:
 
     assert isinstance(decoded, MyStruct)
     assert decoded.a == [1, 2, 3]
-    assert decoded.b == 'test'
+    assert decoded.b == "test"
     assert decoded.c[0].x
     assert decoded.c[0].y == [1, 2, 3]
 
@@ -156,9 +160,15 @@ def test_decode_basemodel():
         b: str
         c: list[SubStruct]
 
-
-    my_struct = MyStruct(a=[1, 2, 3], b='test', c=[SubStruct(x=True, y=[1, 2, 3])])
-    bytes_ = encode(('uint256[]', 'string' , '(bool,uint256[])[]',), [[1, 2, 3], 'test', [(True, [1, 2, 3])]])
+    my_struct = MyStruct(a=[1, 2, 3], b="test", c=[SubStruct(x=True, y=[1, 2, 3])])
+    bytes_ = encode(
+        (
+            "uint256[]",
+            "string",
+            "(bool,uint256[])[]",
+        ),
+        [[1, 2, 3], "test", [(True, [1, 2, 3])]],
+    )
 
     response = EthResponse(
         func=FuncSignature[
