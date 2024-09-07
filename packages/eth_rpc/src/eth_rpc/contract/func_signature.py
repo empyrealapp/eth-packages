@@ -103,10 +103,6 @@ class FuncSignature(Request, Generic[T, U]):
             return tuple(cls._encode(val) for val in value.model_dump().values())
         return value
 
-    @classmethod
-    def _decode(cls, value, type_):
-        pass
-
     def encode_call(self, *, inputs: T) -> HexStr:
         from ..types import Struct
 
