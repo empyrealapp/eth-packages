@@ -132,6 +132,9 @@ class FuncSignature(Request, Generic[T, U]):
         return HexStr(f"{identifier}{input_data}")
 
     def decode_result(self, result: HexStr) -> U:
+        if isclass(self._output) and issubclass(self._output, Struct):
+            return self._output.from_bytes(result)
+
         output = self.get_output()
         if output is None:
             # return None if the expected return type is None
@@ -155,12 +158,12 @@ class FuncSignature(Request, Generic[T, U]):
             and not isinstance(self._output, GenericAlias)
             and issubclass(self._output, BaseModel)
         ):
-            init_dict = {}
-            for (key, field_info), val in zip(
-                self._output.model_fields.items(), decoded_output
-            ):
-                init_dict[field_info.alias or key] = val
-            return self._output(**init_dict)  # type: ignore
+            decoded = decoded_output
+            output = self._output
+            response = {}
+            for (name, field), value in zip(output.model_fields.items(), decoded):
+                response[name] = Struct.cast(field.annotation, value)
+            return output(**response)
         return decoded_output
 
     @staticmethod

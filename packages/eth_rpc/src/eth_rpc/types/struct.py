@@ -2,6 +2,7 @@ from inspect import isclass
 from typing import get_args, get_origin
 
 from eth_abi import decode, encode
+from eth_typing import HexStr
 from pydantic import BaseModel
 
 
@@ -66,7 +67,11 @@ class Struct(BaseModel):
         return args
 
     @classmethod
-    def from_bytes(cls, bytes_: bytes):
+    def from_bytes(cls, data_: bytes | HexStr):
+        if isinstance(data_, str):
+            bytes_ = bytes.fromhex(data_.removeprefix("0x"))
+        else:
+            bytes_ = data_
         types = cls.to_tuple_type()
         decoded = decode([types], bytes_)
         zipped = dict(zip(cls.model_fields.keys(), decoded[0]))
