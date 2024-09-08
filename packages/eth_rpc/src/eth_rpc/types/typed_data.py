@@ -14,6 +14,11 @@ from .struct import Struct
 
 
 class EIP712Model(Struct):
+    """
+    The EIP712Model adds additional methods to the Struct class, allowing for 
+    a struct to be easily hashed for signing.  This is utilized for EIP-712, which
+    creates a standarized approach to serializing data.
+    """
     @classmethod
     def struct_name(cls) -> str:
         """Override this if you want the struct name to be different from the class name"""
