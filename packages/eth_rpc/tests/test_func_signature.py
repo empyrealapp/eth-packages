@@ -13,6 +13,7 @@ from eth_rpc.types import NoArgs, Name, Struct, primitives
 from eth_rpc.types import Name, NoArgs, Struct, primitives
 >>>>>>> a3577d8 (format)
 from eth_rpc.utils.types import transform_primitive
+from eth_typing import HexStr
 from pydantic import BaseModel
 
 
@@ -144,5 +145,5 @@ def test_func_decode_struct_list() -> None:
         ["(uint256,bool,(uint256,uint256)[])[]"], [[(1, True, [(1, 2)])]]
     )
 
-    result = func.decode_result(encoded_bytes.hex())
+    result = func.decode_result(HexStr(encoded_bytes.hex()))
     assert result[0] == my_struct
