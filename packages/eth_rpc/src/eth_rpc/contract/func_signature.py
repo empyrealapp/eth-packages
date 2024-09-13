@@ -147,7 +147,10 @@ class FuncSignature(Request, Generic[T, U]):
             if get_origin(self._output) == list:
                 output_list_type = get_args(self._output)[0]
                 if isclass(output_list_type) and issubclass(output_list_type, Struct):
-                    decoded_arr: U = cast(U, [output_list_type.from_tuple(item) for item in decoded_output])
+                    decoded_arr: U = cast(
+                        U,
+                        [output_list_type.from_tuple(item) for item in decoded_output],
+                    )
                     return decoded_arr
         else:
             if isclass(self._output) and issubclass(self._output, Struct):

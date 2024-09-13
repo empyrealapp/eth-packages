@@ -141,11 +141,8 @@ def test_func_decode_struct_list() -> None:
 
     my_struct = MyStruct(x=1, y=True, z=[MyNestedStruct(a=1, b=2)])
     encoded_bytes = encode(
-        ['(uint256,bool,(uint256,uint256)[])[]'],
-        [[(1, True, [(1, 2)])]]
+        ["(uint256,bool,(uint256,uint256)[])[]"], [[(1, True, [(1, 2)])]]
     )
 
-    result = func.decode_result(
-        encoded_bytes.hex()
-    )
+    result = func.decode_result(encoded_bytes.hex())
     assert result[0] == my_struct
