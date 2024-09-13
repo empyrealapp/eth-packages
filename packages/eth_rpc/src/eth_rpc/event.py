@@ -367,7 +367,7 @@ class Event(Request, Generic[T]):
                 cur_end = end_block
 
     @property
-    def subscribe(self) -> "AsyncSubscribeCallable":
+    def subscribe(self) -> "AsyncSubscribeCallable[T]":
         """
         This returns a callable for the async subscriber, allowing you to select the network
         for the subscription, ie.
@@ -421,9 +421,9 @@ class Event(Request, Generic[T]):
         )
 
 
-class AsyncSubscribeCallable(BaseModel):
+class AsyncSubscribeCallable(BaseModel, Generic[T]):
     network: type[Network]
-    event: Event
+    event: Event[T]
 
     def __getitem__(self, network: type[Network]):
         self.network = network
@@ -431,7 +431,7 @@ class AsyncSubscribeCallable(BaseModel):
 
     async def __call__(  # noqa: C901
         self,
-    ) -> AsyncIterator[EventData]:
+    ) -> AsyncIterator[EventData[T]]:
         # TODO: sometimes the topics match, but the indexed fields are different
 
         if not (wss_uri := self.network.wss):
@@ -497,11 +497,11 @@ class AsyncSubscribeCallable(BaseModel):
                     asyncio.exceptions.IncompleteReadError,  # TODO: should this be handled differently?
                 ) as err:
                     logger.error("connection terminated unexpectedly: %s", err)
-                    await asyncio.sleep(3)
+                    await asyncio.sleep(1)
                     # we're in an iterator, so make a new connection and continue listening
                     break
                 except Exception as err:
-                    logger.error("unknown connection error: %s", err)
-                    await asyncio.sleep(3)
+                    logger.error("connection error: %s", err)
+                    await asyncio.sleep(1)
                     # we're in an iterator, so make a new connection and continue listening
                     break
