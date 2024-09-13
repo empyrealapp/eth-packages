@@ -3,10 +3,14 @@ from typing import Annotated
 import pytest
 from eth_rpc import FuncSignature
 <<<<<<< HEAD
+<<<<<<< HEAD
 from eth_rpc.types import Name, NoArgs, Struct, primitives
 =======
 from eth_rpc.types import NoArgs, Name, Struct, primitives
 >>>>>>> d75c6ce (handle list of structs as response type)
+=======
+from eth_rpc.types import Name, NoArgs, Struct, primitives
+>>>>>>> a3577d8 (format)
 from eth_rpc.utils.types import transform_primitive
 from eth_typing import HexStr
 from pydantic import BaseModel
@@ -130,10 +134,12 @@ def test_func_decode_struct_list() -> None:
         list[MyStruct],
     ](name="func")
 
-    result = func.decode_result(HexStr(
-        "0x00000000000000000000000000000000000000000000000000000000000000"
-        "20000000000000000000000000000000000000000000000000000000000000000"
-        "1000000000000000000000000000000000000000000000000000000000000000"
-        "10000000000000000000000000000000000000000000000000000000000000001"
-    ))
+    result = func.decode_result(
+        HexStr(
+            "0x00000000000000000000000000000000000000000000000000000000000000"
+            "20000000000000000000000000000000000000000000000000000000000000000"
+            "1000000000000000000000000000000000000000000000000000000000000000"
+            "10000000000000000000000000000000000000000000000000000000000000001"
+        )
+    )
     assert result[0] == MyStruct(x=1, y=True)
