@@ -143,6 +143,11 @@ class FuncSignature(Request, Generic[T, U]):
         if not isinstance(output, list):
             output = [output]
             decoded_output = decode(output, bytes.fromhex(result.removeprefix("0x")))[0]
+
+            if get_origin(self._output) == list:
+                output_list_type = get_args(self._output)[0]
+                if isclass(output_list_type) and issubclass(output_list_type, Struct):
+                    return [output_list_type.from_tuple(item) for item in decoded_output]  # type: ignore
         else:
             if isclass(self._output) and issubclass(self._output, Struct):
                 return self._output.from_bytes(bytes.fromhex(result.removeprefix("0x")))
