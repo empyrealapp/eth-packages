@@ -73,15 +73,18 @@ class Struct(BaseModel):
         else:
             bytes_ = data_
         types = cls.to_tuple_type()
-        decoded = decode([types], bytes_)
-        zipped = dict(zip(cls.model_fields.keys(), decoded[0]))
-        fields = [field.annotation for field in cls.model_fields.values()]
+        decoded = decode([types], bytes_)[0]
+        return cls._build(decoded)
 
+    @classmethod
+    def from_tuple(cls, data: list[Any]):
+        return cls._build(data)
+
+    @classmethod
+    def _build(cls, data):
+        zipped = dict(zip(cls.model_fields.keys(), data))
+        fields = [field.annotation for field in cls.model_fields.values()]
         response = {}
         for field, (name, value) in zip(fields, zipped.items()):
             response[name] = cls.cast(field, value)
         return cls(**response)
-
-    @classmethod
-    def from_tuple(cls, data: list[Any]):
-        return cls(**{key: data[i] for i, key in enumerate(cls.model_fields.keys())})
