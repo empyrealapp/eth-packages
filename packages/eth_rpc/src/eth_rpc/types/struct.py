@@ -1,5 +1,5 @@
 from inspect import isclass
-from typing import get_args, get_origin
+from typing import Any, get_args, get_origin
 
 from eth_abi import decode, encode
 from eth_typing import HexStr
@@ -81,3 +81,7 @@ class Struct(BaseModel):
         for field, (name, value) in zip(fields, zipped.items()):
             response[name] = cls.cast(field, value)
         return cls(**response)
+
+    @classmethod
+    def from_tuple(cls, data: list[Any]):
+        return cls(**{key: data[i] for i, key in enumerate(cls.model_fields.keys())})
