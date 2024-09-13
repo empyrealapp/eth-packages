@@ -3,15 +3,7 @@ from typing import Annotated
 import pytest
 from eth_abi import encode
 from eth_rpc import FuncSignature
-<<<<<<< HEAD
-<<<<<<< HEAD
-from eth_rpc.types import Name, NoArgs, Struct, primitives
-=======
 from eth_rpc.types import NoArgs, Name, Struct, primitives
->>>>>>> d75c6ce (handle list of structs as response type)
-=======
-from eth_rpc.types import Name, NoArgs, Struct, primitives
->>>>>>> a3577d8 (format)
 from eth_rpc.utils.types import transform_primitive
 from eth_typing import HexStr
 from pydantic import BaseModel
