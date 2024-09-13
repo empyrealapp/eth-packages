@@ -490,6 +490,8 @@ class AsyncSubscribeCallable(BaseModel, Generic[T]):
                     )
                 except asyncio.exceptions.TimeoutError:
                     pass
+                except TypeError:
+                    logger.warning("Mistmatched type: %s", result_dict)
                 except (
                     ConnectionClosedError,
                     ConnectionResetError,
