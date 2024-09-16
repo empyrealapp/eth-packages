@@ -9,3 +9,4 @@ search:
         - [Model](getting-started/blocks/model.md)
         - [RPC Methods](getting-started/blocks/methods.md)
     - [Transactions](getting-started/transactions/index.md)
+        - [Model](getting-started/transactions/model.md)

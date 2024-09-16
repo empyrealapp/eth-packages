@@ -48,4 +48,10 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/transactions/"/>
     </url>
+    <url>
+        <loc>https://empyrealsdk.com/getting-started/transactions/model/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/transactions/model/"/>
+    </url>
 </urlset>
