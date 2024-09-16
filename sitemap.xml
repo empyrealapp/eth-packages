@@ -139,6 +139,12 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/account/"/>
     </url>
     <url>
+        <loc>https://eth-packages.empyrealsdk.com/getting-started/async/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/async/"/>
+    </url>
+    <url>
         <loc>https://eth-packages.empyrealsdk.com/getting-started/blocks/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
