@@ -181,6 +181,12 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/events/"/>
     </url>
     <url>
+        <loc>https://eth-packages.empyrealsdk.com/getting-started/events/subscriptions/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/events/subscriptions/"/>
+    </url>
+    <url>
         <loc>https://eth-packages.empyrealsdk.com/getting-started/transactions/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
@@ -203,5 +209,41 @@
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/typeshed/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/typeshed/chainlink/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/typeshed/chainlink/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/typeshed/erc20/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/typeshed/erc20/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/typeshed/erc721/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/typeshed/erc721/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/typeshed/multicall/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/typeshed/multicall/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/typeshed/simulacrum/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/typeshed/simulacrum/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/typeshed/uniswap/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/typeshed/uniswap/"/>
     </url>
 </urlset>
