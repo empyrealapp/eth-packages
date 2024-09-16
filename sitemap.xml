@@ -19,6 +19,36 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/eth_packages/"/>
     </url>
     <url>
+        <loc>https://empyrealsdk.com/api/account/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/api/account/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/api/block/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/api/block/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/api/event/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/api/event/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/api/transaction/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/api/transaction/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/api/transaction_receipt/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/api/transaction_receipt/"/>
+    </url>
+    <url>
         <loc>https://empyrealsdk.com/getting-started/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
