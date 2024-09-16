@@ -36,4 +36,16 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/blocks/methods/"/>
     </url>
+    <url>
+        <loc>https://empyrealsdk.com/getting-started/blocks/model/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/blocks/model/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/getting-started/transactions/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/transactions/"/>
+    </url>
 </urlset>
