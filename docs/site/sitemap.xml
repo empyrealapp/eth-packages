@@ -1,87 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-        <loc>https://empyrealsdk.com/SUMMARY/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/SUMMARY/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/SUMMARY/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/SUMMARY/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/eth_packages/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/eth_packages/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/eth_packages/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/eth_packages/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/api/account/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/api/account/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/api/account/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/account/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/api/block/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/api/block/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/api/block/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/block/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/api/event/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/api/event/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/api/event/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/event/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/api/transaction/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/api/transaction/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/api/transaction/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/transaction/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/api/transaction_receipt/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/api/transaction_receipt/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/api/transaction_receipt/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/transaction_receipt/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/getting-started/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/getting-started/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/getting-started/blocks/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/getting-started/blocks/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/blocks/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/blocks/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/getting-started/blocks/methods/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/getting-started/blocks/methods/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/blocks/methods/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/blocks/methods/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/getting-started/blocks/model/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/getting-started/blocks/model/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/blocks/model/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/blocks/model/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/getting-started/transactions/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/getting-started/transactions/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/transactions/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/transactions/"/>
     </url>
     <url>
-        <loc>https://empyrealsdk.com/getting-started/transactions/model/</loc>
+        <loc>https://eth-packages.empyrealsdk.com/getting-started/transactions/model/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/transactions/model/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/transactions/model/"/>
     </url>
 </urlset>

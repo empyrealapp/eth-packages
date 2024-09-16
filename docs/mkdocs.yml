@@ -1,7 +1,7 @@
 site_name: eth-packages
 # description to improve website indexing
 site_description: eth-packages for Python web3 development
-site_url: https://empyrealsdk.com
+site_url: https://eth-packages.empyrealsdk.com
 site_author: empyreal
 copyright: '&copy; 2024 <a href="https://empyrealsdk.com/" target="_blank" rel="noopener">empyreal</a>'
 
