@@ -12,6 +12,7 @@ repo_url: https://github.com/empyrealapp/eth-packages
 edit_uri: https://github.com/empyrealapp/eth-packages/tree/main/docs
 
 theme:
+  color_mode: auto
   name: material
   logo: assets/img/logo.jpg
   favicon: assets/img/logo.jpg
