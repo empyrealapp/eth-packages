@@ -242,3 +242,11 @@ class Transaction(Request, TransactionModel, Generic[Network]):
                 }
             )
         )
+
+    def receipt(self) -> RPCResponseModel[TransactionRequest, Optional[TransactionReceipt]]:
+        return RPCResponseModel(
+            self.rpc().get_tx_receipt,
+            TransactionRequest(
+                tx_hash=self.hash,
+            ),
+        )

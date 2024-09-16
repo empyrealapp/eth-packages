@@ -1,6 +1,6 @@
 import zlib
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import TYPE_CHECKING, Annotated, Optional
 
 from eth_rpc.types import HexInteger
 from eth_rpc.utils import convert_datetime_to_iso_8601
@@ -8,13 +8,15 @@ from eth_typing import HexAddress, HexStr
 from pydantic import Field, PlainSerializer, field_validator
 
 from ..utils import BloomFilter, RPCModel, load_datetime_string
-from .transaction import Transaction
+
+if TYPE_CHECKING:
+    from eth_rpc.transaction import Transaction
 
 
 class Block(RPCModel):
     number: HexInteger
     hash: Optional[HexStr] = None
-    transactions: list[Transaction] | list[HexStr] = Field(default_factory=list)
+    transactions: list["Transaction"] | list[HexStr] = Field(default_factory=list)
     base_fee_per_gas: Optional[HexInteger] = None
     difficulty: HexInteger
     extra_data: HexStr

@@ -26,10 +26,9 @@ from eth_typing import HexStr
 
 from ..block import Block
 from ..log import Log
-from ..transaction import Transaction as TransactionModel
-from ..transaction import TransactionReceipt as TransactionReceiptModel
 from .base import BaseRPC
 from .method import RPCMethod
+from eth_rpc.transaction import Transaction as TransactionModel, TransactionReceipt as TransactionReceiptModel
 
 
 class RPC(BaseRPC):

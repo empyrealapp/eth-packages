@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://empyrealsdk.com/SUMMARY/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/SUMMARY/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/eth_packages/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/eth_packages/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/getting-started/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/getting-started/blocks/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/blocks/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/getting-started/blocks/methods/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/blocks/methods/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/getting-started/blocks/model/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/blocks/model/"/>
+    </url>
+    <url>
+        <loc>https://empyrealsdk.com/getting-started/transactions/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://empyrealsdk.com/getting-started/transactions/"/>
+    </url>
+</urlset>

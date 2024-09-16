@@ -18,6 +18,10 @@ from .transaction import Transaction, TransactionReceipt
 from .types import Network
 from .wallet import PrivateKeyWallet
 
+# we need to rebuild block because we use a ForwardRef for Transactions
+Block.model_rebuild()
+
+
 __all__ = [
     "Account",
     "Block",
