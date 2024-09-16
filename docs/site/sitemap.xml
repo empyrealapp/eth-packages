@@ -151,6 +151,12 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/contracts/func/"/>
     </url>
     <url>
+        <loc>https://eth-packages.empyrealsdk.com/getting-started/events/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/events/"/>
+    </url>
+    <url>
         <loc>https://eth-packages.empyrealsdk.com/getting-started/transactions/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>

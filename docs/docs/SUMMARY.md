@@ -14,6 +14,7 @@ search:
         - [Codegen](getting-started/contracts/codegen.md)
     - [Transactions](getting-started/transactions/index.md)
         - [Model](getting-started/transactions/model.md)
+    - [Events](getting-started/events/index.md)
 - Reference
     - [Account](api/account.md)
     - [Access List](api/access_list.md)

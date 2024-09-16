@@ -13,7 +13,7 @@ search:
 
 # Features
 
-eth-packages is a set of tools to simplify the process of writing or generating code for interacting with the ethereum RPC.  This includes:
+`eth-packages` is a set of tools from the [Empyreal](https://empyrealsdk.com){:target="_blank"} to simplify the process of writing or generating code for interacting with the ethereum RPC.  This includes:
 
 - Sending Requests to the RPC to fetch data about Blocks, Transactions, Logs
 - Creating Typed Bindings for Contracts
@@ -21,6 +21,7 @@ eth-packages is a set of tools to simplify the process of writing or generating 
 - Subscribing to log events
 - Building pipelines for data ingest from RPC nodes
 
+It was designed to be extremely lightweight with minimable dependencies, making it well suited for Cloud Functions/AWS Lambda.
 
 All tooling in eth-rpc is used daily by the Empyreal development team, and we hope that sharing this tooling with you will facilitate your development.  Particular attention has been paid to creating typed bindings to smart contracts, especially in the pursuit of simplified code generation with Large Language Models.
 
