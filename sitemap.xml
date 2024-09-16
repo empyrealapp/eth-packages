@@ -193,6 +193,12 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/transactions/model/"/>
     </url>
     <url>
+        <loc>https://eth-packages.empyrealsdk.com/getting-started/transport/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/transport/"/>
+    </url>
+    <url>
         <loc>https://eth-packages.empyrealsdk.com/typeshed/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
