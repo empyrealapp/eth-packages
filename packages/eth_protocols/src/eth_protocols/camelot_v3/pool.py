@@ -4,11 +4,11 @@ from typing import cast
 from eth_protocols.tokens import ERC20
 from eth_protocols.types import DexPair
 from eth_rpc.types import BLOCK_STRINGS, MaybeAwaitable
+from eth_rpc.utils import to_checksum
 from eth_typeshed.camelot_v3 import CamelotV3Pool, GlobalState
 from eth_typeshed.erc20 import OwnerRequest
 from eth_typeshed.multicall import multicall
 from eth_typing import HexAddress
-from eth_rpc.utils import to_checksum
 from pydantic import PrivateAttr
 
 Q192 = Decimal(2**192)

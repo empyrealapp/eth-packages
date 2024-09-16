@@ -20,7 +20,6 @@ usdt = ERC20[Arbitrum](address=to_checksum('0xFd086bC7CD5C481DCC9C85ebE478A1C0b6
 )
 ```
 
-
 ## Error Handling
 
 If you want to call the multicall, but ignore errors during execution, just add:

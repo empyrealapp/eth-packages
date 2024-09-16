@@ -3,10 +3,10 @@ from typing import Annotated, ClassVar, Generic, cast
 
 from eth_rpc import get_current_network
 from eth_rpc.types import BLOCK_STRINGS, MaybeAwaitable, Network, primitives
+from eth_rpc.utils import to_checksum
 from eth_typeshed import ERC20 as ERC20Contract
 from eth_typeshed.erc20 import OwnerRequest, OwnerSpenderRequest
 from eth_typing import ChecksumAddress, HexAddress
-from eth_rpc.utils import to_checksum
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, WrapValidator
 from typing_extensions import TypeVar
 

@@ -6,8 +6,8 @@ from typing import Annotated, Any, ClassVar, Generic, Optional, cast
 from eth_protocols.tokens import ERC20
 from eth_rpc import ProtocolBase, get_current_network
 from eth_rpc.types import BLOCK_STRINGS, MaybeAwaitable, Network
-from eth_typing import ChecksumAddress, HexAddress
 from eth_rpc.utils import to_checksum
+from eth_typing import ChecksumAddress, HexAddress
 from pydantic import (
     BaseModel,
     ConfigDict,

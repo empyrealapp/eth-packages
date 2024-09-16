@@ -7,12 +7,12 @@ from eth_protocols.uniswap_v2.pair import V2Pair
 from eth_protocols.uniswap_v3.pool import V3Pool
 from eth_rpc import EventData, EventSubscriber, get_current_network
 from eth_rpc.types import Network
+from eth_rpc.utils import to_checksum
 from eth_typeshed.chainlink.eth_usd_feed import ChainlinkPriceOracle, ETHUSDPriceFeed
 from eth_typeshed.constants import Tokens
 from eth_typeshed.uniswap_v2 import V2SyncEvent, V2SyncEventType
 from eth_typeshed.uniswap_v3 import V3SwapEvent, V3SwapEventType
 from eth_typing import HexAddress
-from eth_rpc.utils import to_checksum
 from pydantic import BaseModel, Field, PrivateAttr
 
 
@@ -109,9 +109,7 @@ class PriceTracker(BaseModel):
     def get_highest_liq_pair(self, token_address: HexAddress):
         if not self.token_address_to_pairs:
             raise ValueError("token address_to_pairs not set")
-        pairs_list = self.token_address_to_pairs.get(
-            to_checksum(token_address), []
-        )
+        pairs_list = self.token_address_to_pairs.get(to_checksum(token_address), [])
         return self.find_highest_reserve_pair(token_address, pairs_list)
 
     def get_tvl_in_usd(self, pair_address):
