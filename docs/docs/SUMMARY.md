@@ -10,6 +10,8 @@ search:
         - [Model](getting-started/blocks/model.md)
         - [RPC Methods](getting-started/blocks/methods.md)
     - [Contract](getting-started/contracts/index.md)
+        - [Function Types](getting-started/contracts/func.md)
+        - [Codegen](getting-started/contracts/codegen.md)
     - [Transactions](getting-started/transactions/index.md)
         - [Model](getting-started/transactions/model.md)
 - Reference
