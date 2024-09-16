@@ -1,71 +1,49 @@
-name: Publish Package
+  name: Publish Package
 
-on:
-  workflow_run:
-    workflows: ["Test and Build"]
-    types:
-      - completed
-  push:
-    branches:
-      - main
+  on:
+    workflow_run:
+      workflows: ["Test and Build"]
+      types:
+        - completed
 
-jobs:
-  publish:
-    if: github.event.workflow_run.conclusion == 'success'
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
+  jobs:
+    publish:
+      if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          python: ["3.10", "3.11", "3.12"]
 
-      - name: Set Up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
+      permissions:
+        id-token: write
+        contents: read
 
-      - name: Install build deps
-        run: |
-          pip install tox tox-gh-actions wheel build twine
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v2
 
-      - name: Build Package
-        run: |
-          tox -e lint
-          tox -e test_all
-          tox -e build_eth_rpc
-          tox -e build_eth_typeshed
-          tox -e build_eth_protocols
-          tox -e build_eth_streams
+        - name: Set Up Python
+          uses: actions/setup-python@v4
+          with:
+            python-version: ${{ matrix.python }}
 
-        env:
-          ALCHEMY_KEY: ${{ secrets.ALCHEMY_KEY }}
-  
-      - name: Publish eth_rpc Package
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          twine upload --repository pypi packages/eth_rpc/dist/*
+        - name: Install build deps
+          run: |
+            pip install tox tox-gh-actions wheel build twine
 
-      - name: Publish eth_typeshed Package
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          twine upload --repository pypi packages/eth_typeshed/dist/*
-
-      - name: Publish eth_protocols Package
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          twine upload --repository pypi packages/eth_protocols/dist/*
-
-      - name: Publish eth_streams Package
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          twine upload --repository pypi packages/eth_streams/dist/*
+        - name: Test with tox
+          run: |
+            tox -p -e lint,py${{ matrix.python }}-build_eth_rpc,py${{ matrix.python }}-build_eth_typeshed,py${{ matrix.python }}-build_eth_protocols,py${{ matrix.python }}-build_eth_streams
+          env:
+            ALCHEMY_KEY: ${{ secrets.ALCHEMY_KEY }}
+    
+        - name: Publish All Packages
+          env:
+            TWINE_USERNAME: __token__
+            TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+          run: |
+            twine upload --repository pypi packages/eth_rpc/dist/* \
+                          packages/eth_typeshed/dist/* \
+                          packages/eth_protocols/dist/* \
+                          packages/eth_streams/dist/*
