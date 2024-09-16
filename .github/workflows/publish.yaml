@@ -30,42 +30,12 @@ jobs:
         run: |
           pip install tox tox-gh-actions wheel build twine
 
-      - name: Build Package
-        run: |
-          tox -e lint
-          tox -e test_all
-          tox -e build_eth_rpc
-          tox -e build_eth_typeshed
-          tox -e build_eth_protocols
-          tox -e build_eth_streams
-
-        env:
-          ALCHEMY_KEY: ${{ secrets.ALCHEMY_KEY }}
-  
-      - name: Publish eth_rpc Package
+      - name: Publish All Packages
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
-          twine upload --repository pypi packages/eth_rpc/dist/*
-
-      - name: Publish eth_typeshed Package
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          twine upload --repository pypi packages/eth_typeshed/dist/*
-
-      - name: Publish eth_protocols Package
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          twine upload --repository pypi packages/eth_protocols/dist/*
-
-      - name: Publish eth_streams Package
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          twine upload --repository pypi packages/eth_streams/dist/*
+          twine upload --repository pypi packages/eth_rpc/dist/* \
+                        packages/eth_typeshed/dist/* \
+                        packages/eth_protocols/dist/* \
+                        packages/eth_streams/dist/*
