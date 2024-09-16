@@ -7,10 +7,10 @@ from eth_protocols.tokens import ERC20
 from eth_protocols.types import DexPair
 from eth_rpc import Contract, get_current_network
 from eth_rpc.types import BLOCK_STRINGS, MaybeAwaitable, Network
+from eth_rpc.utils import to_checksum
 from eth_typeshed.multicall import multicall
 from eth_typeshed.uniswap_v2 import UniswapV2Pair
 from eth_typing import HexAddress, HexStr
-from eth_utils import to_checksum_address
 from pydantic import PrivateAttr
 
 
@@ -81,7 +81,7 @@ class V2Pair(DexPair):
     def get_price(
         self, token: HexAddress, block_number: Optional[int | BLOCK_STRINGS] = None
     ) -> Decimal:
-        token = to_checksum_address(token)
+        token = to_checksum(token)
         assert (
             token.lower() == self.token0.address.lower()
             or token.lower() == self.token1.address.lower()
@@ -112,7 +112,7 @@ class V2Pair(DexPair):
         return Decimal(reserve_b / reserve_a)
 
     def get_other_token(self, token: HexAddress) -> HexAddress:
-        token = to_checksum_address(token)
+        token = to_checksum(token)
         if token == self.token0.address:
             return self.token1.address
         if token == self.token1.address:
@@ -142,4 +142,4 @@ def get_uniswap_v2_pair_addr(token_a: HexAddress, token_b: HexAddress) -> HexAdd
         "96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
     )
 
-    return to_checksum_address(factory_contract.create2(salt, keccak_init_code))
+    return to_checksum(factory_contract.create2(salt, keccak_init_code))

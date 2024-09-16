@@ -21,10 +21,9 @@ eth-packages is a set of tools to simplify the process of writing or generating 
 - Subscribing to log events
 - Building pipelines for data ingest from RPC nodes
 
-
 All tooling in eth-rpc is used daily by the Empyreal development team, and we hope that sharing this tooling with you will facilitate your development.  Particular attention has been paid to creating typed bindings to smart contracts, especially in the pursuit of simplified code generation with Large Language Models.
 
-By creating typed bindings, we have made an async-first, meaningfully abstracted library for interacting with and monitoring ethereum smart contracts.  This means a user can have greater type safety and easier debugging, especially when relying on generated code.  Without this type safety, it is very difficult to integrate multiple actions together across a codebase.
+By creating typed bindings, we have made a hybrid async/sync library, meaningfully abstracted library for interacting with and monitoring ethereum smart contracts.  This means a user can have greater type safety and easier debugging, especially when relying on generated code.  Without this type safety, it is very difficult to integrate multiple actions together across a codebase.
 
 ---
 

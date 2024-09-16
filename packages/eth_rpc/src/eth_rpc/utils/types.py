@@ -4,6 +4,7 @@ from types import GenericAlias
 from typing import Annotated, get_args, get_origin
 
 from eth_abi import encode
+from eth_hash.auto import keccak
 from eth_rpc.types import ALL_PRIMITIVES, NoArgs, Struct
 from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import BaseModel
@@ -72,3 +73,7 @@ def to_bytes32(input_: int | HexStr):
     if isinstance(input_, str):
         return encode(["bytes32"], [bytes.fromhex(input_.lstrip("0x"))])
     return encode(["bytes32"], [input_.to_bytes()])
+
+
+def to_topic(event_sig: str) -> bytes:
+    return keccak(event_sig.replace(" ", "").encode("utf-8"))

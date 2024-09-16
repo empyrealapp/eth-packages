@@ -7,7 +7,7 @@ from eth_protocols.tokens import ERC20
 from eth_rpc import ProtocolBase, get_current_network
 from eth_rpc.types import BLOCK_STRINGS, MaybeAwaitable, Network
 from eth_typing import ChecksumAddress, HexAddress
-from eth_utils import to_checksum_address
+from eth_rpc.utils import to_checksum
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -37,7 +37,7 @@ class DexPair(ABC, BaseModel, Generic[NetworkType]):
     pairs: ClassVar[dict[tuple[Network, ChecksumAddress], "DexPair"]] = {}
 
     pair_address: Annotated[
-        ChecksumAddress, WrapValidator(lambda addr, y, z: to_checksum_address(addr))
+        ChecksumAddress, WrapValidator(lambda addr, y, z: to_checksum(addr))
     ]
     token0: Annotated[ERC20, WrapValidator(load_token)]
     token1: Annotated[ERC20, WrapValidator(load_token)]
@@ -56,7 +56,7 @@ class DexPair(ABC, BaseModel, Generic[NetworkType]):
         if isinstance(pair, DexPair):
             return pair
         pair = cast(HexAddress, pair)
-        checksum_address = to_checksum_address(pair)
+        checksum_address = to_checksum(pair)
         network = cls._network or get_current_network()
         key = (network, checksum_address)
         if key not in cls.pairs:
@@ -81,7 +81,7 @@ class DexPair(ABC, BaseModel, Generic[NetworkType]):
         )
 
     def get_reserve(self, token: HexAddress) -> Decimal:
-        token = to_checksum_address(token)
+        token = to_checksum(token)
         if self._reserve0 is None and self._reserve1 is None:
             raise ValueError("Must set reserves first")
         if token == self.token0.address:

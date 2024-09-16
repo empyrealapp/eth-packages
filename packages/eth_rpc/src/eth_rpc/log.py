@@ -5,6 +5,7 @@ from typing import TypeVar
 
 from eth_rpc.models import Log as LogModel
 from eth_rpc.types import HexInt, LogsArgs, LogsParams
+from eth_typing import HexAddress, HexStr
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 from websockets.legacy.client import connect
 
@@ -22,13 +23,20 @@ class Log(Request, LogModel):
         self,
         from_block: int | HexInt,
         to_block: int | HexInt | None = None,
+        address: HexAddress | list[HexAddress] | None = None,
+        topics: list[list[HexStr] | HexStr | None] | None = None,
     ) -> RPCResponseModel[LogsArgs, list["LogModel"]]:
+        """
+        Get all logs in a certain range
+        """
         return RPCResponseModel(
             self.rpc().get_logs,
             LogsArgs(
                 params=LogsParams(
+                    address=address,
                     from_block=HexInt(from_block),
                     to_block=HexInt(to_block or from_block + 1),
+                    topics=topics,
                 )
             ),
         )
@@ -40,6 +48,10 @@ class Log(Request, LogModel):
         queue: asyncio.Queue["LogModel"],
         publish_logs: asyncio.Event = DEFAULT_EVENT,
     ):
+        """
+        Subscribe to logs
+        """
+
         internal_queue: asyncio.Queue = asyncio.Queue()
         flush_queue: bool = True
         async for log in cls._listen():
@@ -62,6 +74,7 @@ class Log(Request, LogModel):
             max_queue=10000,
         ):
             network = cls._network
+            # TODO: this is incomplete
             params = ["logs", {}]
 
             await w3_connection.send(
@@ -100,6 +113,9 @@ class Log(Request, LogModel):
         start_block: int | None = None,
         batch_size: int = 50,
     ) -> AsyncIterator[LogModel]:
+        """
+        Subscribe to logs, but backfilling starting at a specific block number and then listening
+        """
         queue = asyncio.Queue[LogModel]()
         should_publish_logs = asyncio.Event()
         asyncio.create_task(

@@ -10,7 +10,6 @@ from typing import Any, AsyncIterator, Generic, Literal, Optional, TypeVar, get_
 from eth_abi import decode
 from eth_abi.exceptions import InsufficientDataBytes
 from eth_typing import HexAddress, HexStr
-from eth_utils import event_signature_to_log_topic
 from pydantic import BaseModel, PrivateAttr, computed_field
 from websockets.exceptions import ConnectionClosedError
 from websockets.legacy.client import WebSocketClientProtocol, connect
@@ -33,7 +32,7 @@ from .types import (
     RPCResponseModel,
     SubscriptionResponse,
 )
-from .utils import is_annotation
+from .utils import is_annotation, to_topic
 
 T = TypeVar("T", bound=BaseModel)
 logger = logging.getLogger(__name__)
@@ -203,7 +202,7 @@ class Event(Request, Generic[T]):
             [convert(field.annotation) for name, field in input_types.items()]
         )
         event_signature = f"{self.name}({converted_inputs})"
-        return HexStr("0x" + event_signature_to_log_topic(event_signature).hex())
+        return HexStr("0x" + to_topic(event_signature).hex())
 
     def get_indexed(self):
         inputs, *_ = self.__pydantic_generic_metadata__["args"]

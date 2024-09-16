@@ -4,6 +4,7 @@ from eth_protocols.camelot_v3 import CamelotV3Pool
 from eth_protocols.uniswap_v2 import V2Pair
 from eth_protocols.uniswap_v3 import V3Pool
 from eth_rpc.types.primitives import uint24
+from eth_rpc.utils import to_checksum
 from eth_typeshed.camelot_v3 import CamelotV3Factory
 from eth_typeshed.camelot_v3 import CamelotV3Pool as CamelotV3PoolContract
 from eth_typeshed.camelot_v3 import GetPoolRequest as CamelotGetPoolRequest
@@ -13,7 +14,6 @@ from eth_typeshed.uniswap_v2 import GetPairRequest, UniswapV2Factory, UniswapV2P
 from eth_typeshed.uniswap_v3 import GetPoolRequest, UniswapV3Factory, UniswapV3Pool
 from eth_typeshed.utils import try_execute_with_setters
 from eth_typing import HexAddress
-from eth_utils import to_checksum_address
 from pydantic import BaseModel
 
 
@@ -26,8 +26,8 @@ class DexPairHelper(BaseModel):
         fee_tiers: list[int],
         factories: list[HexAddress],
     ):
-        addr = to_checksum_address(addr)
-        paired_with = to_checksum_address(paired_with)
+        addr = to_checksum(addr)
+        paired_with = to_checksum(paired_with)
 
         for factory in factories:
             if (

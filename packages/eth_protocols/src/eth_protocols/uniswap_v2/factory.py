@@ -2,9 +2,9 @@ from typing import ClassVar
 
 from eth_rpc import get_current_network
 from eth_rpc.types import Network
+from eth_rpc.utils import to_checksum
 from eth_typeshed.uniswap_v2 import GetPairRequest, UniswapV2Factory
 from eth_typing import ChecksumAddress, HexAddress
-from eth_utils import to_checksum_address
 from pydantic import BaseModel, Field, PrivateAttr
 
 from .pair import V2Pair
@@ -29,8 +29,8 @@ class V2Factory(BaseModel):
     @classmethod
     async def load_pair(cls, token0: HexAddress, token1: HexAddress) -> "V2Pair":
         network: Network = cls._network or get_current_network()
-        token0 = to_checksum_address(token0)
-        token1 = to_checksum_address(token1)
+        token0 = to_checksum(token0)
+        token1 = to_checksum(token1)
         key = (network, token0, token1)
 
         if key not in cls.pairs:
@@ -40,7 +40,7 @@ class V2Factory(BaseModel):
                     token_b=token1,
                 )
             )
-            cls.pairs[key] = to_checksum_address(pair_address)
+            cls.pairs[key] = to_checksum(pair_address)
 
         return V2Pair.load(
             pair=cls.pairs[key],
