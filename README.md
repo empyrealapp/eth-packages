@@ -32,7 +32,7 @@ pip install eth-typeshed-py
 
 ## Usage
 
-This library aims to simplify the complexity of interacting with smart contracts, by created a python library that supports data validation.  The following example assumes the user has an alchemy key, which is the key used by alchemy to identify your account for RPC requests.  Public RPCs will typically rate limit and/or limit their supported endpoints.
+[**eth-packages**](https://eth-packages.empyrealsdk.com) aims to simplify the complexity of interacting with smart contracts, by created a python library that supports data validation.  The following example assumes the user has an alchemy key, which is the key used by alchemy to identify your account for RPC requests.  Public RPCs will typically rate limit and/or limit their supported endpoints.
 
 ```python
 from eth_rpc import *
