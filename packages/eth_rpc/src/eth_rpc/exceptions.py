@@ -13,6 +13,9 @@ class LogResponseExceededError(Exception):
 class LogDecodeError(ValueError): ...
 
 
+class RateLimitingError(ValueError): ...
+
+
 class RPCDecodeError(ValueError): ...
 
 

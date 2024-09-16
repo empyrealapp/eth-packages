@@ -18,7 +18,7 @@ from websockets.legacy.client import WebSocketClientProtocol, connect
 from ._request import Request
 from ._transport import _force_get_default_network, get_current_network
 from .block import Block
-from .exceptions import LogDecodeError, LogResponseExceededError
+from .exceptions import LogDecodeError, LogResponseExceededError, RateLimitingError
 from .models import EventData, Log
 from .types import (
     BLOCK_STRINGS,
@@ -309,6 +309,10 @@ class Event(Request, Generic[T]):
                 raise LogResponseExceededError(
                     err.args[0], int(boundaries[0], 16), int(boundaries[1], 16)
                 )
+            elif (
+                "Your app has exceeded its compute units per second capacity" in message
+            ):
+                raise RateLimitingError(message)
             raise err
 
         for result in response:
@@ -359,6 +363,9 @@ class Event(Request, Generic[T]):
                     yield log
             except LogResponseExceededError as err:
                 cur_end = err.recommended_end
+                continue
+            except RateLimitingError:
+                await asyncio.sleep(3)
                 continue
             cur_start = cur_end + 1
             if step_size:

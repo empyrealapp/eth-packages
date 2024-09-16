@@ -59,11 +59,7 @@ class Struct(BaseModel):
             tuple_types = get_args(type_)
             return tuple(cls.cast(type_, arg) for type_, arg in zip(tuple_types, args))
         elif isclass(type_) and issubclass(type_, Struct):
-            fields = type_.model_fields
-            model_dict = {}
-            for (name, field), arg in zip(fields.items(), args):
-                model_dict[name] = cls.cast(field.annotation, arg)
-            return type_(**model_dict)
+            return type_._build(args)
         return args
 
     @classmethod

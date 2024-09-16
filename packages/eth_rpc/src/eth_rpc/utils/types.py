@@ -1,3 +1,4 @@
+from enum import Enum
 from inspect import isclass
 from types import GenericAlias
 from typing import Annotated, get_args, get_origin
@@ -33,6 +34,9 @@ def _transform_primitive(type_):
         return mapping[type_]
     if type_.__name__ in ALL_PRIMITIVES:
         return type_.__name__
+
+    if isclass(type_) and issubclass(type_, Enum):
+        return "uint8"
 
     if is_annotation(type_):
         return transform_primitive(get_args(type_)[0])
