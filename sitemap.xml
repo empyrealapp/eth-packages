@@ -139,6 +139,12 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/contracts/"/>
     </url>
     <url>
+        <loc>https://eth-packages.empyrealsdk.com/getting-started/contracts/codegen/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/contracts/codegen/"/>
+    </url>
+    <url>
         <loc>https://eth-packages.empyrealsdk.com/getting-started/contracts/func/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
