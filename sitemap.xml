@@ -103,6 +103,30 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/wallet/"/>
     </url>
     <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/typeshed/erc20/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/typeshed/erc20/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/typeshed/multicall/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/typeshed/multicall/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/typeshed/uniswap_v2/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/typeshed/uniswap_v2/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/typeshed/uniswap_v3/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/typeshed/uniswap_v3/"/>
+    </url>
+    <url>
         <loc>https://eth-packages.empyrealsdk.com/getting-started/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
@@ -167,5 +191,11 @@
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/getting-started/transactions/model/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/typeshed/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/typeshed/"/>
     </url>
 </urlset>
