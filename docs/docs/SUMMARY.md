@@ -5,13 +5,13 @@ search:
 - [Overview](index.md)
 - Tutorial
     - [Getting Started](getting-started/index.md)
+    - [Account](getting-started/account/index.md)
     - [Blocks](getting-started/blocks/index.md)
         - [Model](getting-started/blocks/model.md)
         - [RPC Methods](getting-started/blocks/methods.md)
+    - [Contract](getting-started/contracts/index.md)
     - [Transactions](getting-started/transactions/index.md)
         - [Model](getting-started/transactions/model.md)
-    - [Account](getting-started/account/index.md)
-    - [Contract](getting-started/contracts/index.md)
 - Reference
     - [Account](api/account.md)
     - [Access List](api/access_list.md)
