@@ -19,6 +19,12 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/eth_packages/"/>
     </url>
     <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/access_list/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/access_list/"/>
+    </url>
+    <url>
         <loc>https://eth-packages.empyrealsdk.com/api/account/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
@@ -31,10 +37,52 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/block/"/>
     </url>
     <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/contract/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/contract/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/contract_func/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/contract_func/"/>
+    </url>
+    <url>
         <loc>https://eth-packages.empyrealsdk.com/api/event/</loc>
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/event/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/event_data/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/event_data/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/func/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/func/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/log/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/log/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/network/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/network/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/protocol/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/protocol/"/>
     </url>
     <url>
         <loc>https://eth-packages.empyrealsdk.com/api/transaction/</loc>
@@ -47,6 +95,12 @@
         <lastmod>2024-09-16</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/transaction_receipt/"/>
+    </url>
+    <url>
+        <loc>https://eth-packages.empyrealsdk.com/api/wallet/</loc>
+        <lastmod>2024-09-16</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://eth-packages.empyrealsdk.com/api/wallet/"/>
     </url>
     <url>
         <loc>https://eth-packages.empyrealsdk.com/getting-started/</loc>
