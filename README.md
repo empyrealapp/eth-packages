@@ -1,7 +1,25 @@
 # eth-packages
 
-A collection of packages for working with EVM based blockchains.  This library aims to simplify the complexity of interacting with smart contracts, by created a python library that supports data validation.
+<b>A collection of packages for working with EVM based blockchains.</b>
 
+---
+
+<p align="center">
+  <a href="https://github.com/empyrealapp/eth-packages/actions/workflows/build.yaml" target="_blank">
+    <img src="https://github.com/empyrealapp/eth-packages/actions/workflows/build.yaml/badge.svg?branch=main" alt="Test Passing"/>
+  </a>
+  <a href="https://www.pepy.tech/projects/eth-rpc-py" target="_blank">
+    <img src="https://static.pepy.tech/personalized-badge/eth-rpc-py?period=month&units=international_system&left_color=grey&right_color=green&left_text=downloads/month" alt="Downloads"/>
+  </a>
+  <a href="https://pypi.org/project/eth-rpc-py" target="_blank">
+    <img src="https://img.shields.io/pypi/v/eth-rpc-py?label=PyPI" alt="Package version">
+  </a>
+  <a href="https://pypi.org/project/eth-rpc-py" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/eth-rpc-py.svg" alt="Supported Python versions">
+  </a>
+</p>
+
+---
 
 ## Installation
 
@@ -14,7 +32,7 @@ pip install eth-typeshed-py
 
 ## Usage
 
-The following example assumes the user has an alchemy key, which is the key used by alchemy to identify your account for RPC requests.  Public RPCs will typically rate limit and/or limit their supported endpoints.
+This library aims to simplify the complexity of interacting with smart contracts, by created a python library that supports data validation.  The following example assumes the user has an alchemy key, which is the key used by alchemy to identify your account for RPC requests.  Public RPCs will typically rate limit and/or limit their supported endpoints.
 
 ```python
 from eth_rpc import *
