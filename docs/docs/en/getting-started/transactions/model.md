@@ -2,7 +2,6 @@
 
 [Transaction](/api/transaction/){.internal-link} and [TransactionReceipt](/api/transaction_receipt/){.internal-link} are both Pydantic BaseModels.  It has all the fields provided by the standard Ethereum RPC.
 
-
 ```python
 class Transaction(BaseModel):
     hash: HexStr
