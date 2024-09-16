@@ -1,6 +1,6 @@
 # Transactions
 
-The Transactions model abstracts all requests related to Ethereum Transactions.  With the transactions model you can access Transactions and TransactionReceipts.
+The [Transaction class](/api/transaction/){.internal-link} abstracts all requests related to Ethereum Transactions.  With the transactions model you can access Transactions and TransactionReceipts.
 
 ```python
 from eth_typing import HexStr

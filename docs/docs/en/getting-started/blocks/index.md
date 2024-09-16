@@ -1,6 +1,6 @@
 # Blocks
 
-The `Blocks` class is your connection to the different RPC endpoints that are specific to Blocks onchain.  Typically you will want to check things like the current block number, or you might want to access all the transactions for a specific block.
+The [Block class](/api/block/){.internal-link} is your connection to the different RPC endpoints that are specific to Blocks onchain.  Typically you will want to check things like the current block number, or you might want to access all the transactions for a specific block.
 
 The returned `Block` is a Pydantic BaseModel, providing typed access to all associated fields.
 
