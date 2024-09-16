@@ -2,6 +2,8 @@ from typing import Any
 
 from eth_rpc.models import AccessListResponse, Account, FeeHistory, PendingTransaction
 from eth_rpc.transaction import AlchemyReceiptsResponse
+from eth_rpc.transaction import Transaction as TransactionModel
+from eth_rpc.transaction import TransactionReceipt as TransactionReceiptModel
 from eth_rpc.types import (
     AlchemyBlockReceipt,
     BlockNumberArg,
@@ -26,8 +28,6 @@ from eth_typing import HexStr
 
 from ..block import Block
 from ..log import Log
-from ..transaction import Transaction as TransactionModel
-from ..transaction import TransactionReceipt as TransactionReceiptModel
 from .base import BaseRPC
 from .method import RPCMethod
 
