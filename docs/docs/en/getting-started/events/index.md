@@ -67,18 +67,20 @@ async for event_data in event_filter.subscribe():
 This is also useful for backfilling data from a blockchain.  For example:
 
 ```python
+from eth_rpc.utils import address_to_topic
 
 class TransferEventType(BaseModel):
     sender: Annotated[primitives.address, Indexed]
     recipient: Annotated[primitives.address, Indexed]
     amount: primitives.uint256
 
+# Create an event filter for the TransferEvent
 TransferEvent = Event[TransferEventType](name="Transfer")
 
-# Create an event filter for the V2SwapEvent
-# Set up a filter for the V2SwapEvent, specifying the contract address
+# Set up a filter for the TransferEvent, specifying the topic1 filter.
+# This makes the subscription only return events with the sender specified.
 event_filter = TransferEvent.set_filter(
-    topic1="0x000000000000000000000000be0eb53f46cd790cd13851d5eff43d12404d33e8",
+    topic1=address_to_topic("0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8"),
 )
 
 # Use an asynchronous for loop to iterate over the event subscriber
