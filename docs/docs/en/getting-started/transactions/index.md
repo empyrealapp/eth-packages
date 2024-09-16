@@ -1,12 +1,13 @@
 # Transactions
 
+## Loading Transactions
+
 The [Transaction class](/api/transaction/){.internal-link} abstracts all requests related to Ethereum Transactions.  With the transactions model you can access Transactions and TransactionReceipts.
 
 ```python
 from eth_typing import HexStr
 
 from eth_rpc import Transaction, TransactionReceipt
-
 
 tx_hash: HexStr = HexStr(
     "0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060"
@@ -30,7 +31,7 @@ tx: Transaction = await Transaction.get_by_index(
 
 ---
 
-# Pending Transactions
+## Subscribing to Pending Transactions
 
 You can also load pending transactions by hash, from a mempool monitor
 
@@ -42,7 +43,7 @@ async for tx in Transaction.subscribe_pending():
 
 ---
 
-# Getting a transactions block
+## Getting a Transaction's Block
 
 You can access the transactions block by calling the `get_block` method on a transaction object.  As usual, `with_tx_data` is an optional argument.
 

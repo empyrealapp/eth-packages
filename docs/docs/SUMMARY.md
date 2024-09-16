@@ -5,6 +5,7 @@ search:
 - [Overview](index.md)
 - Tutorial
     - [Getting Started](getting-started/index.md)
+    - [Transport](getting-started/transport/index.md)
     - [Account](getting-started/account/index.md)
     - [Blocks](getting-started/blocks/index.md)
         - [Model](getting-started/blocks/model.md)
@@ -15,7 +16,17 @@ search:
     - [Transactions](getting-started/transactions/index.md)
         - [Model](getting-started/transactions/model.md)
     - [Events](getting-started/events/index.md)
-- Reference
+        - [Subscriptions](getting-started/events/subscriptions.md)
+    - [Wallet](getting-started/wallet/index.md)
+    - [Typed Data (EIP712)](getting-started/typed_data/index.md)
+    - [Async/Sync Execution](getting-started/async/index.md)
+- [Typeshed](typeshed/index.md)
+    - [Chainlink](typeshed/chainlink.md)
+    - [ERC20](typeshed/erc20.md)
+    - [Multicall](typeshed/multicall.md)
+    - [Simulacrum](typeshed/simulacrum.md)
+    - [Uniswap](typeshed/uniswap.md)
+- API Reference
     - [Account](api/account.md)
     - [Access List](api/access_list.md)
     - [Block](api/block.md)
@@ -30,3 +41,8 @@ search:
     - [Transaction Receipt](api/transaction_receipt.md)
     - [Transaction](api/transaction.md)
     - [Wallet](api/wallet.md)
+- Typeshed Reference
+    - [ERC20](api/typeshed/erc20.md)
+    - [Multicall](api/typeshed/multicall.md)
+    - [UniswapV2](api/typeshed/uniswap_v2.md)
+    - [UniswapV3](api/typeshed/uniswap_v3.md)

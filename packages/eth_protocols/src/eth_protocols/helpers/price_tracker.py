@@ -7,12 +7,12 @@ from eth_protocols.uniswap_v2.pair import V2Pair
 from eth_protocols.uniswap_v3.pool import V3Pool
 from eth_rpc import EventData, EventSubscriber, get_current_network
 from eth_rpc.types import Network
+from eth_rpc.utils import to_checksum
 from eth_typeshed.chainlink.eth_usd_feed import ChainlinkPriceOracle, ETHUSDPriceFeed
 from eth_typeshed.constants import Tokens
 from eth_typeshed.uniswap_v2 import V2SyncEvent, V2SyncEventType
 from eth_typeshed.uniswap_v3 import V3SwapEvent, V3SwapEventType
-from eth_typing import HexAddress, HexStr
-from eth_utils import to_checksum_address
+from eth_typing import HexAddress
 from pydantic import BaseModel, Field, PrivateAttr
 
 
@@ -69,7 +69,7 @@ class PriceTracker(BaseModel):
         ]
 
     async def get_pair_reserves(self, pair_address: HexAddress):
-        pair_address = to_checksum_address(pair_address)
+        pair_address = to_checksum(pair_address)
         pair = self.pair_address_to_pairs[pair_address]
         if not pair:
             return 0, 0
@@ -79,10 +79,10 @@ class PriceTracker(BaseModel):
         if not pairs:
             return
         for k, pairs_list in pairs.items():
-            k = to_checksum_address(k)
+            k = to_checksum(k)
             tmp_pairs = []
             for pair in pairs_list:
-                address = to_checksum_address(pair.pair_address)
+                address = to_checksum(pair.pair_address)
                 tmp_pairs.append(pair)
                 self.pair_address_to_pairs[address] = pair
             self.token_address_to_pairs[k] = tmp_pairs
@@ -109,16 +109,14 @@ class PriceTracker(BaseModel):
     def get_highest_liq_pair(self, token_address: HexAddress):
         if not self.token_address_to_pairs:
             raise ValueError("token address_to_pairs not set")
-        pairs_list = self.token_address_to_pairs.get(
-            to_checksum_address(token_address), []
-        )
+        pairs_list = self.token_address_to_pairs.get(to_checksum(token_address), [])
         return self.find_highest_reserve_pair(token_address, pairs_list)
 
     def get_tvl_in_usd(self, pair_address):
-        if to_checksum_address(pair_address) not in self.pair_address_to_pairs:
+        if to_checksum(pair_address) not in self.pair_address_to_pairs:
             logger.warning(f"not found {pair_address=}")
             return 0
-        pair = self.pair_address_to_pairs[to_checksum_address(pair_address)]
+        pair = self.pair_address_to_pairs[to_checksum(pair_address)]
         return pair.get_reserve(pair.token0.address) * (
             self.get_price_in_usd(pair.token0.address)
         ) + pair.get_reserve(pair.token1.address) * (
@@ -131,7 +129,7 @@ class PriceTracker(BaseModel):
         """
         Recurse the token address following its deepest liquidity until we reach a token with a known price.
         """
-        if to_checksum_address(token_address) == to_checksum_address(self.WETH):
+        if to_checksum(token_address) == to_checksum(self.WETH):
             return self._eth_price_provider.get_eth_price()
         if not token_address:
             return 0

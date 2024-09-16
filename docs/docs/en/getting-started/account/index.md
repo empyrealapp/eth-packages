@@ -2,6 +2,9 @@
 
 The [Account class](/api/account/){.internal-link} is part of the eth_rpc package and provides methods for interacting with Ethereum accounts via RPC calls.
 
+!!! warning
+    `get_account` will not work on the Alchemy RPC; it does not support the `eth_getAccount` method.  It will work with Quicknode and some other RPC providers.
+
 ```python
 from eth_rpc import Account
 
@@ -27,6 +30,3 @@ print(f"Balance in Ether: {balance_in_ether:.6f} ETH")
 is_contract = account_data.code_hash != "0x0000000"
 print(f"Is Contract: {'Yes' if is_contract else 'No'}")
 ```
-
-!!! warning
-    `get_account` will not work on the Alchemy RPC; it does not support the `eth_getAccount` method.  It will work with quicknode and some other RPC providers.

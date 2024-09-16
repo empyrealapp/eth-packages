@@ -2,6 +2,8 @@
 
 `Block` is a Pydantic BaseModel.  It has all the fields provided by the standard Ethereum RPC.
 
+!!! tip
+    The block will either have a list of Transaction hashes or a list of Transactions, depending on whether or not you request the block `with_tx_data=True`.  By default it returns the transaction hashes.
 
 ```python
 class Block(RPCModel):
@@ -27,7 +29,3 @@ class Block(RPCModel):
     transactions_root: HexStr
     uncles: list[HexStr] = Field(default_factory=list)
 ```
-
-
-!!! tip
-    The block will either have a list of Transaction hashes or a list of Transactions, depending on whether or not you request the block `with_tx_data=True`.  By default it returns the transaction hashes.

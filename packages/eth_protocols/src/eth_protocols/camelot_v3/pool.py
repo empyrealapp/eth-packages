@@ -4,11 +4,11 @@ from typing import cast
 from eth_protocols.tokens import ERC20
 from eth_protocols.types import DexPair
 from eth_rpc.types import BLOCK_STRINGS, MaybeAwaitable
+from eth_rpc.utils import to_checksum
 from eth_typeshed.camelot_v3 import CamelotV3Pool, GlobalState
 from eth_typeshed.erc20 import OwnerRequest
 from eth_typeshed.multicall import multicall
 from eth_typing import HexAddress
-from eth_utils import to_checksum_address
 from pydantic import PrivateAttr
 
 Q192 = Decimal(2**192)
@@ -65,7 +65,7 @@ class CamelotV3Pool(DexPair):
         token: HexAddress,
         block_number: int | BLOCK_STRINGS = "latest",
     ) -> Decimal:
-        token = to_checksum_address(token)
+        token = to_checksum(token)
         assert token == self.token0.address or token == self.token1.address
 
         if block_number:
@@ -83,7 +83,7 @@ class CamelotV3Pool(DexPair):
         )
 
     def get_other_token(self, token: HexAddress) -> HexAddress:
-        token = to_checksum_address(token)
+        token = to_checksum(token)
         if token == self.token0.address:
             return self.token1.address
         elif token == self.token1.address:

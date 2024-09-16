@@ -3,10 +3,10 @@ from typing import Annotated, ClassVar, Generic, cast
 
 from eth_rpc import get_current_network
 from eth_rpc.types import BLOCK_STRINGS, MaybeAwaitable, Network, primitives
+from eth_rpc.utils import to_checksum
 from eth_typeshed import ERC20 as ERC20Contract
 from eth_typeshed.erc20 import OwnerRequest, OwnerSpenderRequest
 from eth_typing import ChecksumAddress, HexAddress
-from eth_utils import to_checksum_address
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, WrapValidator
 from typing_extensions import TypeVar
 
@@ -23,7 +23,7 @@ class ERC20(BaseModel, Generic[NetworkType]):
     events: TransferEvents = Field(default_factory=TransferEvents)
 
     address: Annotated[
-        ChecksumAddress, WrapValidator(lambda addr, y, z: to_checksum_address(addr))
+        ChecksumAddress, WrapValidator(lambda addr, y, z: to_checksum(addr))
     ]
     network: Network = Field(default_factory=get_current_network)
 
@@ -53,7 +53,7 @@ class ERC20(BaseModel, Generic[NetworkType]):
 
     @classmethod
     def load(cls, address: HexAddress, network: Network | None = None):
-        checksum_address = to_checksum_address(address)
+        checksum_address = to_checksum(address)
 
         network = cls.get_network(network)
         key = (network, checksum_address)
