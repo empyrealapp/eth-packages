@@ -21,7 +21,7 @@ This approach strikes a balance between initial setup and long-term benefits, pr
 
 ## Generating Typed Bindings
 
-To convert an ABI to a valid eth_rpc Contract class, just use the cli.  You will need to provide an input file, output target, and contract name (by default the contract will be named `AnonContract`), ie:
+To convert an ABI to a valid `Contract`, just use the cli.  You will need to provide an input file, output target, and contract name (by default the contract will be named `AnonContract`), ie:
 
 ```bash
 >>> eth_rpc codegen <input_file> <output_file> -c UniversalRouter
