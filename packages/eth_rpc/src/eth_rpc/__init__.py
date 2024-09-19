@@ -9,6 +9,7 @@ from ._transport import (
 )
 from .account import Account
 from .block import Block
+from .codegen import codegen
 from .contract import Contract, ContractFunc, EthResponse, FuncSignature, ProtocolBase
 from .event import Event
 from .log import Log
@@ -38,6 +39,7 @@ __all__ = [
     "ProtocolBase",
     "Transaction",
     "TransactionReceipt",
+    "codegen",
     "configure_rpc_from_env",
     "get_current_network",
     "set_alchemy_key",
