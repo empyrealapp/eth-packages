@@ -40,10 +40,10 @@ def convert_types(types_):
         return lst, models
     if len(lst) == 1:
         return lst[0], models
-    return (tuple[*lst], models)  # type: ignore
+    return (tuple[*lst], models)
 
 
-def convert_to_base(abi: list[dict[str, Any]], contract_name: str) -> str:
+def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:
     """
     Convert an ABI to the string implementation of a ProtocolBase.
 
@@ -62,14 +62,13 @@ def convert_to_base(abi: list[dict[str, Any]], contract_name: str) -> str:
     """
     # Begin building the class string
     imports = [
-        "from pydantic import BaseModel",
+        "from typing import Annotated\n",
         "from eth_rpc import ProtocolBase, ContractFunc",
-        "from eth_rpc.types import primitives, NoArgs",
-        "from typing import Any, List, Tuple",
+        "from eth_rpc.types import primitives, Name, NoArgs, Struct",
         "\n",
     ]
     lines = [
-        f"class {contract_name}(ProtocolBase):",
+        f"\nclass {contract_name}(ProtocolBase):",
     ]
 
     # Iterate over each function in the ABI
@@ -101,9 +100,9 @@ def convert_to_base(abi: list[dict[str, Any]], contract_name: str) -> str:
         if output_type == []:
             output_type = 'None'
         if not has_name_annotation:
-            lines.append(f"\t{func_name}: ContractFunc[\n\t\t{input_type},\n\t\t{output_type}\n\t]")
+            lines.append(f"\t{func_name}: ContractFunc[\n\t\t{input_type},\n\t\t{output_type}\n\t]\n")
         else:
-            lines.append(f"\t{alias}: Annotated[\n\t\tContractFunc[\n\t\t\t{input_type},\n\t\t\t{output_type}\n\t\t],\n\t\tName(\"{func_name}\"),\n\t]")
+            lines.append(f"\t{alias}: Annotated[\n\t\tContractFunc[\n\t\t\t{input_type},\n\t\t\t{output_type}\n\t\t],\n\t\tName(\"{func_name}\"),\n\t]\n")
 
     # Combine all lines into a single string
 
@@ -114,8 +113,7 @@ class {name}(Struct):
         for field in fields:
             type_ = _convert_type(field['internalType'])
             model_str += f"\t{field['name']}: {type_}\n"
-        model_str += '\n'
         lines = [model_str] + lines
 
     class_str = "\n".join(imports) + "\n".join(lines) + '\n'
-    return class_str.replace('eth_rpc.types.', '')
+    return class_str.replace('eth_rpc.types.', '').replace('\t', '    ').strip() + '\n'
