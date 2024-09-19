@@ -5,6 +5,7 @@ search:
 - [Overview](index.md)
 - Tutorial
     - [Getting Started](getting-started/index.md)
+    - [How is this Different from Web3.py](getting-started/web3/index.md)
     - [Transport](getting-started/transport/index.md)
     - [Account](getting-started/account/index.md)
     - [Blocks](getting-started/blocks/index.md)
