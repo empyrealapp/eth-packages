@@ -5,13 +5,13 @@ from eth_rpc.types import NoArgs, primitives
 
 
 def to_snake_case(name):
-    return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
+    return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
 
 
 def _convert_type(type_: str) -> Any:
-    if type_ in ['bytes', 'bool']:
+    if type_ in ["bytes", "bool"]:
         return type_
-    if type_.endswith('[]'):
+    if type_.endswith("[]"):
         return list[_convert_type(type_[:-2])]  # type: ignore
     for type in dir(primitives):
         if type == type_:
@@ -20,20 +20,20 @@ def _convert_type(type_: str) -> Any:
 
 
 def object_to_type(obj):
-    if 'components' in obj:
-        components = [object_to_type(t) for t in obj['components']]
+    if "components" in obj:
+        components = [object_to_type(t) for t in obj["components"]]
         return tuple[*components]
-    return _convert_type(obj['internalType'])
+    return _convert_type(obj["internalType"])
 
 
 def convert_types(types_):
     lst = []
     models = []
     for type_ in types_:
-        if 'components' in type_:
-            py_model_name = type_['internalType'].split('.')[-1]
+        if "components" in type_:
+            py_model_name = type_["internalType"].split(".")[-1]
             lst.append(py_model_name)
-            models.append((py_model_name, type_['components']))
+            models.append((py_model_name, type_["components"]))
         else:
             lst.append(object_to_type(type_))
     if len(lst) == 0:
@@ -88,7 +88,11 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:
 
         has_name_annotation: bool = False
         alias: str
-        if func_name != (py_name := to_snake_case(func_name.replace("WETH", "Weth").replace("ETH", "Eth"))):
+        if func_name != (
+            py_name := to_snake_case(
+                func_name.replace("WETH", "Weth").replace("ETH", "Eth")
+            )
+        ):
             has_name_annotation = True
             alias = py_name
         else:
@@ -96,13 +100,17 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:
 
         # Append the function definition to the class
         if input_type == NoArgs or input_type == []:
-            input_type = 'NoArgs'
+            input_type = "NoArgs"
         if output_type == []:
-            output_type = 'None'
+            output_type = "None"
         if not has_name_annotation:
-            lines.append(f"\t{func_name}: ContractFunc[\n\t\t{input_type},\n\t\t{output_type}\n\t]\n")
+            lines.append(
+                f"\t{func_name}: ContractFunc[\n\t\t{input_type},\n\t\t{output_type}\n\t]\n"
+            )
         else:
-            lines.append(f"\t{alias}: Annotated[\n\t\tContractFunc[\n\t\t\t{input_type},\n\t\t\t{output_type}\n\t\t],\n\t\tName(\"{func_name}\"),\n\t]\n")
+            lines.append(
+                f'\t{alias}: Annotated[\n\t\tContractFunc[\n\t\t\t{input_type},\n\t\t\t{output_type}\n\t\t],\n\t\tName("{func_name}"),\n\t]\n'
+            )
 
     # Combine all lines into a single string
 
@@ -111,9 +119,9 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:
 class {name}(Struct):
 """
         for field in fields:
-            type_ = _convert_type(field['internalType'])
+            type_ = _convert_type(field["internalType"])
             model_str += f"\t{field['name']}: {type_}\n"
         lines = [model_str] + lines
 
-    class_str = "\n".join(imports) + "\n".join(lines) + '\n'
-    return class_str.replace('eth_rpc.types.', '').replace('\t', '    ').strip() + '\n'
+    class_str = "\n".join(imports) + "\n".join(lines) + "\n"
+    return class_str.replace("eth_rpc.types.", "").replace("\t", "    ").strip() + "\n"
