@@ -36,7 +36,9 @@ def load(input_file, output_file, contract_name: str):
 @click.option("--output", "-o", default="abi.py")
 @click.option("--api_key", "-a", required=True)
 @click.option("--contract-name", "-c", default="AnonContract")
-def explorer(network: str, address: HexAddress, output: str, api_key, contract_name: str):
+def explorer(
+    network: str, address: HexAddress, output: str, api_key, contract_name: str
+):
     if network.lower() != "ethereum":
         click.echo("Network not yet supported.  Coming soon!")
     abi = get_abi(address, api_key)
