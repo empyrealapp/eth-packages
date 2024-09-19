@@ -24,7 +24,13 @@ This approach strikes a balance between initial setup and long-term benefits, pr
 To convert an ABI to a valid `Contract`, just use the cli.  You will need to provide an input file, output target, and contract name (by default the contract will be named `AnonContract`), ie:
 
 ```bash
->>> eth_rpc codegen <input_file> <output_file> -c UniversalRouter
+# load from file
+>>> eth_rpc codegen load <input_file> -o <output_file> -c <contract_name>
+```
+
+```bash
+# load from etherscan, other block explorers being added soon
+>>> eth_rpc codegen explorer --address <contract_address> -o <output_file> -a <etherscan_api_key> -c <contract_name>
 ```
 
 !!! NOTE
