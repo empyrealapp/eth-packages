@@ -41,6 +41,7 @@ def explorer(
 ):
     if network.lower() != "ethereum":
         click.echo("Network not yet supported.  Coming soon!")
+        return
     abi = get_abi(address, api_key)
     with open(output, "w") as f:
         f.write(codegen_cmd(abi, contract_name))
