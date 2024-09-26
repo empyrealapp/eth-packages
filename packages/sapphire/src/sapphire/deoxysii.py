@@ -24,10 +24,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import struct
 import array
 import hmac
-from typing import Union, Optional
+import struct
+from typing import Optional, Union
 
 BLOCK_SIZE = 16
 

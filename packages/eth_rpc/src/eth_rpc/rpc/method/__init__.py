@@ -14,8 +14,7 @@ P = ParamSpec("P")
 
 
 class Middleware(BaseModel):
-    def update(self, method: "RPCMethod", make_request, params=None):
-        ...
+    def update(self, method: "RPCMethod", make_request, params=None): ...
 
 
 class RPCMethod(RPCMethodBase[Params, Response], Generic[Params, Response]):

@@ -1,13 +1,13 @@
-from typing import Optional, TypedDict, cast, Union
-from binascii import unhexlify
 import hmac
+from binascii import unhexlify
+from typing import Optional, TypedDict, Union, cast
 
 import cbor2
 from nacl.bindings.crypto_scalarmult import crypto_scalarmult
-from nacl.utils import random
 from nacl.public import PrivateKey, PublicKey
+from nacl.utils import random
 
-from .deoxysii import DeoxysII, NONCE_SIZE, TAG_SIZE
+from .deoxysii import NONCE_SIZE, TAG_SIZE, DeoxysII
 from .error import SapphireError
 
 ###############################################################################

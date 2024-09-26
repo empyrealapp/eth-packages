@@ -1,14 +1,14 @@
 from asyncio import iscoroutinefunction
+from binascii import hexlify, unhexlify
 from typing import Any, Callable, cast
-from binascii import unhexlify, hexlify
 
-from pydantic import BaseModel, PrivateAttr
+from eth_rpc._transport import _force_get_global_rpc
 from eth_rpc.contract.function import EthCallArgs
-from eth_rpc.utils.dual_async import run
 from eth_rpc.rpc import RPCMethod
 from eth_rpc.types import CallWithBlockArgs
-from eth_rpc._transport import _force_get_global_rpc
+from eth_rpc.utils.dual_async import run
 from eth_typing import HexStr
+from pydantic import BaseModel, PrivateAttr
 
 from .envelope import TransactionCipher
 
@@ -109,7 +109,7 @@ def sapphire_middleware(method: RPCMethod, make_request: Callable):  # noqa: C90
                     if pk:
                         manager.add(pk)
                 if not pk:
-                    raise RuntimeError('Could not retrieve callDataPublicKey!')
+                    raise RuntimeError("Could not retrieve callDataPublicKey!")
                 do_fetch = False
 
                 if method.name == "eth_call":
@@ -138,16 +138,19 @@ def sapphire_middleware(method: RPCMethod, make_request: Callable):  # noqa: C90
                     else:
                         result = await make_request(params)
                 except ValueError as exc:
-                    if 'core: invalid call format: epoch too far in the past' in exc.args[0]:
+                    if (
+                        "core: invalid call format: epoch too far in the past"
+                        in exc.args[0]
+                    ):
                         # force the re-fetch, and encrypt with new key
                         do_fetch = True
                         pk = None
                         continue
 
             # Only eth_call is decrypted
-            if method.name == 'eth_call' and result != '0x':
+            if method.name == "eth_call" and result != "0x":
                 decrypted = c.decrypt(unhexlify(result[2:]))
-                result = HexStr('0x' + hexlify(decrypted).decode('ascii'))
+                result = HexStr("0x" + hexlify(decrypted).decode("ascii"))
 
             return result
         return make_request(*params)
