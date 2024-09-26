@@ -9,6 +9,7 @@ from .block import (
 from .eth_call import CallWithBlockArgs, EthCallArgs, EthCallParams
 from .fee_history import FeeHistoryArgs
 from .logs import LogsArgs, LogsParams
+from .oasis import OasisCalldataPublicKey
 from .storage import GetCodeArgs, GetStorageArgs
 from .tracer import TraceArgs, TracerConfig
 from .transaction import (
@@ -35,6 +36,7 @@ __all__ = [
     "GetTransactionByBlockNumber",
     "LogsArgs",
     "LogsParams",
+    "OasisCalldataPublicKey",
     "RawTransaction",
     "TraceArgs",
     "TracerConfig",

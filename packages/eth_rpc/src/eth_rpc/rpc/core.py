@@ -20,6 +20,7 @@ from eth_rpc.types import (
     HexInteger,
     LogsArgs,
     NoArgs,
+    OasisCalldataPublicKey,
     RawTransaction,
     TraceArgs,
     TransactionRequest,
@@ -93,6 +94,11 @@ class RPC(BaseRPC):
 
     send_raw_tx: RPCMethod = RPCMethod[RawTransaction, HexStr](
         name="eth_sendRawTransaction"
+    )
+
+    # oasis specific methods
+    oasis_calldata_public_key: RPCMethod = RPCMethod[NoArgs, OasisCalldataPublicKey](
+        name="oasis_callDataPublicKey"
     )
 
     # debug methods

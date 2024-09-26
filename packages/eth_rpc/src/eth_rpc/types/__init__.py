@@ -24,6 +24,7 @@ from .args import (  # noqa: F401
     GetTransactionByBlockNumber,
     LogsArgs,
     LogsParams,
+    OasisCalldataPublicKey,
     RawTransaction,
     TraceArgs,
     TransactionRequest,

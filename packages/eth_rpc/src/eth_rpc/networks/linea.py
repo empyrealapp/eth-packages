@@ -11,7 +11,7 @@ class Linea(Network):
     rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
             http=Url("https://rpc.linea.build"),
-            wss=Url("wss://rpc.linea.build	"),
+            wss=Url("wss://rpc.linea.build"),
         )
     )
     block_explorer: ClassVar[BlockExplorer] = BlockExplorer(

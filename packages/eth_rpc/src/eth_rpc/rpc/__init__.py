@@ -1,8 +1,10 @@
-# from .base import BaseRPC
-# from .rpc import RPC
+from .base import BaseRPC
+from .method import Middleware, RPCMethod, add_middleware
 
 
-# __all__ = [
-#     "BaseRPC",
-#     "RPC",
-# ]
+__all__ = [
+    "BaseRPC",
+    "Middleware",
+    "RPCMethod",
+    "add_middleware",
+]
