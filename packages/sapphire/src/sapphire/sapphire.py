@@ -1,6 +1,6 @@
+import os
 from asyncio import iscoroutinefunction
 from binascii import hexlify, unhexlify
-import os
 from typing import Any, Callable, cast
 
 from eth_rpc import PrivateKeyWallet

@@ -1,12 +1,9 @@
 import cbor2
-from pydantic import BaseModel, Field
-
-from eth_typing import HexStr
-from eth_rpc import Block
 from eth_account.account import Account, LocalAccount
-from eth_rpc import PrivateKeyWallet
+from eth_rpc import Block, PrivateKeyWallet
 from eth_rpc.types import primitives
-
+from eth_typing import HexStr
+from pydantic import BaseModel, Field
 
 TYPES = {
     "Call": [
@@ -126,7 +123,12 @@ class SignedArgs(BaseModel):
 
 
 def make_response(
-    from_, to, data, envelope, wallet: PrivateKeyWallet, chain_id: int = 0x5AFF,
+    from_,
+    to,
+    data,
+    envelope,
+    wallet: PrivateKeyWallet,
+    chain_id: int = 0x5AFF,
 ):
     block: Block = Block.latest().sync  # type: ignore
     block_number = block.number - 1

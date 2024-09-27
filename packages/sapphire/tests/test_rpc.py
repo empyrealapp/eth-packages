@@ -1,13 +1,11 @@
 from typing import Annotated
 
-from pydantic import BaseModel
 import pytest
-
 from eth_rpc import ContractFunc, ProtocolBase, add_middleware, set_default_network
 from eth_rpc._transport import _force_get_global_rpc
 from eth_rpc.networks import SapphireTestnet
 from eth_rpc.types import METHOD, Name, NoArgs, primitives
-
+from pydantic import BaseModel
 from sapphire import sapphire_middleware
 
 SAPPHIRE_TESTNET_RPC_URL = "https://testnet.sapphire.oasis.io"
@@ -58,4 +56,9 @@ async def test_contract():
     # print(response.private_key.hex())
 
     who_am_i = WhoAmI(address="0xE1687514796F2be43AAa00b2b1abcf3fa5752D07")
-    assert await who_am_i.who_am_i().get(from_="0x7051DF3cD51115e75ab61d0e5eB0607623A75b56") == "0x7051df3cd51115e75ab61d0e5eb0607623a75b56"
+    assert (
+        await who_am_i.who_am_i().get(
+            from_="0x7051DF3cD51115e75ab61d0e5eB0607623A75b56"
+        )
+        == "0x7051df3cd51115e75ab61d0e5eb0607623a75b56"
+    )
