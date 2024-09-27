@@ -12,6 +12,7 @@ from .types import Network
 
 if TYPE_CHECKING:
     from .rpc.core import RPC
+    from .wallet import PrivateKeyWallet
 
 
 class Transports(BaseModel):
@@ -38,6 +39,12 @@ class Transports(BaseModel):
 _selected_transports: ContextVar["Transports"] = ContextVar(
     "_selected_transports",
     default=Transports(),
+)
+
+
+_selected_wallet: ContextVar["PrivateKeyWallet | None"] = ContextVar(
+    "_selected_wallet",
+    default=None,
 )
 
 
@@ -126,6 +133,14 @@ def configure_rpc_from_env():
 
     set_alchemy_key(alchemy_key, network=network)
     set_default_network(network)
+
+
+def set_selected_wallet(wallet: "PrivateKeyWallet"):
+    _selected_wallet.set(wallet)
+
+
+def get_selected_wallet():
+    return _selected_wallet.get()
 
 
 def set_rpc_url(network: Network, http: str | None = None, wss: str | None = None):

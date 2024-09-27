@@ -6,6 +6,8 @@ from ._transport import (
     set_rpc_timeout,
     set_rpc_url,
     set_transport,
+    get_selected_wallet,
+    set_selected_wallet,
 )
 from .account import Account
 from .block import Block
@@ -45,8 +47,10 @@ __all__ = [
     "codegen",
     "configure_rpc_from_env",
     "get_current_network",
+    "get_selected_wallet",
     "set_alchemy_key",
     "set_default_network",
+    "set_selected_wallet",
     "set_transport",
     "set_rpc_timeout",
     "set_rpc_url",

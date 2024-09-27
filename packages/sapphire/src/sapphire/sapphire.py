@@ -1,11 +1,10 @@
-import os
 from asyncio import iscoroutinefunction
 from binascii import hexlify, unhexlify
-from typing import Any, Callable, cast
+from typing import Callable, cast
 
-from eth_rpc import PrivateKeyWallet
+from eth_rpc import get_selected_wallet
 from eth_rpc._transport import _force_get_global_rpc
-from eth_rpc.contract.function import EthCallArgs, EthCallParams
+from eth_rpc.contract.function import EthCallArgs
 from eth_rpc.rpc import RPCMethod
 from eth_rpc.types import CallWithBlockArgs
 from eth_rpc.utils.dual_async import run
@@ -77,7 +76,7 @@ def _make_envelope(pk, data):
 
 
 def _encrypt_tx_params(
-    pk: CalldataPublicKey, data: bytes | str, params: EthCallParams | None = None
+    pk: CalldataPublicKey, data: bytes | str | HexStr
 ):
     c = TransactionCipher(peer_pubkey=pk.key, peer_epoch=pk.epoch)
     if isinstance(data, bytes):
@@ -114,7 +113,7 @@ def sapphire_middleware(method: RPCMethod, make_request: Callable):  # noqa: C90
     """
     manager = CalldataPublicKeyManager()
 
-    async def middleware(*params: Any, sync: bool = False):
+    async def middleware(*params, sync: bool = False):
         if _should_intercept(method, params):
             if params:
                 params = params[0]
@@ -134,13 +133,15 @@ def sapphire_middleware(method: RPCMethod, make_request: Callable):  # noqa: C90
 
                 if method.name == "eth_call":
                     _params = cast(EthCallArgs, params)
-                    if not _params.params.from_:
-                        c, data = _encrypt_tx_params(pk, _params.params.data)  # type: ignore
+                    if not _params.params.from_ and _params.params.data:
+                        c, data = _encrypt_tx_params(pk, _params.params.data)
                         _params.params.data = data
-                        params = _params
+                        params = _params  # type: ignore
                     else:
                         c, envelope = _make_envelope(pk, _params.params.data)
-                        wallet = PrivateKeyWallet(private_key=os.environ["PRIVATE_KEY"])
+                        wallet = get_selected_wallet()
+                        if not wallet:
+                            raise ValueError("Can not mock view call without a signer")
                         response = make_response(
                             _params.params.from_,
                             _params.params.to,
@@ -148,7 +149,7 @@ def sapphire_middleware(method: RPCMethod, make_request: Callable):  # noqa: C90
                             envelope,
                             wallet,
                         )
-                        params = SignedArgs(req=response)
+                        params = SignedArgs(req=response)  # type: ignore
                 elif method.name == "eth_sendRawTransaction":
                     c, params = _encrypt_tx_params(pk, params)  # type: ignore
                 elif method.name == "estimate_gas":
