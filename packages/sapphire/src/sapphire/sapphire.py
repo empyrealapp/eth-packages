@@ -1,15 +1,18 @@
 from asyncio import iscoroutinefunction
 from binascii import hexlify, unhexlify
+import os
 from typing import Any, Callable, cast
 
+from eth_rpc import PrivateKeyWallet
 from eth_rpc._transport import _force_get_global_rpc
-from eth_rpc.contract.function import EthCallArgs
+from eth_rpc.contract.function import EthCallArgs, EthCallParams
 from eth_rpc.rpc import RPCMethod
 from eth_rpc.types import CallWithBlockArgs
 from eth_rpc.utils.dual_async import run
 from eth_typing import HexStr
 from pydantic import BaseModel, PrivateAttr
 
+from .data_pack import SignedArgs, make_response
 from .envelope import TransactionCipher
 
 # Should transactions which deploy contracts be encrypted?
@@ -59,7 +62,7 @@ def _should_intercept(method: RPCMethod, params: tuple):
     return method.name in ("eth_estimateGas", "eth_sendRawTransaction", "eth_call")
 
 
-def _encrypt_tx_params(pk: CalldataPublicKey, data: bytes | str):
+def _make_envelope(pk, data):
     c = TransactionCipher(peer_pubkey=pk.key, peer_epoch=pk.epoch)
     if isinstance(data, bytes):
         data_bytes = data
@@ -69,6 +72,23 @@ def _encrypt_tx_params(pk: CalldataPublicKey, data: bytes | str):
         data_bytes = unhexlify(data[2:])
     else:
         raise TypeError("Invalid 'data' type", type(data))
+    envelope = c.make_envelope(data_bytes)
+    return c, envelope
+
+
+def _encrypt_tx_params(
+    pk: CalldataPublicKey, data: bytes | str, params: EthCallParams | None = None
+):
+    c = TransactionCipher(peer_pubkey=pk.key, peer_epoch=pk.epoch)
+    if isinstance(data, bytes):
+        data_bytes = data
+    elif isinstance(data, str):
+        if len(data) < 2 or data[:2] != "0x":
+            raise ValueError("Data is not hex encoded!", data)
+        data_bytes = unhexlify(data[2:])
+    else:
+        raise TypeError("Invalid 'data' type", type(data))
+
     encrypted_data = c.encrypt(data_bytes)
     return c, HexStr("0x" + hexlify(encrypted_data).decode("ascii"))
 
@@ -95,10 +115,10 @@ def sapphire_middleware(method: RPCMethod, make_request: Callable):  # noqa: C90
     manager = CalldataPublicKeyManager()
 
     async def middleware(*params: Any, sync: bool = False):
-        if params:
-            params = params[0]
-
         if _should_intercept(method, params):
+            if params:
+                params = params[0]
+
             do_fetch = True
             pk = manager.newest
             while do_fetch:
@@ -114,10 +134,21 @@ def sapphire_middleware(method: RPCMethod, make_request: Callable):  # noqa: C90
 
                 if method.name == "eth_call":
                     _params = cast(EthCallArgs, params)
-                    if _params.params.data:
-                        c, data = _encrypt_tx_params(pk, _params.params.data)
+                    if not _params.params.from_:
+                        c, data = _encrypt_tx_params(pk, _params.params.data)  # type: ignore
                         _params.params.data = data
-                        params = _params  # type: ignore
+                        params = _params
+                    else:
+                        c, envelope = _make_envelope(pk, _params.params.data)
+                        wallet = PrivateKeyWallet(private_key=os.environ["PRIVATE_KEY"])
+                        response = make_response(
+                            _params.params.from_,
+                            _params.params.to,
+                            _params.params.data,
+                            envelope,
+                            wallet,
+                        )
+                        params = SignedArgs(req=response)
                 elif method.name == "eth_sendRawTransaction":
                     c, params = _encrypt_tx_params(pk, params)  # type: ignore
                 elif method.name == "estimate_gas":
