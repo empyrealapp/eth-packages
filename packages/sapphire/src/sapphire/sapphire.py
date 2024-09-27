@@ -146,6 +146,8 @@ def sapphire_middleware(method: RPCMethod, make_request: Callable):  # noqa: C90
                         do_fetch = True
                         pk = None
                         continue
+                    else:
+                        raise exc
 
             # Only eth_call is decrypted
             if method.name == "eth_call" and result != "0x":
