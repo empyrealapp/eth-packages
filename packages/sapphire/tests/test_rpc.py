@@ -1,12 +1,9 @@
 import pytest
-
-from pydantic import BaseModel
-
 from eth_rpc import ContractFunc, ProtocolBase, add_middleware, set_default_network
 from eth_rpc._transport import _force_get_global_rpc
 from eth_rpc.networks import SapphireTestnet
 from eth_rpc.types import METHOD, NoArgs, primitives
-
+from pydantic import BaseModel
 from sapphire import sapphire_middleware
 
 SAPPHIRE_TESTNET_RPC_URL = "https://testnet.sapphire.oasis.io"
