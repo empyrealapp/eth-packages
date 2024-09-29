@@ -194,7 +194,7 @@ class EventSubscriber(Request, Generic[U]):
                 subscription_response: SubscriptionResponse = json.loads(
                     await w3_connection.recv()
                 )
-                if not subscription_response["result"]:
+                if not subscription_response.get("result"):
                     raise ValueError(subscription_response)
             except Exception as e:
                 raise e

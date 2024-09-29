@@ -1,10 +1,12 @@
 from ._transport import (
     configure_rpc_from_env,
     get_current_network,
+    get_selected_wallet,
     set_alchemy_key,
     set_default_network,
     set_rpc_timeout,
     set_rpc_url,
+    set_selected_wallet,
     set_transport,
 )
 from .account import Account
@@ -14,6 +16,7 @@ from .contract import Contract, ContractFunc, EthResponse, FuncSignature, Protoc
 from .event import Event
 from .log import Log
 from .models import EventData
+from .rpc import Middleware, add_middleware
 from .subscriber import EventSubscriber
 from .transaction import Transaction, TransactionReceipt
 from .types import Network
@@ -34,16 +37,20 @@ __all__ = [
     "EventSubscriber",
     "FuncSignature",
     "Log",
+    "Middleware",
     "Network",
     "PrivateKeyWallet",
     "ProtocolBase",
     "Transaction",
     "TransactionReceipt",
+    "add_middleware",
     "codegen",
     "configure_rpc_from_env",
     "get_current_network",
+    "get_selected_wallet",
     "set_alchemy_key",
     "set_default_network",
+    "set_selected_wallet",
     "set_transport",
     "set_rpc_timeout",
     "set_rpc_url",

@@ -5,6 +5,8 @@ from eth_rpc.types import NoArgs, primitives
 
 
 def to_snake_case(name):
+    if name.isupper():
+        return name
     return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
 
 
@@ -13,9 +15,11 @@ def _convert_type(type_: str) -> Any:
         return type_
     if type_.endswith("[]"):
         return list[_convert_type(type_[:-2])]  # type: ignore
-    for type in dir(primitives):
-        if type == type_:
+    for _type in dir(primitives):
+        if _type == type_:
             return getattr(primitives, type_)
+    if type_.startswith("enum "):
+        return primitives.uint8
     raise ValueError(f"Invalid Type {type_}")
 
 
@@ -23,7 +27,10 @@ def object_to_type(obj):
     if "components" in obj:
         components = [object_to_type(t) for t in obj["components"]]
         return tuple[*components]
-    return _convert_type(obj["internalType"])
+    try:
+        return _convert_type(obj["internalType"])
+    except ValueError:
+        return _convert_type(obj["type"])
 
 
 def convert_types(types_):
@@ -31,7 +38,7 @@ def convert_types(types_):
     models = []
     for type_ in types_:
         if "components" in type_:
-            py_model_name = type_["internalType"].split(".")[-1]
+            py_model_name = type_["internalType"].split(".")[-1].removeprefix("struct ")
             lst.append(py_model_name)
             models.append((py_model_name, type_["components"]))
         else:
@@ -43,7 +50,7 @@ def convert_types(types_):
     return (tuple[*lst], models)
 
 
-def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:
+def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:  # noqa: C901
     """
     Convert an ABI to the string implementation of a ProtocolBase.
 
@@ -72,7 +79,7 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:
     ]
 
     # Iterate over each function in the ABI
-    models = []
+    model_dict = {}
     for func in abi:
         if func["type"] != "function":
             continue  # Skip non-function types
@@ -82,9 +89,25 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:
         outputs = func.get("outputs", [])
 
         input_type, _models = convert_types(inputs)
-        models.extend(_models)
-        output_type, _models = convert_types(outputs)
-        models.extend(_models)
+        for model in _models:
+            if model[0] not in model_dict:
+                model_dict[model[0]] = model[1]
+            elif model_dict[model[0]] == model[1]:
+                continue
+            else:
+                print("Warning: Duplicate model name with different fields")
+                model_dict[model[0] + "_extra"] = model[1]
+
+        output_type, __models = convert_types(outputs)
+
+        for model in __models:
+            if model[0] not in model_dict:
+                model_dict[model[0]] = model[1]
+            elif model_dict[model[0]] == model[1]:
+                continue
+            else:
+                print("Warning: Duplicate model name with different fields")
+                model_dict[model[0] + "_extra"] = model[1]
 
         has_name_annotation: bool = False
         alias: str
@@ -103,6 +126,9 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:
             input_type = "NoArgs"
         if output_type == []:
             output_type = "None"
+
+        input_type = str(input_type).replace("'", "")
+        output_type = str(output_type).replace("'", "")
         if not has_name_annotation:
             lines.append(
                 f"\t{func_name}: ContractFunc[\n\t\t{input_type},\n\t\t{output_type}\n\t]\n"
@@ -114,12 +140,18 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:
 
     # Combine all lines into a single string
 
+    models = list(model_dict.items())
     for name, fields in models:
         model_str = f"""
 class {name}(Struct):
 """
+        embedded_types = []
         for field in fields:
-            type_ = _convert_type(field["internalType"])
+            try:
+                type_ = _convert_type(field["internalType"])
+            except ValueError:
+                type_ = object_to_type(field)
+                embedded_types.append(type_)
             model_str += f"\t{field['name']}: {type_}\n"
         lines = [model_str] + lines
 

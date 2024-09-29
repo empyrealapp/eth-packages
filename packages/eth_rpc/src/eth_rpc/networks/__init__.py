@@ -2,6 +2,7 @@ from .arbitrum import Arbitrum, ArbitrumSepolia
 from .base import Base, BaseSepolia
 from .ethereum import Ethereum
 from .linea import Linea
+from .sapphire import SapphireTestnet
 
 Networks = {
     1: Ethereum,
@@ -10,6 +11,7 @@ Networks = {
     42161: Arbitrum,
     421614: ArbitrumSepolia,
     59144: Linea,
+    23295: SapphireTestnet,
 }
 
 
@@ -25,4 +27,5 @@ __all__ = [
     "Ethereum",
     "Linea",
     "Networks",
+    "SapphireTestnet",
 ]

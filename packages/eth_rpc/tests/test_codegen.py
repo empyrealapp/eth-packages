@@ -1,6 +1,6 @@
 import ast
 
-from eth_rpc.codegen import convert_to_base
+from eth_rpc.codegen import codegen
 
 UNISWAP_UNIVERAL_ROUTER_ABI = [
     {
@@ -475,8 +475,8 @@ UNISWAP_SWAP_ROUTER = [
 
 
 def test_codegen():
-    result = convert_to_base(UNISWAP_SWAP_ROUTER, "UniversalRouter")
+    result = codegen(UNISWAP_SWAP_ROUTER, "UniversalRouter")
     ast.parse(result)
 
-    result = convert_to_base(UNISWAP_UNIVERAL_ROUTER_ABI, "UniversalRouter")
+    result = codegen(UNISWAP_UNIVERAL_ROUTER_ABI, "UniversalRouter")
     ast.parse(result)

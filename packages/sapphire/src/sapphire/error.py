@@ -1,0 +1,2 @@
+class SapphireError(Exception):
+    pass
