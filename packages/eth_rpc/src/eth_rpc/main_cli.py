@@ -21,12 +21,17 @@ def codegen():
 @click.argument("input_file")
 @click.option("--output", "-o", default="abi.py")
 @click.option("--contract-name", "-c", default="AnonContract")
-def load(input_file, output_file, contract_name: str):
+def load(input_file, output, contract_name: str):
     with open(input_file, "r") as f:
         raw_abi = f.read()
 
     abi = json.loads(raw_abi)
-    with open(output_file, "w") as f:
+    if isinstance(abi, dict):
+        try:
+            abi = abi['abi']
+        except KeyError:
+            raise ValueError("Invalid Format")
+    with open(output, "w") as f:
         f.write(codegen_cmd(abi, contract_name))
 
 

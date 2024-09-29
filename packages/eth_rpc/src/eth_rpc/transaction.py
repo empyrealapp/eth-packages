@@ -11,6 +11,7 @@ from eth_rpc.types.args import (
     GetTransactionByBlockHash,
     GetTransactionByBlockNumber,
     TransactionRequest,
+    RawTransaction,
 )
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict
@@ -144,6 +145,17 @@ class Transaction(Request, TransactionModel, Generic[Network]):
         )
 
     @classmethod
+    def send_raw_transaction(
+        cls, tx: HexStr
+    ) -> RPCResponseModel[RawTransaction, HexStr]:
+        return RPCResponseModel(
+            cls.rpc().send_raw_tx,
+            RawTransaction(
+                signed_tx=tx,
+            ),
+        )
+
+    @classmethod
     def get_by_index(
         self,
         transaction_index: int,
@@ -194,7 +206,7 @@ class Transaction(Request, TransactionModel, Generic[Network]):
                 subscription_response: SubscriptionResponse = json.loads(
                     await w3_connection.recv()
                 )
-                if not subscription_response["result"]:
+                if not subscription_response.get("result"):
                     raise ValueError(subscription_response)
             except Exception as e:
                 raise e

@@ -11,6 +11,7 @@ from eth_abi import decode
 from eth_abi.exceptions import InsufficientDataBytes
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, PrivateAttr, computed_field
+from pydantic_core import Url
 from websockets.exceptions import ConnectionClosedError
 from websockets.legacy.client import WebSocketClientProtocol, connect
 
@@ -444,7 +445,7 @@ class AsyncSubscribeCallable(BaseModel, Generic[T]):
             raise ValueError("No wss set for network")
 
         async for w3_connection in connect(
-            wss_uri,
+            wss_uri.unicode_string() if isinstance(wss_uri, Url) else wss_uri,
             ping_interval=60,
             ping_timeout=60,
             max_queue=10000,
@@ -471,7 +472,7 @@ class AsyncSubscribeCallable(BaseModel, Generic[T]):
                 subscription_response: SubscriptionResponse = json.loads(
                     await w3_connection.recv()
                 )
-                if not subscription_response["result"]:
+                if not subscription_response.get("result"):
                     raise ValueError(subscription_response)
             except Exception as e:
                 raise e
