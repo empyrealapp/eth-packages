@@ -28,7 +28,7 @@ def load(input_file, output, contract_name: str):
     abi = json.loads(raw_abi)
     if isinstance(abi, dict):
         try:
-            abi = abi['abi']
+            abi = abi["abi"]
         except KeyError:
             raise ValueError("Invalid Format")
     with open(output, "w") as f:

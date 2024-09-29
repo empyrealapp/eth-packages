@@ -96,10 +96,10 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:  # noqa: C901
                 continue
             else:
                 print("Warning: Duplicate model name with different fields")
-                model_dict[model[0] + '_extra'] = model[1]
+                model_dict[model[0] + "_extra"] = model[1]
 
         output_type, __models = convert_types(outputs)
- 
+
         for model in __models:
             if model[0] not in model_dict:
                 model_dict[model[0]] = model[1]
@@ -107,7 +107,7 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:  # noqa: C901
                 continue
             else:
                 print("Warning: Duplicate model name with different fields")
-                model_dict[model[0] + '_extra'] = model[1]
+                model_dict[model[0] + "_extra"] = model[1]
 
         has_name_annotation: bool = False
         alias: str

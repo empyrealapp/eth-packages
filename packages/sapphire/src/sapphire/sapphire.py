@@ -75,9 +75,7 @@ def _make_envelope(pk, data):
     return c, envelope
 
 
-def _encrypt_tx_params(
-    pk: CalldataPublicKey, data: bytes | str | HexStr
-):
+def _encrypt_tx_params(pk: CalldataPublicKey, data: bytes | str | HexStr):
     c = TransactionCipher(peer_pubkey=pk.key, peer_epoch=pk.epoch)
     if isinstance(data, bytes):
         data_bytes = data

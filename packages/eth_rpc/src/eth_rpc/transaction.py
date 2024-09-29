@@ -10,8 +10,8 @@ from eth_rpc.models import TransactionReceipt as TransactionReceiptModel
 from eth_rpc.types.args import (
     GetTransactionByBlockHash,
     GetTransactionByBlockNumber,
-    TransactionRequest,
     RawTransaction,
+    TransactionRequest,
 )
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict

@@ -1,13 +1,13 @@
 from ._transport import (
     configure_rpc_from_env,
     get_current_network,
+    get_selected_wallet,
     set_alchemy_key,
     set_default_network,
     set_rpc_timeout,
     set_rpc_url,
-    set_transport,
-    get_selected_wallet,
     set_selected_wallet,
+    set_transport,
 )
 from .account import Account
 from .block import Block

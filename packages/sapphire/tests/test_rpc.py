@@ -1,13 +1,20 @@
 from typing import Annotated
 
-from pydantic import BaseModel
 import pytest
-from sapphire import sapphire_middleware
-
-from eth_rpc import ContractFunc, PrivateKeyWallet, ProtocolBase, add_middleware, set_default_network, set_selected_wallet, get_selected_wallet
+from eth_rpc import (
+    ContractFunc,
+    PrivateKeyWallet,
+    ProtocolBase,
+    add_middleware,
+    get_selected_wallet,
+    set_default_network,
+    set_selected_wallet,
+)
 from eth_rpc._transport import _force_get_global_rpc
 from eth_rpc.networks import SapphireTestnet
 from eth_rpc.types import METHOD, Name, NoArgs, primitives
+from pydantic import BaseModel
+from sapphire import sapphire_middleware
 
 SAPPHIRE_TESTNET_RPC_URL = "https://testnet.sapphire.oasis.io"
 
@@ -50,7 +57,9 @@ async def test_contract():
     assert await c.double(100).get() == 200
 
     who_am_i = WhoAmI(address="0xE1687514796F2be43AAa00b2b1abcf3fa5752D07")
-    assert await who_am_i.who_am_i().get() == '0x0000000000000000000000000000000000000000'
+    assert (
+        await who_am_i.who_am_i().get() == "0x0000000000000000000000000000000000000000"
+    )
 
     add_middleware(sapphire_middleware)
 
@@ -66,9 +75,4 @@ async def test_contract():
 
     # simple endpoint that returns the sender's address
     who_am_i = WhoAmI(address="0xE1687514796F2be43AAa00b2b1abcf3fa5752D07")
-    assert (
-        await who_am_i.who_am_i().get(
-            from_=wallet.address
-        )
-        == wallet.address.lower()
-    )
+    assert await who_am_i.who_am_i().get(from_=wallet.address) == wallet.address.lower()
