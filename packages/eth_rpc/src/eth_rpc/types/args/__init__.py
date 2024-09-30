@@ -1,11 +1,6 @@
 from .account import GetAccountArgs
-from .block import (
-    AlchemyBlockReceipt,
-    AlchemyParams,
-    BlockNumberArg,
-    GetBlockByHashArgs,
-    GetBlockByNumberArgs,
-)
+from .alchemy import AlchemyBlockReceipt, AlchemyParams, AlchemyTokenBalances
+from .block import BlockNumberArg, GetBlockByHashArgs, GetBlockByNumberArgs
 from .eth_call import CallWithBlockArgs, EthCallArgs, EthCallParams
 from .fee_history import FeeHistoryArgs
 from .logs import LogsArgs, LogsParams
@@ -22,6 +17,7 @@ from .transaction import (
 __all__ = [
     "AlchemyBlockReceipt",
     "AlchemyParams",
+    "AlchemyTokenBalances",
     "BlockNumberArg",
     "CallWithBlockArgs",
     "EthCallArgs",

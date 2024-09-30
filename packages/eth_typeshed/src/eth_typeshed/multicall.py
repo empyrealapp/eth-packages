@@ -3,7 +3,14 @@ from typing import Annotated, Any, Generic, Literal, TypeVar, overload
 
 from eth_abi.exceptions import InsufficientDataBytes
 from eth_rpc import ContractFunc, ProtocolBase
-from eth_rpc.types import BLOCK_STRINGS, METHOD, MaybeAwaitable, Name, primitives
+from eth_rpc.types import (
+    BLOCK_STRINGS,
+    METHOD,
+    MaybeAwaitable,
+    Name,
+    Struct,
+    primitives,
+)
 from eth_rpc.utils import handle_maybe_awaitable, run
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, Field
@@ -14,6 +21,11 @@ U = TypeVar("U")
 MULTICALL3_ADDRESS = HexAddress(HexStr("0xcA11bde05977b3631167028862bE2a173976CA11"))
 
 
+class Result(Struct):
+    success: bool
+    return_data: bytes
+
+
 class TryMulticallRequest(BaseModel):
     require_success: Annotated[bool, Name("requireSuccess")]
     calls: list[tuple[primitives.address, primitives.bytes]]
@@ -21,6 +33,10 @@ class TryMulticallRequest(BaseModel):
 
 class MulticallRequest(BaseModel):
     calls: list[tuple[primitives.address, primitives.bytes]]
+
+
+class TryAggregateResponse(BaseModel):
+    results: list[Result]
 
 
 class TryMulticallResponse(BaseModel):
@@ -48,6 +64,13 @@ class Multicall(ProtocolBase):
             TryMulticallResponse,
         ],
         Name("blockAndAggregate"),
+    ] = METHOD
+    try_aggregate: Annotated[
+        ContractFunc[
+            TryMulticallRequest,
+            TryAggregateResponse,
+        ],
+        Name("tryAggregate"),
     ] = METHOD
     try_block_and_aggregate: Annotated[
         ContractFunc[
@@ -108,23 +131,23 @@ class Multicall(ProtocolBase):
         sync: bool = False,
         block_number: int | BLOCK_STRINGS = "latest",
     ) -> list[TryResult]:
-        call = await self.try_block_and_aggregate(
+        call = await self.try_aggregate(
             TryMulticallRequest(
                 require_success=require_success,
                 calls=[(c.address, c.encode()) for c in calls],
             )
         ).call(sync=sync, block_number=block_number)
 
-        if call.result != "0x":
-            return_data = call.decode().return_data
-        else:
-            return_data = call.result
+        return_data = call.decode()
 
         response: list[TryResult] = []
-        for (success, result), func in zip(return_data, calls):
-            if success:
+
+        for result, func in zip(return_data.results, calls):
+            if result.success:
                 try:
-                    response.append(TryResult(success=True, result=func.decode(result)))
+                    response.append(
+                        TryResult(success=True, result=func.decode(result.return_data))
+                    )
                 except (OverflowError, InsufficientDataBytes):
                     response.append(TryResult(success=False, result=None))
             else:
