@@ -31,7 +31,7 @@ jobs:
 
       - name: Test with tox
         run: |
-          tox -p -e lint,py${{ matrix.python }}-build_eth_rpc,py${{ matrix.python }}-build_eth_typeshed,py${{ matrix.python }}-build_eth_protocols,py${{ matrix.python }}-build_eth_streams,py${{ matrix.python }}-test_eth_rpc,py${{ matrix.python }}-test_eth_typeshed,py${{ matrix.python }}-test_eth_protocols,py${{ matrix.python }}-test_eth_streams
+          tox -e lint,py${{ matrix.python }}-build_eth_rpc,py${{ matrix.python }}-build_eth_typeshed,py${{ matrix.python }}-build_eth_protocols,py${{ matrix.python }}-build_eth_streams,py${{ matrix.python }}-test_eth_rpc,py${{ matrix.python }}-test_eth_typeshed,py${{ matrix.python }}-test_eth_protocols,py${{ matrix.python }}-test_eth_streams
         env:
           ALCHEMY_KEY: ${{ secrets.ALCHEMY_KEY }}
   
