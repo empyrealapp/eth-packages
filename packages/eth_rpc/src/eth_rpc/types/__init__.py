@@ -10,6 +10,7 @@ from . import primitives
 from .args import (  # noqa: F401
     AlchemyBlockReceipt,
     AlchemyParams,
+    AlchemyTokenBalances,
     BlockNumberArg,
     CallWithBlockArgs,
     EthCallArgs,

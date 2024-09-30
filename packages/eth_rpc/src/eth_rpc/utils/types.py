@@ -55,7 +55,7 @@ def _transform_primitive(type_):
     elif isclass(type_) and issubclass(type_, Struct):
         # If this is a Struct, return a tuple
         args = [arg.annotation for arg in type_.model_fields.values()]
-        return transform_primitive(tuple[*args])  # type: ignore
+        return transform_primitive(tuple[*args])
     elif isclass(type_) and issubclass(type_, BaseModel):
         # If this is a BaseModel and NOT a Struct, return a list
         args = [arg.annotation for arg in type_.model_fields.values()]

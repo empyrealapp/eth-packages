@@ -194,7 +194,7 @@ class Event(Request, Generic[T]):
             | {name: val for (name, _), val in zip(unindexed, unindexed_values)}
         )
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @cached_property
     def get_topic0(self) -> HexStr:
         inputs, *_ = self.__pydantic_generic_metadata__["args"]

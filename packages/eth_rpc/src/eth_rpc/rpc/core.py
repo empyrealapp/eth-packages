@@ -6,6 +6,7 @@ from eth_rpc.transaction import Transaction as TransactionModel
 from eth_rpc.transaction import TransactionReceipt as TransactionReceiptModel
 from eth_rpc.types import (
     AlchemyBlockReceipt,
+    AlchemyTokenBalances,
     BlockNumberArg,
     CallWithBlockArgs,
     EthCallArgs,
@@ -25,7 +26,7 @@ from eth_rpc.types import (
     TraceArgs,
     TransactionRequest,
 )
-from eth_typing import HexStr
+from eth_typing import HexAddress, HexStr
 
 from ..block import Block
 from ..log import Log
@@ -74,9 +75,6 @@ class RPC(BaseRPC):
     get_block_receipts: RPCMethod = RPCMethod[
         list[HexInteger | HexStr], list[TransactionReceiptModel]
     ](name="eth_getBlockReceipts")
-    alchemy_get_block_receipts: RPCMethod = RPCMethod[
-        AlchemyBlockReceipt, AlchemyReceiptsResponse
-    ](name="alchemy_getTransactionReceipts")
     get_tx_by_block_hash: RPCMethod = RPCMethod[
         GetTransactionByBlockHash, TransactionModel
     ](name="eth_getTransactionByBlockHashAndIndex")
@@ -103,6 +101,15 @@ class RPC(BaseRPC):
 
     # debug methods
     debug_tracecall: RPCMethod = RPCMethod[TraceArgs, Any](name="debug_traceCall")
+
+    # alchemy
+    alchemy_get_block_receipts: RPCMethod = RPCMethod[
+        AlchemyBlockReceipt, AlchemyReceiptsResponse
+    ](name="alchemy_getTransactionReceipts")
+    alchemy_token_balances: RPCMethod = RPCMethod[
+        list[HexAddress],
+        AlchemyTokenBalances,
+    ](name="alchemy_getTokenBalances")
 
     def model_post_init(self, __context):
         rpc_methods = []

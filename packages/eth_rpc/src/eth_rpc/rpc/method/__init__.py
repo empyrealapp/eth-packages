@@ -1,13 +1,19 @@
 from typing import Awaitable, Callable, ClassVar, Generic, ParamSpec, TypeVar
 
-from eth_rpc.types import HexInt, NoArgs
+from eth_rpc.types import HexAddress, HexInt, NoArgs
 from eth_typing import HexStr
 from pydantic import BaseModel
 
 from .base import RPCMethodBase
 
 Params = TypeVar(
-    "Params", bound=BaseModel | HexInt | HexStr | list[HexInt | HexStr] | NoArgs
+    "Params",
+    bound=BaseModel
+    | HexInt
+    | HexStr
+    | list[HexInt | HexStr]
+    | list[HexAddress]
+    | NoArgs,
 )
 Response = TypeVar("Response")
 P = ParamSpec("P")
