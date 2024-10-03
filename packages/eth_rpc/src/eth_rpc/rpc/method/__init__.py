@@ -1,21 +1,9 @@
-from typing import Awaitable, Callable, ClassVar, Generic, ParamSpec, TypeVar
+from typing import Awaitable, Callable, ClassVar, Generic, ParamSpec
 
-from eth_rpc.types import HexAddress, HexInt, NoArgs
-from eth_typing import HexStr
 from pydantic import BaseModel
 
-from .base import RPCMethodBase
+from .base import Params, Response, RPCMethodBase
 
-Params = TypeVar(
-    "Params",
-    bound=BaseModel
-    | HexInt
-    | HexStr
-    | list[HexInt | HexStr]
-    | list[HexAddress]
-    | NoArgs,
-)
-Response = TypeVar("Response")
 P = ParamSpec("P")
 
 
@@ -31,10 +19,12 @@ class RPCMethod(RPCMethodBase[Params, Response], Generic[Params, Response]):
         cls.middlewares.append(middleware)
 
     def __call__(self, *params: Params) -> Awaitable[Response]:
-        make_request = self.call_async
-        for middleware in self.middlewares:
-            make_request = middleware(self, make_request)
-        return make_request(*params)
+        async def run():
+            make_request = self.call_async
+            for middleware in self.middlewares:
+                make_request = middleware(self, make_request, is_async=True)
+            return await make_request(*params)
+        return run()
 
     @property
     def sync(self) -> Callable[..., Response]:

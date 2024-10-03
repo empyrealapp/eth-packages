@@ -1,12 +1,12 @@
-from asyncio import iscoroutinefunction
 from binascii import hexlify, unhexlify
+from functools import partial
 from typing import Callable, cast
 
 from eth_rpc import get_selected_wallet
 from eth_rpc._transport import _force_get_global_rpc
 from eth_rpc.contract.function import EthCallArgs
 from eth_rpc.rpc import RPCMethod
-from eth_rpc.types import CallWithBlockArgs
+from eth_rpc.types import CallWithBlockArgs, RawTransaction
 from eth_rpc.utils.dual_async import run
 from eth_typing import HexStr
 from pydantic import BaseModel, PrivateAttr
@@ -56,8 +56,9 @@ def _should_intercept(method: RPCMethod, params: tuple):
     if not ENCRYPT_DEPLOYS:
         if method.name in ("eth_sendRawTransaction", "eth_estimateGas"):
             # When 'to' flag is missing, we assume it's a deployment
-            if not params[0].get("to", None):
-                return False
+            if hasattr(params[0], "params"):
+                if not params[0].params.to:
+                    return False
     return method.name in ("eth_estimateGas", "eth_sendRawTransaction", "eth_call")
 
 
@@ -75,9 +76,14 @@ def _make_envelope(pk, data):
     return c, envelope
 
 
-def _encrypt_tx_params(pk: CalldataPublicKey, data: bytes | str | HexStr):
+def _encrypt_tx_params(
+    pk: CalldataPublicKey, data: bytes | str | HexStr | RawTransaction
+):
     c = TransactionCipher(peer_pubkey=pk.key, peer_epoch=pk.epoch)
-    if isinstance(data, bytes):
+    if isinstance(data, RawTransaction):
+        data_bytes = data.signed_tx
+        return c, [data.signed_tx]
+    elif isinstance(data, bytes):
         data_bytes = data
     elif isinstance(data, str):
         if len(data) < 2 or data[:2] != "0x":
@@ -90,7 +96,7 @@ def _encrypt_tx_params(pk: CalldataPublicKey, data: bytes | str | HexStr):
     return c, HexStr("0x" + hexlify(encrypted_data).decode("ascii"))
 
 
-def sapphire_middleware(method: RPCMethod, make_request: Callable):  # noqa: C901
+def sapphire_middleware(method: RPCMethod, make_request: Callable, is_async: bool = False):  # noqa: C901
     """
     Transparently encrypt the calldata for:
 
@@ -163,7 +169,7 @@ def sapphire_middleware(method: RPCMethod, make_request: Callable):  # noqa: C90
                 #  'core: invalid call format: epoch in the future'
                 # We can only do something meaningful with the first!
                 try:
-                    if sync:
+                    if not is_async and sync:
                         result = make_request(params)
                     else:
                         result = await make_request(params)
@@ -190,6 +196,6 @@ def sapphire_middleware(method: RPCMethod, make_request: Callable):  # noqa: C90
     def sync_middleware(*params):
         return run(middleware, *params, sync=True)
 
-    if iscoroutinefunction(make_request):
-        return middleware
+    if is_async:
+        return partial(middleware, sync=False)
     return sync_middleware

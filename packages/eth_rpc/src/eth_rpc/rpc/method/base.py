@@ -6,14 +6,14 @@ from typing import TYPE_CHECKING, Generic, Optional, TypeVar
 import httpx
 from eth_rpc._response import RPCResponse
 from eth_rpc.exceptions import RPCDecodeError
-from eth_rpc.types import HexInt, HexStr, Network, NoArgs
+from eth_rpc.types import HexAddress, HexInt, HexStr, Network, NoArgs
 from pydantic import BaseModel, ConfigDict, PrivateAttr
 
 if TYPE_CHECKING:
     from ..core import RPC
 
 Params = TypeVar(
-    "Params", bound=BaseModel | HexInt | HexStr | list[HexInt | HexStr] | NoArgs
+    "Params", bound=BaseModel | HexInt | HexStr | list[HexInt | HexStr] | list[HexAddress] | NoArgs
 )
 Response = TypeVar("Response")
 

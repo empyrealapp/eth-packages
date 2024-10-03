@@ -14,7 +14,7 @@ from eth_rpc.types.args import (
     TransactionRequest,
 )
 from eth_typing import HexAddress, HexStr
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 from pydantic.alias_generators import to_camel
 from typing_extensions import TypeVar
 from websockets.exceptions import ConnectionClosedError
@@ -47,8 +47,9 @@ class PreparedTransaction(BaseModel):
 
     type: int = 2
     gas: int
-    max_fee_per_gas: int
-    max_priority_fee_per_gas: int
+    gas_price: int | None = None
+    max_fee_per_gas: int | None = None
+    max_priority_fee_per_gas: int | None = None
     data: HexStr
     nonce: int
     to: HexAddress
@@ -61,6 +62,13 @@ class PreparedTransaction(BaseModel):
             *args, exclude_none=exclude_none, by_alias=by_alias, **kwargs
         )
 
+    @model_validator(mode='after')
+    def validate_xor(self):
+        if self.gas_price is None and self.max_fee_per_gas is None:
+            raise ValueError("Must set gas_price or max_fee_per_gas")
+        if self.max_fee_per_gas is not None and self.max_priority_fee_per_gas is None:
+            self.max_priority_fee_per_gas = 0
+        return self
 
 class TransactionReceipt(Request, TransactionReceiptModel, Generic[Network]):
     @classmethod
