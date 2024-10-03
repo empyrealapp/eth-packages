@@ -39,7 +39,10 @@ def convert_types(types_):
     for type_ in types_:
         if "components" in type_:
             py_model_name = type_["internalType"].split(".")[-1].removeprefix("struct ")
-            lst.append(py_model_name)
+            field_name = py_model_name
+            while field_name.endswith("[]"):
+                field_name = f"list[{py_model_name[:-2]}]"
+            lst.append(field_name)
             models.append((py_model_name, type_["components"]))
         else:
             lst.append(object_to_type(type_))
@@ -101,13 +104,14 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:  # noqa: C901
         output_type, __models = convert_types(outputs)
 
         for model in __models:
-            if model[0] not in model_dict:
-                model_dict[model[0]] = model[1]
-            elif model_dict[model[0]] == model[1]:
+            model_name = model[0].replace("[]", "")
+            if model_name not in model_dict:
+                model_dict[model_name] = model[1]
+            elif model_dict[model_name] == model[1]:
                 continue
             else:
                 print("Warning: Duplicate model name with different fields")
-                model_dict[model[0] + "_extra"] = model[1]
+                model_dict[model_name + "_extra"] = model[1]
 
         has_name_annotation: bool = False
         alias: str
