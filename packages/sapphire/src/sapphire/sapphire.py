@@ -96,7 +96,9 @@ def _encrypt_tx_params(
     return c, HexStr("0x" + hexlify(encrypted_data).decode("ascii"))
 
 
-def sapphire_middleware(method: RPCMethod, make_request: Callable, is_async: bool = False):  # noqa: C901
+def sapphire_middleware(
+    method: RPCMethod, make_request: Callable, is_async: bool = False
+):  # noqa: C901
     """
     Transparently encrypt the calldata for:
 

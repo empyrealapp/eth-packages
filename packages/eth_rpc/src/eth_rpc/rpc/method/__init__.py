@@ -24,6 +24,7 @@ class RPCMethod(RPCMethodBase[Params, Response], Generic[Params, Response]):
             for middleware in self.middlewares:
                 make_request = middleware(self, make_request, is_async=True)
             return await make_request(*params)
+
         return run()
 
     @property

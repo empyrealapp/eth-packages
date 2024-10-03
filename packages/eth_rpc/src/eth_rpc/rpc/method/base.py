@@ -13,7 +13,13 @@ if TYPE_CHECKING:
     from ..core import RPC
 
 Params = TypeVar(
-    "Params", bound=BaseModel | HexInt | HexStr | list[HexInt | HexStr] | list[HexAddress] | NoArgs
+    "Params",
+    bound=BaseModel
+    | HexInt
+    | HexStr
+    | list[HexInt | HexStr]
+    | list[HexAddress]
+    | NoArgs,
 )
 Response = TypeVar("Response")
 
