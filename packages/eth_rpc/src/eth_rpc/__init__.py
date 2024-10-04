@@ -18,7 +18,7 @@ from .log import Log
 from .models import EventData
 from .rpc import Middleware, add_middleware
 from .subscriber import EventSubscriber
-from .transaction import Transaction, TransactionReceipt
+from .transaction import PreparedTransaction, Transaction, TransactionReceipt
 from .types import Network
 from .wallet import PrivateKeyWallet
 
@@ -39,6 +39,7 @@ __all__ = [
     "Log",
     "Middleware",
     "Network",
+    "PreparedTransaction",
     "PrivateKeyWallet",
     "ProtocolBase",
     "Transaction",

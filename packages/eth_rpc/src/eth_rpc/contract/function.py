@@ -399,6 +399,7 @@ class ContractFunc(Generic[T, U]):
         *,
         nonce: Optional[int] = None,
         value: int = 0,
+        gas_price: Optional[int] = None,
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
         use_access_list: bool = False,
@@ -422,28 +423,32 @@ class ContractFunc(Generic[T, U]):
         else:
             chain_id = await rpc.chain_id()
 
-        if sync:
-            max_priority_fee_per_gas = (
-                max_priority_fee_per_gas or Block.priority_fee().sync
-            )
-            base_fee_per_gas = Block.pending().sync.base_fee_per_gas
-        else:
-            max_priority_fee_per_gas = (
-                max_priority_fee_per_gas or await Block.priority_fee()
-            )
-            # TODO: fix pending()
-            base_fee_per_gas = (await Block.pending()).base_fee_per_gas
+        if not (max_fee_per_gas or gas_price):
+            if sync:
+                max_priority_fee_per_gas = (
+                    max_priority_fee_per_gas or Block.priority_fee().sync
+                )
+                base_fee_per_gas = Block.pending().sync.base_fee_per_gas
+            else:
+                max_priority_fee_per_gas = (
+                    max_priority_fee_per_gas or await Block.priority_fee()
+                )
 
-        assert base_fee_per_gas, "block is earlier than London Hard Fork"
-        max_fee_per_gas = max_fee_per_gas or (
-            2 * base_fee_per_gas + max_priority_fee_per_gas
-        )
+                # TODO: fix pending()
+                block = await Block.pending()
+                base_fee_per_gas = block.base_fee_per_gas
+
+            assert base_fee_per_gas, "block is earlier than London Hard Fork"
+            max_fee_per_gas = max_fee_per_gas or (
+                2 * base_fee_per_gas + max_priority_fee_per_gas
+            )
 
         if sync:
             return PreparedTransaction(
                 data=self.data,
                 to=self.address,
                 gas=HexInteger(gas),
+                gas_price=gas_price,
                 max_fee_per_gas=max_fee_per_gas,
                 max_priority_fee_per_gas=max_priority_fee_per_gas,
                 nonce=nonce or wallet.get_nonce().sync,
@@ -471,6 +476,7 @@ class ContractFunc(Generic[T, U]):
         sync: Literal[True],
         nonce: Optional[int] = ...,
         value: int = ...,
+        gas_price: Optional[int] = ...,
         max_fee_per_gas: Optional[int] = ...,
         max_priority_fee_per_gas: Optional[int] = ...,
         use_access_list: bool = ...,
@@ -483,6 +489,7 @@ class ContractFunc(Generic[T, U]):
         *,
         nonce: Optional[int] = ...,
         value: int = ...,
+        gas_price: Optional[int] = ...,
         max_fee_per_gas: Optional[int] = ...,
         max_priority_fee_per_gas: Optional[int] = ...,
         use_access_list: bool = ...,
@@ -494,6 +501,7 @@ class ContractFunc(Generic[T, U]):
         *,
         nonce: Optional[int] = None,
         value: int = 0,
+        gas_price: Optional[int] = None,
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
         use_access_list: bool = False,
@@ -504,6 +512,7 @@ class ContractFunc(Generic[T, U]):
             wallet,
             nonce=nonce,
             value=value,
+            gas_price=gas_price,
             max_fee_per_gas=max_fee_per_gas,
             max_priority_fee_per_gas=max_priority_fee_per_gas,
             use_access_list=use_access_list,
@@ -516,6 +525,7 @@ class ContractFunc(Generic[T, U]):
         *,
         nonce: Optional[int] = None,
         value: int = 0,
+        gas_price: Optional[int] = None,
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
         use_access_list: bool = False,
@@ -526,6 +536,7 @@ class ContractFunc(Generic[T, U]):
                 wallet,
                 nonce=nonce,
                 value=value,
+                gas_price=gas_price,
                 max_fee_per_gas=max_fee_per_gas,
                 max_priority_fee_per_gas=max_priority_fee_per_gas,
                 use_access_list=use_access_list,
@@ -557,6 +568,7 @@ class ContractFunc(Generic[T, U]):
         sync: Literal[True],
         nonce: Optional[int] = ...,
         value: int = ...,
+        gas_price: Optional[int] = ...,
         max_fee_per_gas: Optional[int] = ...,
         max_priority_fee_per_gas: Optional[int] = ...,
         use_access_list: bool = ...,
@@ -569,6 +581,7 @@ class ContractFunc(Generic[T, U]):
         *,
         nonce: Optional[int] = ...,
         value: int = ...,
+        gas_price: Optional[int] = ...,
         max_fee_per_gas: Optional[int] = ...,
         max_priority_fee_per_gas: Optional[int] = ...,
         use_access_list: bool = ...,
@@ -580,6 +593,7 @@ class ContractFunc(Generic[T, U]):
         *,
         nonce: Optional[int] = None,
         value: int = 0,
+        gas_price: Optional[int] = None,
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
         use_access_list: bool = False,
@@ -590,6 +604,7 @@ class ContractFunc(Generic[T, U]):
             wallet,
             nonce=nonce,
             value=value,
+            gas_price=gas_price,
             max_fee_per_gas=max_fee_per_gas,
             max_priority_fee_per_gas=max_priority_fee_per_gas,
             use_access_list=use_access_list,
