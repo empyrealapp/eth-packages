@@ -40,15 +40,11 @@ class TryAggregateResponse(BaseModel):
 
 
 class TryMulticallResponse(BaseModel):
-    block_number: Annotated[primitives.uint256, Name("blockNumber")] = Field(
-        alias="blockNumber"
-    )
-    block_hash: Annotated[primitives.bytes32, Name("blockHash")] = Field(
-        alias="blockHash"
-    )
+    block_number: Annotated[primitives.uint256, Name("blockNumber")]
+    block_hash: Annotated[primitives.bytes32, Name("blockHash")]
     return_data: Annotated[
         list[tuple[primitives.bool, primitives.bytes]], Name("returnData")
-    ] = Field(alias="returnData")
+    ]
 
 
 class TryResult(BaseModel, Generic[T]):
