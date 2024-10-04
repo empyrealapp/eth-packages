@@ -95,7 +95,7 @@ class RPC(BaseRPC):
     )
 
     # oasis specific methods
-    oasis_calldata_public_key: RPCMethod = RPCMethod[NoArgs, OasisCalldataPublicKey](
+    oasis_calldata_public_key: RPCMethod[NoArgs, OasisCalldataPublicKey] = RPCMethod[NoArgs, OasisCalldataPublicKey](
         name="oasis_callDataPublicKey"
     )
 

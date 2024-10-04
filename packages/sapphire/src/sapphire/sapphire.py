@@ -76,12 +76,21 @@ def _make_envelope(pk, data):
     return c, envelope
 
 
+async def encrypt_tx_data(data: HexStr) -> tuple[TransactionCipher, HexStr]:
+    rpc = _force_get_global_rpc()
+    pk = await rpc.oasis_calldata_public_key()
+    c = TransactionCipher(peer_pubkey=pk.key, peer_epoch=pk.epoch)
+    data_bytes = unhexlify(data[2:])
+    encrypted_data = c.encrypt(data_bytes)
+
+    return (c, HexStr("0x" + hexlify(encrypted_data).decode("ascii")))
+
+
 def _encrypt_tx_params(
     pk: CalldataPublicKey, data: bytes | str | HexStr | RawTransaction
 ):
     c = TransactionCipher(peer_pubkey=pk.key, peer_epoch=pk.epoch)
     if isinstance(data, RawTransaction):
-        data_bytes = data.signed_tx
         return c, [data.signed_tx]
     elif isinstance(data, bytes):
         data_bytes = data
@@ -96,9 +105,9 @@ def _encrypt_tx_params(
     return c, HexStr("0x" + hexlify(encrypted_data).decode("ascii"))
 
 
-def sapphire_middleware(
+def sapphire_middleware(  # noqa: C901
     method: RPCMethod, make_request: Callable, is_async: bool = False
-):  # noqa: C901
+):
     """
     Transparently encrypt the calldata for:
 
@@ -140,8 +149,7 @@ def sapphire_middleware(
                 if method.name == "eth_call":
                     _params = cast(EthCallArgs, params)
                     if not _params.params.from_ and _params.params.data:
-                        c, data = _encrypt_tx_params(pk, _params.params.data)
-                        _params.params.data = data
+                        c, _params.params.data = _encrypt_tx_params(pk, _params.params.data)
                         params = _params  # type: ignore
                     else:
                         c, envelope = _make_envelope(pk, _params.params.data)
@@ -161,8 +169,7 @@ def sapphire_middleware(
                 elif method.name == "estimate_gas":
                     _params = cast(CallWithBlockArgs, params)  # type: ignore
                     if _params.params.data:
-                        c, data = _encrypt_tx_params(pk, _params.params.data)
-                        _params.params.data = data
+                        c, _params.params.data = _encrypt_tx_params(pk, _params.params.data)
                         params = _params  # type: ignore
 
                 # We may encounter three errors here:
