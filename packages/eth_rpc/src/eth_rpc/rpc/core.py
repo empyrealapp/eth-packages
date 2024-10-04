@@ -95,9 +95,9 @@ class RPC(BaseRPC):
     )
 
     # oasis specific methods
-    oasis_calldata_public_key: RPCMethod[NoArgs, OasisCalldataPublicKey] = RPCMethod[NoArgs, OasisCalldataPublicKey](
-        name="oasis_callDataPublicKey"
-    )
+    oasis_calldata_public_key: RPCMethod[NoArgs, OasisCalldataPublicKey] = RPCMethod[
+        NoArgs, OasisCalldataPublicKey
+    ](name="oasis_callDataPublicKey")
 
     # debug methods
     debug_tracecall: RPCMethod = RPCMethod[TraceArgs, Any](name="debug_traceCall")

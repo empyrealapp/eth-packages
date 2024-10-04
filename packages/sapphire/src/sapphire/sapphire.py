@@ -149,7 +149,9 @@ def sapphire_middleware(  # noqa: C901
                 if method.name == "eth_call":
                     _params = cast(EthCallArgs, params)
                     if not _params.params.from_ and _params.params.data:
-                        c, _params.params.data = _encrypt_tx_params(pk, _params.params.data)
+                        c, _params.params.data = _encrypt_tx_params(
+                            pk, _params.params.data
+                        )
                         params = _params  # type: ignore
                     else:
                         c, envelope = _make_envelope(pk, _params.params.data)
@@ -169,7 +171,9 @@ def sapphire_middleware(  # noqa: C901
                 elif method.name == "estimate_gas":
                     _params = cast(CallWithBlockArgs, params)  # type: ignore
                     if _params.params.data:
-                        c, _params.params.data = _encrypt_tx_params(pk, _params.params.data)
+                        c, _params.params.data = _encrypt_tx_params(
+                            pk, _params.params.data
+                        )
                         params = _params  # type: ignore
 
                 # We may encounter three errors here:
