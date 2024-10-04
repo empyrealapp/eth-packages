@@ -5,8 +5,9 @@ from typing import Callable, cast
 from eth_rpc import get_selected_wallet
 from eth_rpc._transport import _force_get_global_rpc
 from eth_rpc.contract.function import EthCallArgs
+from eth_rpc.networks import Sapphire
 from eth_rpc.rpc import RPCMethod
-from eth_rpc.types import CallWithBlockArgs, RawTransaction
+from eth_rpc.types import CallWithBlockArgs, Network, RawTransaction
 from eth_rpc.utils.dual_async import run
 from eth_typing import HexStr
 from pydantic import BaseModel, PrivateAttr
@@ -76,8 +77,10 @@ def _make_envelope(pk, data):
     return c, envelope
 
 
-async def encrypt_tx_data(data: HexStr) -> tuple[TransactionCipher, HexStr]:
-    rpc = _force_get_global_rpc()
+async def encrypt_tx_data(
+    data: HexStr, network: type[Network] | None = Sapphire
+) -> tuple[TransactionCipher, HexStr]:
+    rpc = _force_get_global_rpc(network)
     pk = await rpc.oasis_calldata_public_key()
     c = TransactionCipher(peer_pubkey=pk.key, peer_epoch=pk.epoch)
     data_bytes = unhexlify(data[2:])
