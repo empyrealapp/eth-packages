@@ -64,6 +64,10 @@ class PreparedTransaction(BaseModel):
 
     @model_validator(mode="after")
     def validate_xor(self):
+        if self.max_fee_per_gas is not None:
+            self.type = 2
+        else:
+            self.type = 1
         if self.gas_price is None and self.max_fee_per_gas is None:
             raise ValueError("Must set gas_price or max_fee_per_gas")
         if self.max_fee_per_gas is not None and self.max_priority_fee_per_gas is None:
