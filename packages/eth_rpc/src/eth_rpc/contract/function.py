@@ -78,8 +78,6 @@ class ContractFunc(Generic[T, U]):
         This uses the default network, unless a network has been provided, then immediately unsets the network.
         This makes it safe for async code.
         """
-        from .._transport import _force_get_global_rpc
-
         if self._network is None:
             return _force_get_global_rpc(None)
         response = _force_get_global_rpc(self._network)
@@ -417,7 +415,7 @@ class ContractFunc(Generic[T, U]):
             access_list = access_list_response.access_list
         else:
             access_list = None
-        rpc = _force_get_global_rpc()
+        rpc = self._rpc()
         if sync:
             chain_id = rpc.chain_id.sync()
         else:
@@ -426,16 +424,17 @@ class ContractFunc(Generic[T, U]):
         if not (max_fee_per_gas or gas_price):
             if sync:
                 max_priority_fee_per_gas = (
-                    max_priority_fee_per_gas or Block.priority_fee().sync
+                    max_priority_fee_per_gas or rpc.max_priority_fee_per_gas.sync()
                 )
-                base_fee_per_gas = Block.pending().sync.base_fee_per_gas
+                # TODO: get block with default network if not set in contract
+                base_fee_per_gas = Block[rpc.network].pending().sync.base_fee_per_gas
             else:
                 max_priority_fee_per_gas = (
-                    max_priority_fee_per_gas or await Block.priority_fee()
+                    max_priority_fee_per_gas or await rpc.max_priority_fee_per_gas()
                 )
 
                 # TODO: fix pending()
-                block = await Block.pending()
+                block = await Block[rpc.network].pending()
                 base_fee_per_gas = block.base_fee_per_gas
 
             assert base_fee_per_gas, "block is earlier than London Hard Fork"
@@ -455,11 +454,13 @@ class ContractFunc(Generic[T, U]):
                 value=value,
                 access_list=access_list,
                 chain_id=chain_id,
+                type=1 if bool(gas_price) else 2,
             )
         return PreparedTransaction(
             data=self.data,
             to=self.address,
             gas=HexInteger(gas),
+            gas_price=gas_price,
             max_fee_per_gas=max_fee_per_gas,
             max_priority_fee_per_gas=max_priority_fee_per_gas,
             nonce=nonce or await wallet.get_nonce(),
