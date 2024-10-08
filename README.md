@@ -21,6 +21,12 @@
 
 ---
 
+## Docs
+
+Read the docs [here](https://eth-packages.empyrealsdk.com/)
+
+---
+
 ## Installation
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install eth_rpc and/or eth_typeshed
