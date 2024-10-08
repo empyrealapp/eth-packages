@@ -185,7 +185,7 @@ class PrivateKeyWallet(BaseWallet):
         return self.send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction))
 
     def sign_hash(self, hashed: bytes) -> SignedMessage:
-        return EthAccount._sign_hash(hashed, self._account.key)  # type: ignore
+        return EthAccount._sign_hash(hashed, self._account.key)
 
     async def balance(self, block_number: int | BLOCK_STRINGS = "latest") -> int:
         return await Account.get_balance(self.address, block_number=block_number)

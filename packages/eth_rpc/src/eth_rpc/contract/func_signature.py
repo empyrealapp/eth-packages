@@ -45,8 +45,7 @@ class FuncSignature(Request, Generic[T, U]):
         ):
             converted_inputs = transform_primitive(inputs)
             if issubclass(inputs, Struct):
-                converted_input_tuple = ",".join(converted_inputs)
-                return [f"({converted_input_tuple})"]
+                return [converted_inputs]
         else:
             if get_origin(inputs) == list:
                 return [transform_primitive(inputs)]
