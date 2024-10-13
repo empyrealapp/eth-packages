@@ -10,7 +10,7 @@ from .struct import Struct
 class Error(Struct):
     @classmethod
     def selector(cls):
-        return f'0x{keccak(cls.type_string())[:4].hex()}'
+        return f"0x{keccak(cls.type_string())[:4].hex()}"
 
     @classmethod
     def decode(cls, data: HexStr) -> Self:

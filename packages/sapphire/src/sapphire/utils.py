@@ -1,12 +1,12 @@
 from binascii import unhexlify
 
-from eth_rpc import ContractFunc, Network, PrivateKeyWallet, PreparedTransaction
+from eth_rpc import ContractFunc, Network, PreparedTransaction, PrivateKeyWallet
 from eth_rpc._transport import _force_get_global_rpc
 from eth_rpc.networks import SapphireTestnet
 from eth_typing import HexStr
 
-from .sapphire import encrypt_tx_data, _make_envelope, SignedArgs
 from .data_pack import make_response_async
+from .sapphire import SignedArgs, _make_envelope, encrypt_tx_data
 
 
 async def send_encrypted_call(
@@ -39,10 +39,14 @@ async def send_encrypted_tx(
     gas_price: int = 100000000000,
     network: type[Network] = SapphireTestnet,
 ):
-    prepared_tx: PreparedTransaction = await invocation.prepare(wallet, gas_price=gas_price)
+    prepared_tx: PreparedTransaction = await invocation.prepare(
+        wallet, gas_price=gas_price
+    )
     _, prepared_tx.data = await encrypt_tx_data(
         prepared_tx.data,
         network=network,
     )
     signed_tx = wallet.sign_transaction(prepared_tx)
-    return await wallet[network].send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction))
+    return await wallet[network].send_raw_transaction(
+        HexStr("0x" + signed_tx.raw_transaction)
+    )

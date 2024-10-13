@@ -138,7 +138,9 @@ def make_response(
     nonce = wallet.get_nonce().sync + 15
     call = make_upgraded_call(from_, to, data, block_number, block_hash, nonce)
     domain = make_upgraded_domain(chain_id)
-    signed_data: SignedMessage = Account.sign_typed_data(wallet.private_key, domain, TYPES, call)
+    signed_data: SignedMessage = Account.sign_typed_data(
+        wallet.private_key, domain, TYPES, call
+    )
     signature = signed_data.signature
 
     return SignedResponse(
@@ -164,7 +166,9 @@ async def make_response_async(
     nonce = await wallet[network].get_nonce() + 15
     call = make_upgraded_call(from_, to, data, block_number, block_hash, nonce)
     domain = make_upgraded_domain(chain_id)
-    signed_data: SignedMessage = Account.sign_typed_data(wallet.private_key, domain, TYPES, call)
+    signed_data: SignedMessage = Account.sign_typed_data(
+        wallet.private_key, domain, TYPES, call
+    )
     signature = signed_data.signature
 
     return SignedResponse(
