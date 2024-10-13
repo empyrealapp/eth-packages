@@ -427,14 +427,14 @@ class ContractFunc(Generic[T, U]):
                     max_priority_fee_per_gas or rpc.max_priority_fee_per_gas.sync()
                 )
                 # TODO: get block with default network if not set in contract
-                base_fee_per_gas = Block[rpc.network].pending().sync.base_fee_per_gas
+                base_fee_per_gas = Block[rpc.network].pending().sync.base_fee_per_gas  # type: ignore[name-defined]
             else:
                 max_priority_fee_per_gas = (
                     max_priority_fee_per_gas or await rpc.max_priority_fee_per_gas()
                 )
 
                 # TODO: fix pending()
-                block = await Block[rpc.network].pending()
+                block = await Block[rpc.network].pending()  # type: ignore[name-defined]
                 base_fee_per_gas = block.base_fee_per_gas
 
             assert base_fee_per_gas, "block is earlier than London Hard Fork"
@@ -450,7 +450,7 @@ class ContractFunc(Generic[T, U]):
                 gas_price=gas_price,
                 max_fee_per_gas=max_fee_per_gas,
                 max_priority_fee_per_gas=max_priority_fee_per_gas,
-                nonce=nonce or wallet.get_nonce().sync,
+                nonce=nonce or wallet[rpc.network].get_nonce().sync,
                 value=value,
                 access_list=access_list,
                 chain_id=chain_id,
@@ -463,7 +463,7 @@ class ContractFunc(Generic[T, U]):
             gas_price=gas_price,
             max_fee_per_gas=max_fee_per_gas,
             max_priority_fee_per_gas=max_priority_fee_per_gas,
-            nonce=nonce or await wallet.get_nonce(),
+            nonce=nonce or await wallet[rpc.network].get_nonce(),
             value=value,
             access_list=access_list,
             chain_id=chain_id,

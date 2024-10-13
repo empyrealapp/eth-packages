@@ -1,6 +1,7 @@
 import cbor2
-from eth_account.account import Account, LocalAccount
-from eth_rpc import Block, PrivateKeyWallet
+from eth_account.account import Account, LocalAccount, SignedMessage
+from eth_rpc import Block, Network, PrivateKeyWallet
+from eth_rpc.networks import SapphireTestnet
 from eth_rpc.types import primitives
 from eth_typing import HexStr
 from pydantic import BaseModel, Field
@@ -137,8 +138,34 @@ def make_response(
     nonce = wallet.get_nonce().sync + 15
     call = make_upgraded_call(from_, to, data, block_number, block_hash, nonce)
     domain = make_upgraded_domain(chain_id)
-    data = Account.sign_typed_data(wallet.private_key, domain, TYPES, call)
-    signature = data.signature
+    signed_data: SignedMessage = Account.sign_typed_data(wallet.private_key, domain, TYPES, call)
+    signature = signed_data.signature
+
+    return SignedResponse(
+        from_=from_,
+        to=to,
+        data=make_body(nonce, signature, envelope, block_hash, block_number),
+    )
+
+
+async def make_response_async(
+    from_,
+    to,
+    data,
+    envelope,
+    wallet: PrivateKeyWallet,
+    chain_id: int = 0x5AFF,
+    network: type[Network] = SapphireTestnet,
+):
+    block = await Block[network].latest()  # type: ignore
+    block_number = block.number - 1
+    block = await Block[network].load_by_number(block_number)  # type: ignore
+    block_hash = bytes.fromhex(block.hash[2:])  # type: ignore
+    nonce = await wallet[network].get_nonce() + 15
+    call = make_upgraded_call(from_, to, data, block_number, block_hash, nonce)
+    domain = make_upgraded_domain(chain_id)
+    signed_data: SignedMessage = Account.sign_typed_data(wallet.private_key, domain, TYPES, call)
+    signature = signed_data.signature
 
     return SignedResponse(
         from_=from_,
