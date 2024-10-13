@@ -115,7 +115,8 @@ def set_alchemy_key(alchemy_key: str, network: type[Network] | None = None) -> N
         set_alchemy_transport(alchemy_key, network)
     else:
         for network in Networks.values():
-            set_alchemy_transport(alchemy_key, network)
+            if network.alchemy_str:
+                set_alchemy_transport(alchemy_key, network)
 
 
 def configure_rpc_from_env():
