@@ -36,7 +36,7 @@ from typing import Annotated
 from eth_rpc.contract import ProtocolBase, ContractFunc
 from eth_rpc import Transaction
 from eth_rpc.wallet import PrivateKeyWallet
-from eth_rpc.types import HexStr, Name, primitives
+from eth_rpc.types import METHOD, HexStr, Name, primitives
 
 
 class MyContract(ProtocolBase):
