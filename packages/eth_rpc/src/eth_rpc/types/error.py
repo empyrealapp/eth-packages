@@ -7,7 +7,7 @@ from eth_typing import HexStr
 from .struct import Struct
 
 
-class Error(Struct):
+class EvmError(Struct):
     @classmethod
     def selector(cls):
         return f"0x{keccak(cls.type_string())[:4].hex()}"
