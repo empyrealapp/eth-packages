@@ -5,10 +5,9 @@ from typing import Annotated, get_args, get_origin
 from eth_abi import encode
 from eth_account import Account
 from eth_hash.auto import keccak
-from eth_typing import ChecksumAddress, HexAddress, HexStr
+from eth_typing import HexAddress, HexStr
 from pydantic import Field
 
-from .basic import ALL_PRIMITIVES
 from .primitives import bytes32
 from .struct import Struct
 
@@ -19,36 +18,6 @@ class EIP712Model(Struct):
     a struct to be easily hashed for signing.  This is utilized for EIP-712, which
     creates a standarized approach to serializing data.
     """
-
-    @classmethod
-    def struct_name(cls) -> str:
-        """Override this if you want the struct name to be different from the class name"""
-        return cls.__name__
-
-    @staticmethod
-    def transform(type_):
-        mapping = {
-            str: "string",
-            int: "uint256",  # defaults to uint256
-            HexAddress: "address",
-            ChecksumAddress: "address",
-            HexStr: "bytes",
-        }
-        if type_ in mapping:
-            return mapping[type_]
-        if str(type_) in ALL_PRIMITIVES:
-            return str(type_)
-        # handle list type
-        if isinstance(type_, GenericAlias):
-            (arg,) = get_args(type_)
-            return f"{arg.__name__}[]"
-        return type_.__name__
-
-    @classmethod
-    def get_nested_types(cls):
-        for _, field in cls.model_fields.items():
-            for item in cls._get_nested_types(field.annotation):
-                yield item
 
     @classmethod
     def _get_nested_types(cls, type_) -> list:

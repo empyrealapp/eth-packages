@@ -134,6 +134,7 @@ __all__ = [
     "BASIC_TYPES",
     "BYTES_TYPES",
     "BLOCK_STRINGS",
+    "METHOD",
     "BlockExplorer",
     "BlockReference",
     "Bytes32Hex",

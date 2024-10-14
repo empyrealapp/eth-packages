@@ -1,9 +1,12 @@
 from inspect import isclass
-from typing import Any, get_args, get_origin
+from types import GenericAlias
+from typing import Annotated, Any, get_args, get_origin
 
 from eth_abi import decode, encode
-from eth_typing import HexStr
+from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import BaseModel
+
+from .basic import ALL_PRIMITIVES
 
 
 class Struct(BaseModel):
@@ -84,3 +87,71 @@ class Struct(BaseModel):
         for field, (name, value) in zip(fields, zipped.items()):
             response[name] = cls.cast(field, value)
         return cls(**response)
+
+    @classmethod
+    def struct_name(cls) -> str:
+        """Override this if you want the struct name to be different from the class name"""
+        return cls.__name__
+
+    @staticmethod
+    def transform(type_):
+        mapping = {
+            str: "string",
+            int: "uint256",  # defaults to uint256
+            HexAddress: "address",
+            ChecksumAddress: "address",
+            HexStr: "bytes",
+        }
+        if type_ in mapping:
+            return mapping[type_]
+        if str(type_) in ALL_PRIMITIVES:
+            return str(type_)
+        # handle list type
+        if isinstance(type_, GenericAlias):
+            (arg,) = get_args(type_)
+            return f"{arg.__name__}[]"
+        return type_.__name__
+
+    @classmethod
+    def get_nested_types(cls):
+        for _, field in cls.model_fields.items():
+            for item in cls._get_nested_types(field.annotation):
+                yield item
+
+    @classmethod
+    def _get_nested_types(cls, type_) -> list:
+        if get_origin(type_) == list:
+            return cls._get_nested_types(get_args(type_)[0])
+        elif get_origin(type_) == tuple:
+            args = get_args(type_)
+            return [
+                item
+                for subl in [cls._get_nested_types(arg) for arg in args]
+                for item in subl
+            ]
+        elif get_origin(type_) == Annotated:
+            return cls._get_nested_types(get_args(type_)[0])
+        return []
+
+    @classmethod
+    def type_string(cls) -> bytes:
+        type_string: str = ""
+        nested_types = list(cls.get_nested_types())
+        for name, field_data in cls.model_fields.items():
+            name = field_data.serialization_alias or name
+            type_ = field_data.annotation
+
+            if isinstance(type_, GenericAlias):
+                if get_origin(type_) == list:
+                    (arg,) = get_args(type_)
+                    type_str = f"{cls.transform(arg)}[]"
+                elif get_origin(type_) == tuple:
+                    args = get_args(type_)
+                    type_str = f"({','.join([cls.transform(arg) for arg in args])})"
+            else:
+                type_str = cls.transform(type_)
+            type_string += f"{type_str},"
+        encoded_typestr: bytes = (
+            f'{cls.struct_name()}({type_string.rstrip(",")})'.encode("utf-8")
+        )
+        return encoded_typestr + b"".join(set(nested_types))
