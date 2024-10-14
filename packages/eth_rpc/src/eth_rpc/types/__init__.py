@@ -38,6 +38,7 @@ from .basic import (
     HexInt,
     HexInteger,
 )
+from .error import EvmError
 from .event import Indexed, Name
 from .network import BlockExplorer, Network, Rpcs, RpcUrl
 from .primitives import BASIC_TYPES, BYTES_TYPES
@@ -140,6 +141,7 @@ __all__ = [
     "Bytes32Hex",
     "Domain",
     "EIP712Model",
+    "EvmError",
     "Indexed",
     "Name",
     "Network",
