@@ -204,3 +204,8 @@ class PrivateKeyWallet(BaseWallet):
         r = signature[:-66].lstrip("0x")
 
         return int(r, 16), int(s, 16), int(v, 16)
+
+    def __repr__(self):
+        return f"<PrivateKeyWallet address={self.address}>"
+
+    __str__ = __repr__
