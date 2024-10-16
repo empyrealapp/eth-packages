@@ -342,7 +342,7 @@ class Event(Request, Generic[T]):
         This backfills events, handling LogResponseExceededError to provide all logs in a range too large for a single request
         """
         start_block = start_block or 1
-        current_number = await Block.get_number()
+        current_number = await Block[self._network].get_number()  # type: ignore[name-defined]
         end_block = end_block or (current_number - 3)  # set 3 default confirmations
 
         if start_block == "earliest":
