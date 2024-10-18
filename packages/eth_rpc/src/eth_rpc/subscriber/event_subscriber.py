@@ -23,7 +23,6 @@ from websockets.exceptions import ConnectionClosedError
 from websockets.legacy.client import WebSocketClientProtocol, connect
 
 from .._request import Request
-from .._transport import _force_get_global_rpc
 from ..constants import DEFAULT_CONTEXT, DEFAULT_EVENT
 
 T = TypeVar("T", bound=BaseModel)
@@ -177,7 +176,7 @@ class EventSubscriber(Request, Generic[U]):
         # TODO: sometimes the topics match, but the indexed fields are different
         topic_dict = {event.get_topic0: event for event in self.events}
 
-        rpc = _force_get_global_rpc()
+        rpc = self._rpc()
         async for w3_connection in connect(
             rpc.wss,
             ping_interval=60,
