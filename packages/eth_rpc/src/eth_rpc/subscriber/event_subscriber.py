@@ -266,7 +266,8 @@ class EventSubscriber(Request, Generic[U]):
                 start_context=latest_block,
             )
         )
-        latest = await Block.latest()
+        rpc = self._rpc()
+        latest = await Block[rpc.network].latest()  # type: ignore
         latest_block.set(latest.number)
         await self.get_logs(start_block, latest.number, addresses)
         should_publish_events.set()
