@@ -554,9 +554,11 @@ class ContractFunc(Generic[T, U]):
             )
         signed_tx = wallet.sign_transaction(prepared_tx)
         if sync:
-            return wallet[self._network].send_raw_transaction(
-                HexStr("0x" + signed_tx.raw_transaction)
-            ).sync
+            return (
+                wallet[self._network]
+                .send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction))
+                .sync
+            )
         return await wallet[self._network].send_raw_transaction(
             HexStr("0x" + signed_tx.raw_transaction)
         )
