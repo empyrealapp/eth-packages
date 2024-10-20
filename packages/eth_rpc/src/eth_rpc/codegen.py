@@ -94,7 +94,7 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:  # noqa: C901
         outputs = func.get("outputs", [])
 
         input_type, _models = convert_types(inputs)
-        for (model_name, model) in _models:
+        for model_name, model in _models:
             if model_name not in model_dict:
                 model_dict[model_name] = model
             elif model_dict[model_name] == model:
@@ -148,10 +148,10 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:  # noqa: C901
 
     for _, fields in list(model_dict.items()):
         for field in fields:
-            if field['internalType'].startswith('struct'):
-                model_name = field['internalType'].split('.')[-1].replace("[]", "")
+            if field["internalType"].startswith("struct"):
+                model_name = field["internalType"].split(".")[-1].replace("[]", "")
                 if model_name not in model_dict:
-                    model_dict[model_name] = field['components']
+                    model_dict[model_name] = field["components"]
 
     models = list(model_dict.items())
     for name, fields in models:
@@ -160,10 +160,10 @@ class {name}(Struct):
 """
         embedded_types = []
         for field in fields:
-            if (internalType := field['internalType']).startswith('struct'):
-                type_ = internalType.split('.')[-1].replace('[]', '')
-                while internalType.endswith('[]'):
-                    type_ = list[type_]   # type: ignore[valid-type]
+            if (internalType := field["internalType"]).startswith("struct"):
+                type_ = internalType.split(".")[-1].replace("[]", "")
+                while internalType.endswith("[]"):
+                    type_ = list[type_]  # type: ignore[valid-type]
                     internalType = internalType[:-2]
             else:
                 try:
@@ -173,12 +173,12 @@ class {name}(Struct):
                     if field["internalType"].endswith("[]"):
                         type_ = list[type_]  # type: ignore[valid-type]
             embedded_types.append(type_)
-            name = field['name']
-            snakecase_name = to_snake_case(field['name'])
+            name = field["name"]
+            snakecase_name = to_snake_case(field["name"])
             if name == snakecase_name:
                 model_str += f"\t{name}: {type_}\n"
             else:
-                model_str += f"\t{snakecase_name}: Annotated[{type_}, Name(\"{name}\")]\n"
+                model_str += f'\t{snakecase_name}: Annotated[{type_}, Name("{name}")]\n'
         lines = [model_str] + lines
 
     class_str = "\n".join(imports) + "\n".join(lines) + "\n"
