@@ -472,6 +472,36 @@ UNISWAP_SWAP_ROUTER = [
     },
     {"stateMutability": "payable", "type": "receive"},
 ]
+WHOAMI = [
+    {
+        "type": "function",
+        "name": "whoAmI",
+        "inputs": [
+            {
+                "name": "user",
+                "type": "tuple",
+                "internalType": "struct WhoAmI.User",
+                "components": [
+                    {"name": "userName", "type": "string", "internalType": "string"},
+                    {
+                        "name": "walletName",
+                        "type": "tuple[]",
+                        "internalType": "struct WhoAmI.Wallet[]",
+                        "components": [
+                            {
+                                "name": "addr",
+                                "type": "address",
+                                "internalType": "address",
+                            }
+                        ],
+                    },
+                ],
+            }
+        ],
+        "outputs": [{"name": "", "type": "address", "internalType": "address"}],
+        "stateMutability": "view",
+    }
+]
 
 
 def test_codegen():
@@ -479,4 +509,7 @@ def test_codegen():
     ast.parse(result)
 
     result = codegen(UNISWAP_UNIVERAL_ROUTER_ABI, "UniversalRouter")
+    ast.parse(result)
+
+    result = codegen(WHOAMI, "WhoAmI")
     ast.parse(result)
