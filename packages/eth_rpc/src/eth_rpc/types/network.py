@@ -1,5 +1,7 @@
+import json
 from typing import ClassVar, Optional
 
+import httpx
 from eth_typing import HexAddress, HexStr
 from pydantic import AnyHttpUrl, BaseModel, Field
 from pydantic.networks import AnyWebsocketUrl, Url
@@ -59,6 +61,13 @@ class Network(BaseModel):
         if api_key:
             cls.block_explorer.api_key = api_key
         return cls
+
+    async def get_abi(self, address: HexAddress, api_key: str):
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.block_explorer.url}?module=contract&action=getabi&address={address}&apikey={api_key}"
+            )
+        return json.loads(response.json()["result"])
 
     def __init_subclass__(cls, **kwargs):
         if cls.rpc.default.http:
