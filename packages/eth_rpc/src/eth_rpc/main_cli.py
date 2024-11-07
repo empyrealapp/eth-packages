@@ -39,7 +39,7 @@ def load(input_file, output, contract_name: str):
 @click.option("--network", "-n", default="ethereum")
 @click.option("--address", "-a", required=True)
 @click.option("--output", "-o", default="abi.py")
-@click.option("--api_key", "-a", required=True)
+@click.option("--api-key", "-a", required=True)
 @click.option("--contract-name", "-c", default="AnonContract")
 def explorer(
     network: str, address: HexAddress, output: str, api_key, contract_name: str

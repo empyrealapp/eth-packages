@@ -65,7 +65,7 @@ class Network(BaseModel):
     async def get_abi(self, address: HexAddress, api_key: str):
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{self.block_explorer.url}?module=contract&action=getabi&address={address}&apikey={api_key}"
+                f"{self.block_explorer.api_url}?module=contract&action=getabi&address={address}&apikey={api_key}"
             )
         return json.loads(response.json()["result"])
 
