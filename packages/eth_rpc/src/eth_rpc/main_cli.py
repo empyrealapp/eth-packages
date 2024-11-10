@@ -44,7 +44,7 @@ def load(input_file, output, contract_name: str):
 def explorer(
     network: str, address: HexAddress, output: str, api_key, contract_name: str
 ):
-    if network.lower() != "ethereum":
+    if network.lower() not in ["ethereum", "base", "arbitrum"]:
         click.echo("Network not yet supported.  Coming soon!")
         return
     abi = get_abi(address, api_key)
