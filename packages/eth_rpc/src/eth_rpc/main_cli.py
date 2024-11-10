@@ -1,9 +1,11 @@
+import asyncio
 import json
 
 import click
 from eth_typing import HexAddress
 
-from .block_explorer import get_abi
+from eth_rpc.networks import get_network_by_name
+from eth_rpc.networks import Network
 from .codegen import codegen as codegen_cmd
 
 
@@ -47,7 +49,10 @@ def explorer(
     if network.lower() not in ["ethereum", "base", "arbitrum"]:
         click.echo("Network not yet supported.  Coming soon!")
         return
-    abi = get_abi(address, api_key)
+
+    network_type: type[Network] = get_network_by_name(network)
+
+    abi = asyncio.run(network_type.get_abi(address, api_key))
     with open(output, "w") as f:
         f.write(codegen_cmd(abi, contract_name))
 

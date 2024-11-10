@@ -62,11 +62,14 @@ class Network(BaseModel):
             cls.block_explorer.api_key = api_key
         return cls
 
+    @classmethod
     async def get_abi(self, address: HexAddress, api_key: str):
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"{self.block_explorer.api_url}?module=contract&action=getabi&address={address}&apikey={api_key}"
-            )
+        response = httpx.get(
+            f"{self.block_explorer.api_url}?module=contract&action=getabi&address={address}&apikey={api_key}"
+        )
+        if response.json()["message"] != "OK":
+            error_message = response.json()['result']
+            raise Exception(f"Failed to get ABI for {address}. API returned error: \"{error_message}\"")
         return json.loads(response.json()["result"])
 
     def __init_subclass__(cls, **kwargs):
