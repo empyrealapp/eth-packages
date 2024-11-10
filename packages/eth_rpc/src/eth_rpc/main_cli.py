@@ -2,10 +2,9 @@ import asyncio
 import json
 
 import click
+from eth_rpc.networks import Network, get_network_by_name
 from eth_typing import HexAddress
 
-from eth_rpc.networks import get_network_by_name
-from eth_rpc.networks import Network
 from .codegen import codegen as codegen_cmd
 
 
