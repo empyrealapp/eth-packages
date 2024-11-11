@@ -26,7 +26,7 @@ def get_network_by_name(network_name: str) -> type[Network]:
         for network in Networks.values()
         if network.__name__.lower() == network_name.lower()
     ]
-    if not len(matching_network) != 1:
+    if len(matching_network) != 1:
         raise ValueError("Network not found")
     return matching_network[0]
 
