@@ -1,4 +1,4 @@
-from .contracts import GMXEnvironment, GMXArbitrum, GMXAvalanche
+from ._environment import GMXEnvironment, GMXArbitrum, GMXAvalanche
 from .synthetics_reader import SyntheticsReader, DepositAmountOutParams, ExecutionPriceParams, ReaderPricingUtilsExecutionPriceResult, MarketProps
 
 

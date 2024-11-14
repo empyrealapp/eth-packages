@@ -32,6 +32,16 @@ class OraclePrice(BaseModel):
     oracle_type: str
     blob: str
 
+    def __repr__(self) -> str:
+        return f"<OraclePrice token_address={self.token_address}, token_symbol={self.token_symbol}, min_price={self.min_price}, max_price={self.max_price}>"
+
+    __str__ = __repr__
+
 
 class OraclePriceResponse(BaseModel):
     signed_prices: list[OraclePrice] = Field(alias="signedPrices")
+
+    def __repr__(self) -> str:
+        return f"<OraclePriceResponse signed_prices={self.signed_prices}>"
+
+    __str__ = __repr__

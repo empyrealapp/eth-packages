@@ -2,7 +2,7 @@ from eth_abi import encode
 from eth_hash.auto import keccak
 
 
-def create_hash(types: list[str], values: list[str]):
+def create_hash(types: list[str], values: list[str | bytes | bool]):
     return keccak(encode(types, values))
 
 

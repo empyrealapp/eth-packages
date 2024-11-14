@@ -86,7 +86,7 @@ def max_open_interest_key(market: str,
 
     return create_hash(
         ["bytes32", "address", "bool"],
-        [MAX_OPEN_INTEREST, market, is_long]
+        [MAX_OPEN_INTEREST, market, is_long],
     )
 
 

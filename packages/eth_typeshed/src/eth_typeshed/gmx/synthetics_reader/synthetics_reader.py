@@ -6,6 +6,7 @@ from eth_rpc.types import primitives, Name
 from .schemas import (
     DepositAmountOutParams,
     ExecutionPriceParams,
+    GetMarketsParams,
     SwapAmountOutParams,
     SwapAmountOutResponse,
     WithdrawalAmountOutParams,
@@ -126,7 +127,7 @@ class SyntheticsReader(ProtocolBase):
 
     get_markets: Annotated[
         ContractFunc[
-            tuple[primitives.address, primitives.uint256, primitives.uint256],
+            GetMarketsParams,
             list[MarketProps]
         ],
         Name("getMarkets"),

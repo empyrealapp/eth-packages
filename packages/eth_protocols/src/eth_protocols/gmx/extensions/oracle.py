@@ -2,7 +2,8 @@ from typing import Literal
 
 import httpx
 from eth_rpc.networks import get_network_by_name
-from eth_typing import HexAddress
+from eth_rpc.utils import to_checksum
+from eth_typing import ChecksumAddress
 from pydantic import BaseModel, PrivateAttr
 
 from ..types import OraclePrice, OraclePriceResponse
@@ -23,15 +24,9 @@ class PriceOracle(BaseModel):
             else "https://avalanche-api.gmxinfra.io/signed_prices/latest"
         )
 
-    async def get_recent_prices(self) -> dict[HexAddress, OraclePrice]:
+    async def get_recent_prices(self) -> dict[ChecksumAddress, OraclePrice]:
         """
         Get raw output of the GMX rest v2 api for signed prices
-
-        Returns
-        -------
-        dict
-            dictionary containing raw output for each token as its keys.
-
         """
         raw_output = await self._make_query()
         return self._process_output(raw_output)
@@ -39,20 +34,13 @@ class PriceOracle(BaseModel):
     async def _make_query(self) -> OraclePriceResponse:
         """
         Make request using oracle url
-
-        Returns
-        -------
-        requests.models.Response
-            raw request response.
-
         """
         async with httpx.AsyncClient() as client:
             response = await client.get(self._oracle_url)
         return OraclePriceResponse(**response.json())
 
-    def _process_output(self, output: OraclePriceResponse) -> dict[HexAddress, OraclePrice]:
-        processed: dict[str, OraclePriceResponse] = {}
+    def _process_output(self, output: OraclePriceResponse) -> dict[ChecksumAddress, OraclePrice]:
+        processed: dict[ChecksumAddress, OraclePrice] = {}
         for i in output.signed_prices:
-            processed[i.token_address] = i
-
+            processed[to_checksum(i.token_address)] = i
         return processed

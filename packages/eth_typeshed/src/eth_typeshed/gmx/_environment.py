@@ -14,7 +14,7 @@ class GMXEnvironment(BaseModel):
     order_vault: HexAddress
     synthetics_reader: HexAddress
     synthetics_router: HexAddress
-    glv_reader: HexAddress
+    glv_reader: HexAddress | None = None
 
     tokens_url: str
 

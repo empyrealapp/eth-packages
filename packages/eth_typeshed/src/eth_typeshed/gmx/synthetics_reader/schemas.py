@@ -3,6 +3,7 @@ from typing import Annotated
 from pydantic import BaseModel
 
 from eth_rpc.types import primitives, Name
+from eth_typing import HexAddress
 from .enums import SwapPricingType
 from .types import MarketProps, MarketUtilsMarketPrices, PriceProps, SwapPricingUtilsSwapFees
 
@@ -55,3 +56,9 @@ class WithdrawalAmountOutParams(BaseModel):
 class WithdrawalAmountOutResponse(BaseModel):
     long_amount_after_fees: primitives.uint256
     short_amount_after_fees: primitives.uint256
+
+
+class GetMarketsParams(BaseModel):
+    data_store: HexAddress
+    start_index: primitives.uint256
+    end_index: primitives.uint256

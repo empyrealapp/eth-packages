@@ -1,23 +1,14 @@
 from typing import Literal
 
 import httpx
-from eth_typing import HexAddress
-from pydantic import BaseModel
+from eth_typing import ChecksumAddress
 
+from eth_rpc.utils import to_checksum
 from eth_typeshed.gmx.contracts import GMXEnvironment
+from ..types import TokensInfo, TokenInfo
 
 
-class TokenInfo(BaseModel):
-    symbol: str
-    address: HexAddress
-    decimals: int
-
-
-class TokensInfo(BaseModel):
-    tokens: list[TokenInfo]
-
-
-async def get_tokens_address_dict(chain: Literal["arbitrum", "avalanche"] = "arbitrum") -> dict[HexAddress, TokenInfo]:
+async def get_tokens_address_dict(chain: Literal["arbitrum", "avalanche"] = "arbitrum") -> dict[ChecksumAddress, TokenInfo]:
     environment = GMXEnvironment.get_environment(chain)
 
     try:
@@ -32,9 +23,9 @@ async def get_tokens_address_dict(chain: Literal["arbitrum", "avalanche"] = "arb
     except httpx.RequestError as e:
         print(f"Error: {e}")
 
-    token_address_dict: dict[HexAddress, TokenInfo] = {}
+    token_address_dict: dict[ChecksumAddress, TokenInfo] = {}
     for token_info in token_infos.tokens:
-        token_address_dict[token_info.address] = token_info
+        token_address_dict[to_checksum(token_info.address)] = token_info
     return token_address_dict
 
 
@@ -66,23 +57,6 @@ def get_funding_factor_per_period(
     market_info: dict, is_long: bool, period_in_seconds: int,
     long_interest_usd: int, short_interest_usd: int
 ):
-    """
-    For a given market, calculate the funding factor for a given period
-
-    Parameters
-    ----------
-    market_info : dict
-        market parameters returned from the reader contract.
-    is_long : bool
-        direction of the position.
-    period_in_seconds : int
-        Want percentage rate we want to output to be in.
-    long_interest_usd : int
-        expanded decimal long interest.
-    short_interest_usd : int
-        expanded decimal short interest.
-    """
-
     funding_factor_per_second = (
         market_info['funding_factor_per_second'] * 10**-28
     )
@@ -117,28 +91,6 @@ def get_funding_factor_per_period(
 
 
 def determine_swap_route(markets: dict, in_token: str, out_token: str):
-    """
-    Using the available markets, find the list of GMX markets required
-    to swap from token in to token out
-
-    Parameters
-    ----------
-    markets : dict
-        dictionary of markets output by getMarketInfo.
-    in_token : str
-        contract address of in token.
-    out_token : str
-        contract address of out token.
-
-    Returns
-    -------
-    list
-        list of GMX markets to swap through.
-    is_requires_multi_swap : TYPE
-        requires more than one market to pass thru.
-
-    """
-
     if in_token == "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f":
         in_token = "0x47904963fc8b2340414262125aF798B9655E58Cd"
 

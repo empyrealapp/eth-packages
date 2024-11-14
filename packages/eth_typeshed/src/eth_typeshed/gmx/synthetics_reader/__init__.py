@@ -1,4 +1,4 @@
-from .schemas import DepositAmountOutParams, ExecutionPriceParams
+from .schemas import DepositAmountOutParams, ExecutionPriceParams, GetMarketsParams
 from .synthetics_reader import SyntheticsReader
 from .types import (
     MarketProps,
@@ -11,6 +11,7 @@ from .types import (
 __all__ = [
     "DepositAmountOutParams",
     "ExecutionPriceParams",
+    "GetMarketsParams",
     "MarketProps",
     "SyntheticsReader",
     "OrderProps",
