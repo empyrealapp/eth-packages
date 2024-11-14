@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from eth_rpc import ProtocolBase, ContractFunc
-from eth_rpc.types import primitives, Name, NoArgs, Struct
+from eth_rpc.types import primitives, Name, Struct
 
 
 class WithdrawalFlags(Struct):
@@ -49,6 +49,16 @@ class ReaderUtilsVirtualInventory(Struct):
     virtual_pool_amount_for_long_token: Annotated[primitives.uint256, Name("virtualPoolAmountForLongToken")]
     virtual_pool_amount_for_short_token: Annotated[primitives.uint256, Name("virtualPoolAmountForShortToken")]
     virtual_inventory_for_positions: Annotated[primitives.int256, Name("virtualInventoryForPositions")]
+
+
+class MarketUtilsCollateralType(Struct):
+    long_token: Annotated[primitives.uint256, Name("longToken")]
+    short_token: Annotated[primitives.uint256, Name("shortToken")]
+
+
+class MarketUtilsPositionType(Struct):
+    long: Annotated[MarketUtilsCollateralType, Name("long")]
+    short: Annotated[MarketUtilsCollateralType, Name("short")]
 
 
 class MarketUtilsGetNextFundingAmountPerSizeResult(Struct):
@@ -237,6 +247,13 @@ class MarketPoolValueInfoProps(Struct):
     impact_pool_amount: Annotated[primitives.uint256, Name("impactPoolAmount")]
 
 
+class MarketProps(Struct):
+    market_token: Annotated[primitives.address, Name("marketToken")]
+    index_token: Annotated[primitives.address, Name("indexToken")]
+    long_token: Annotated[primitives.address, Name("longToken")]
+    short_token: Annotated[primitives.address, Name("shortToken")]
+
+
 class ReaderUtilsMarketInfo(Struct):
     market: MarketProps
     borrowing_factor_per_second_for_longs: Annotated[primitives.uint256, Name("borrowingFactorPerSecondForLongs")]
@@ -251,18 +268,6 @@ class ReaderPricingUtilsExecutionPriceResult(Struct):
     price_impact_usd: Annotated[primitives.int256, Name("priceImpactUsd")]
     price_impact_diff_usd: Annotated[primitives.uint256, Name("priceImpactDiffUsd")]
     execution_price: Annotated[primitives.uint256, Name("executionPrice")]
-
-
-class PriceProps(Struct):
-    min: primitives.uint256
-    max: primitives.uint256
-
-
-class MarketProps(Struct):
-    market_token: Annotated[primitives.address, Name("marketToken")]
-    index_token: Annotated[primitives.address, Name("indexToken")]
-    long_token: Annotated[primitives.address, Name("longToken")]
-    short_token: Annotated[primitives.address, Name("shortToken")]
 
 
 class DepositProps(Struct):
@@ -293,12 +298,6 @@ class ReaderUtilsPositionInfo(Struct):
     base_pnl_usd: Annotated[primitives.int256, Name("basePnlUsd")]
     uncapped_base_pnl_usd: Annotated[primitives.int256, Name("uncappedBasePnlUsd")]
     pnl_after_price_impact_usd: Annotated[primitives.int256, Name("pnlAfterPriceImpactUsd")]
-
-
-class MarketUtilsMarketPrices[](Struct):
-    index_token_price: Annotated[PriceProps, Name("indexTokenPrice")]
-    long_token_price: Annotated[PriceProps, Name("longTokenPrice")]
-    short_token_price: Annotated[PriceProps, Name("shortTokenPrice")]
 
 
 class OrderProps(Struct):
