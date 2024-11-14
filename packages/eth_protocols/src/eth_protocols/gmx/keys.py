@@ -1,4 +1,5 @@
-from .gmx_utils import create_hash_string, create_hash, get_datastore_contract
+from .utils import create_hash_string, create_hash
+
 
 ACCOUNT_POSITION_LIST = create_hash_string("ACCOUNT_POSITION_LIST")
 CLAIMABLE_FEE_AMOUNT = create_hash_string("CLAIMABLE_FEE_AMOUNT")

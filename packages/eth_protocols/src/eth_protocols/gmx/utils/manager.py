@@ -62,9 +62,6 @@ def find_dictionary_by_key_value(outer_dict: dict, key: str, value: str):
     return None
 
 
-PRECISION = 30
-
-
 def apply_factor(value, factor):
     return value * factor / 10**30
 
