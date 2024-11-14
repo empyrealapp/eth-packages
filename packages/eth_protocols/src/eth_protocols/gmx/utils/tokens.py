@@ -1,44 +1,40 @@
 from typing import Literal
 
 import httpx
+from eth_typing import HexAddress
+from pydantic import BaseModel
+
+from eth_typeshed.gmx.contracts import GMXEnvironment
 
 
-async def get_tokens_address_dict(chain: Literal["arbitrum", "avalanche"] = "arbitrum"):
-    """
-    Query the GMX infra api for to generate dictionary of tokens available on v2
+class TokenInfo(BaseModel):
+    symbol: str
+    address: HexAddress
+    decimals: int
 
-    Parameters
-    ----------
-    chain : avalanche | arbitrum
 
-    Returns
-    -------
-    token_address_dict : dict
-        dictionary containing available tokens to trade on GMX.
+class TokensInfo(BaseModel):
+    tokens: list[TokenInfo]
 
-    """
-    url = {
-        "arbitrum": "https://arbitrum-api.gmxinfra.io/tokens",
-        "avalanche": "https://avalanche-api.gmxinfra.io/tokens"
-    }
+
+async def get_tokens_address_dict(chain: Literal["arbitrum", "avalanche"] = "arbitrum") -> dict[HexAddress, TokenInfo]:
+    environment = GMXEnvironment.get_environment(chain)
 
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(url[chain])
+            response = await client.get(environment.tokens_url)
 
         # Check if the request was successful (status code 200)
         if response.status_code == 200:
-            token_infos = response.json()['tokens']
+            token_infos = TokensInfo(**response.json())
         else:
             print(f"Error: {response.status_code}")
     except httpx.RequestError as e:
         print(f"Error: {e}")
 
-    token_address_dict = {}
-
-    for token_info in token_infos:
-        token_address_dict[token_info['address']] = token_info
-
+    token_address_dict: dict[HexAddress, TokenInfo] = {}
+    for token_info in token_infos.tokens:
+        token_address_dict[token_info.address] = token_info
     return token_address_dict
 
 
@@ -85,7 +81,6 @@ def get_funding_factor_per_period(
         expanded decimal long interest.
     short_interest_usd : int
         expanded decimal short interest.
-
     """
 
     funding_factor_per_second = (
