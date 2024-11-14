@@ -109,7 +109,7 @@ def codegen(abi: list[dict[str, Any]], contract_name: str, full_struct_names: bo
                     count += 1
                 model_dict[model_name + f"_{count}"] = model
 
-        output_type, __models = convert_types(outputs)
+        output_type, __models = convert_types(outputs, full_struct_names=full_struct_names)
 
         for model in __models:
             model_name = model[0].replace("[]", "")

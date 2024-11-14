@@ -1,17 +1,7 @@
 from typing import Annotated
 
 from eth_rpc import ProtocolBase, ContractFunc
-from eth_rpc.types import primitives, Name, Struct
-
-
-class MarketUtilsCollateralType(Struct):
-    longToken: primitives.uint256
-    shortToken: primitives.uint256
-
-
-class MarketUtilsPositionType(Struct):
-    long: MarketUtilsCollateralType
-    short: MarketUtilsCollateralType
+from eth_rpc.types import primitives, Name, NoArgs, Struct
 
 
 class WithdrawalFlags(Struct):
@@ -122,6 +112,46 @@ class PositionAddresses(Struct):
     account: primitives.address
     market: primitives.address
     collateral_token: Annotated[primitives.address, Name("collateralToken")]
+
+
+class PositionPricingUtilsPositionReferralFees(Struct):
+    referral_code: primitives.bytes32
+    affiliate: primitives.address 
+    trader: primitives.address
+    total_rebate_factor: Annotated[primitives.uint256, Name("totalRebateFactor")]
+    affiliate_reward_factor: Annotated[primitives.uint256, Name("affiliateRewardFactor")]
+    adjusted_affiliate_reward_factor: Annotated[primitives.uint256, Name("adjustedAffiliateRewardFactor")]
+    trader_discount_factor: Annotated[primitives.uint256, Name("traderDiscountFactor")]
+    total_rebate_amount: Annotated[primitives.uint256, Name("totalRebateAmount")]
+    trader_discount_amount: Annotated[primitives.uint256, Name("traderDiscountAmount")]
+    affiliate_reward_amount: Annotated[primitives.uint256, Name("affiliateRewardAmount")]
+
+
+class PositionPricingUtilsPositionFundingFees(Struct):
+    funding_fee_amount: Annotated[primitives.uint256, Name("fundingFeeAmount")]
+    claimable_long_token_amount: Annotated[primitives.uint256, Name("claimableLongTokenAmount")]
+    claimable_short_token_amount: Annotated[primitives.uint256, Name("claimableShortTokenAmount")]
+    latest_funding_fee_amount_per_size: Annotated[primitives.uint256, Name("latestFundingFeeAmountPerSize")]
+    latest_long_token_claimable_funding_amount_per_size: Annotated[primitives.uint256, Name("latestLongTokenClaimableFundingAmountPerSize")]
+    latest_short_token_claimable_funding_amount_per_size: Annotated[primitives.uint256, Name("latestShortTokenClaimableFundingAmountPerSize")]
+
+
+class PositionPricingUtilsPositionBorrowingFees(Struct):
+    borrowing_fee_usd: Annotated[primitives.uint256, Name("borrowingFeeUsd")]
+    borrowing_fee_amount: Annotated[primitives.uint256, Name("borrowingFeeAmount")]
+    borrowing_fee_receiver_factor: Annotated[primitives.uint256, Name("borrowingFeeReceiverFactor")]
+    borrowing_fee_amount_for_fee_receiver: Annotated[primitives.uint256, Name("borrowingFeeAmountForFeeReceiver")]
+
+
+class PositionPricingUtilsPositionUiFees(Struct):
+    ui_fee_receiver: Annotated[primitives.address, Name("uiFeeReceiver")]
+    ui_fee_receiver_factor: Annotated[primitives.uint256, Name("uiFeeReceiverFactor")]
+    ui_fee_amount: Annotated[primitives.uint256, Name("uiFeeAmount")]
+
+
+class PriceProps(Struct):
+    min: primitives.uint256
+    max: primitives.uint256
 
 
 class PositionPricingUtilsPositionFees(Struct):
@@ -256,10 +286,19 @@ class PositionProps(Struct):
 class ReaderUtilsPositionInfo(Struct):
     position: PositionProps
     fees: PositionPricingUtilsPositionFees
-    execution_price_result: Annotated[ReaderPricingUtilsExecutionPriceResult, Name("executionPriceResult")]
+    execution_price_result: Annotated[
+        ReaderPricingUtilsExecutionPriceResult,
+        Name("executionPriceResult"),
+    ]
     base_pnl_usd: Annotated[primitives.int256, Name("basePnlUsd")]
     uncapped_base_pnl_usd: Annotated[primitives.int256, Name("uncappedBasePnlUsd")]
     pnl_after_price_impact_usd: Annotated[primitives.int256, Name("pnlAfterPriceImpactUsd")]
+
+
+class MarketUtilsMarketPrices[](Struct):
+    index_token_price: Annotated[PriceProps, Name("indexTokenPrice")]
+    long_token_price: Annotated[PriceProps, Name("longTokenPrice")]
+    short_token_price: Annotated[PriceProps, Name("shortTokenPrice")]
 
 
 class OrderProps(Struct):
