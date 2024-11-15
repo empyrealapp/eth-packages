@@ -1,9 +1,9 @@
 from typing import Annotated
 
+from eth_typing import HexAddress
 from pydantic import BaseModel
 
 from eth_rpc.types import primitives, Name
-from eth_typing import HexAddress
 from .enums import SwapPricingType
 from .types import MarketProps, MarketUtilsMarketPrices, PriceProps, SwapPricingUtilsSwapFees
 
@@ -62,3 +62,25 @@ class GetMarketsParams(BaseModel):
     data_store: HexAddress
     start_index: primitives.uint256
     end_index: primitives.uint256
+
+
+class GetOpenInterestParams(BaseModel):
+    data_store: HexAddress
+    market: MarketProps
+    index_token_price: PriceProps
+    is_long: bool
+    maximize: bool
+
+
+class GetPnlParams(BaseModel):
+    data_store: HexAddress
+    market: MarketProps
+    index_token_price: PriceProps
+    is_long: bool
+    maximize: bool
+
+
+class GetMarketParams(BaseModel):
+    data_store: HexAddress
+    prices: MarketUtilsMarketPrices
+    market_key: HexAddress

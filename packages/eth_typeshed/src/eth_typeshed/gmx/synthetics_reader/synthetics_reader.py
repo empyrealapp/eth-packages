@@ -7,6 +7,9 @@ from .schemas import (
     DepositAmountOutParams,
     ExecutionPriceParams,
     GetMarketsParams,
+    GetMarketParams,
+    GetOpenInterestParams,
+    GetPnlParams,
     SwapAmountOutParams,
     SwapAmountOutResponse,
     WithdrawalAmountOutParams,
@@ -103,7 +106,7 @@ class SyntheticsReader(ProtocolBase):
 
     get_market_info: Annotated[
         ContractFunc[
-            tuple[primitives.address, MarketUtilsMarketPrices, primitives.address],
+            GetMarketParams,
             ReaderUtilsMarketInfo
         ],
         Name("getMarketInfo"),
@@ -143,7 +146,7 @@ class SyntheticsReader(ProtocolBase):
 
     get_open_interest_with_pnl: Annotated[
         ContractFunc[
-            tuple[primitives.address, MarketProps, PriceProps, bool, bool],
+            GetOpenInterestParams,
             primitives.int256
         ],
         Name("getOpenInterestWithPnl"),
@@ -159,7 +162,7 @@ class SyntheticsReader(ProtocolBase):
 
     get_pnl: Annotated[
         ContractFunc[
-            tuple[primitives.address, MarketProps, PriceProps, bool, bool],
+            GetPnlParams,
             primitives.int256
         ],
         Name("getPnl"),

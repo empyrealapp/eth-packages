@@ -6,10 +6,13 @@ from pydantic import Field, PrivateAttr
 from eth_rpc.networks import Arbitrum, Avalanche
 from eth_rpc.types.primitives import address, uint256
 from eth_rpc.utils import to_checksum
-from eth_typeshed.gmx import MarketProps, GMXEnvironment, SyntheticsReader as SyntheticsReaderContract, ExecutionPriceParams
+from eth_typeshed.gmx import MarketProps, GMXEnvironment, SyntheticsReader as SyntheticsReaderContract, ExecutionPriceParams, ReaderUtilsMarketInfo
 from eth_typeshed.gmx.synthetics_reader.schemas import (
     DepositAmountOutParams,
     GetMarketsParams,
+    GetMarketParams,
+    GetOpenInterestParams,
+    GetPnlParams,
     SwapAmountOutParams,
     SwapAmountOutResponse,
     WithdrawalAmountOutParams,
@@ -113,6 +116,15 @@ class SyntheticsReader(PriceOracle):
                     short_token_address=market.short_token
                 )
         return decoded_markets
+
+    async def get_open_interest_with_pnl(self, params: GetOpenInterestParams) -> int:
+        return await self._contract.get_open_interest_with_pnl(params).get()
+
+    async def get_pnl(self, params: GetPnlParams) -> int:
+        return await self._contract.get_pnl(params).get()
+
+    async def get_market_info(self, params: GetMarketParams) -> ReaderUtilsMarketInfo:
+        return await self._contract.get_market_info(params).get()
 
     # Private Methods
 

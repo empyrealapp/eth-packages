@@ -1,5 +1,5 @@
 from ._environment import GMXEnvironment, GMXArbitrum, GMXAvalanche
-from .synthetics_reader import SyntheticsReader, DepositAmountOutParams, ExecutionPriceParams, ReaderPricingUtilsExecutionPriceResult, MarketProps
+from .synthetics_reader import SyntheticsReader, DepositAmountOutParams, ExecutionPriceParams, ReaderPricingUtilsExecutionPriceResult, MarketProps, ReaderUtilsMarketInfo
 
 
 __all__ = [
@@ -10,5 +10,6 @@ __all__ = [
     "ExecutionPriceParams",
     "MarketProps",
     "ReaderPricingUtilsExecutionPriceResult",
+    "ReaderUtilsMarketInfo",
     "SyntheticsReader",
 ]
