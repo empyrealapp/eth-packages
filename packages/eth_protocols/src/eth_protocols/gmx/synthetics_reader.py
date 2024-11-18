@@ -22,7 +22,7 @@ from eth_typeshed.gmx.synthetics_reader.schemas import (
     WithdrawalAmountOutResponse,
 )
 
-from .extensions.oracle import PriceOracle
+from .oracle import PriceOracle
 from .types import ExecutionPriceResult, MarketInfo
 from .utils import TokenInfo, get_tokens_address_dict
 
