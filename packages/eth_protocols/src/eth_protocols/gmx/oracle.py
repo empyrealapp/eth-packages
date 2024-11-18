@@ -6,7 +6,7 @@ from eth_rpc.utils import to_checksum
 from eth_typing import ChecksumAddress
 from pydantic import BaseModel, PrivateAttr
 
-from ..types import OraclePrice, OraclePriceResponse
+from .types import OraclePrice, OraclePriceResponse
 
 
 class PriceOracle(BaseModel):

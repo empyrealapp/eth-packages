@@ -1,5 +1,7 @@
 from typing import Annotated
 
+from eth_typing import HexAddress
+
 from eth_rpc import ProtocolBase, ContractFunc
 from eth_rpc.types import primitives, Name
 
@@ -10,6 +12,8 @@ from .schemas import (
     GetMarketParams,
     GetOpenInterestParams,
     GetPnlParams,
+    GetMarketTokenPriceParams,
+    GetMarketTokenPriceResponse,
     SwapAmountOutParams,
     SwapAmountOutResponse,
     WithdrawalAmountOutParams,
@@ -21,7 +25,6 @@ from .types import (
     ReaderPricingUtilsExecutionPriceResult,
     PositionProps,
     MarketProps,
-    MarketPoolValueInfoProps,
     DepositProps,
     WithdrawalProps,
     ShiftProps,
@@ -50,7 +53,7 @@ class SyntheticsReader(ProtocolBase):
 
     get_account_positions: Annotated[
         ContractFunc[
-            tuple[primitives.address, primitives.address, primitives.uint256, primitives.uint256],
+            tuple[HexAddress, HexAddress, primitives.uint256, primitives.uint256],
             list[PositionProps]
         ],
         Name("getAccountPositions"),
@@ -122,8 +125,8 @@ class SyntheticsReader(ProtocolBase):
 
     get_market_token_price: Annotated[
         ContractFunc[
-            tuple[primitives.address, MarketProps, PriceProps, PriceProps, PriceProps, primitives.bytes32, bool],
-            tuple[primitives.int256, MarketPoolValueInfoProps]
+            GetMarketTokenPriceParams,
+            GetMarketTokenPriceResponse,
         ],
         Name("getMarketTokenPrice"),
     ]

@@ -20,7 +20,7 @@ class DataLoader(BaseModel):
     network: Literal["arbitrum", "avalanche"] = Field(default="arbitrum")
     filter_swap_markets: bool = Field(default=True)
 
-    output: dict[str, dict[str, dict[str, Any]]] = {
+    output: dict[str, Any] = {
         "long": {},
         "short": {}
     }
@@ -29,18 +29,24 @@ class DataLoader(BaseModel):
     _long_token_address: None | ChecksumAddress = PrivateAttr(default=None)
     _short_token_address: None | ChecksumAddress = PrivateAttr(default=None)
 
+    @property
+    def markets(self):
+        return self._markets
+
     def model_post_init(self, __context):
         self._synthetics_reader = SyntheticsReader(network=self.network)
         self._markets = MarketsLoader(network=self.network)
 
     async def get_data(self):
+        await self._markets.load()
         if self.filter_swap_markets:
             await self._filter_swap_markets()
         data = await self._get_data_processing()
         return data
 
-    async def _get_data_processing(self):
-        pass
+    # @abstrctmethod
+    # async def _get_data_processing(self, pnl_factor_type: bytes):
+    #     pass
 
     async def _get_token_addresses(self, market_key: str):
         self._long_token_address = self._markets.get_long_token_address(market_key)
@@ -81,9 +87,8 @@ class DataLoader(BaseModel):
 
     async def _get_oracle_prices(
         self,
-        market_key: str,
         index_token_address: HexAddress,
-    ) -> ReaderUtilsMarketInfo:
+    ) -> MarketUtilsMarketPrices:
         oracle_prices_dict = await self._synthetics_reader.get_recent_prices()
         index_token: ChecksumAddress = to_checksum(index_token_address)
 
@@ -122,7 +127,10 @@ class DataLoader(BaseModel):
                     max=int(1000000000000000000000000),
                 ),
             )
+        return prices
 
+    async def get_market_info(self, market_key: str, index_token_address: HexAddress) -> ReaderUtilsMarketInfo:
+        prices = await self._get_oracle_prices(index_token_address)
         return await self._synthetics_reader.get_market_info(
             GetMarketParams(
                 data_store=self._synthetics_reader.datastore,

@@ -7,12 +7,15 @@ from eth_rpc.networks import Arbitrum, Avalanche
 from eth_rpc.types.primitives import address, uint256
 from eth_rpc.utils import to_checksum
 from eth_typeshed.gmx import MarketProps, GMXEnvironment, SyntheticsReader as SyntheticsReaderContract, ExecutionPriceParams, ReaderUtilsMarketInfo
+from eth_typeshed.gmx.synthetics_reader.types import PositionProps, PriceProps
 from eth_typeshed.gmx.synthetics_reader.schemas import (
     DepositAmountOutParams,
     GetMarketsParams,
     GetMarketParams,
     GetOpenInterestParams,
     GetPnlParams,
+    GetMarketTokenPriceParams,
+    GetMarketTokenPriceResponse,
     SwapAmountOutParams,
     SwapAmountOutResponse,
     WithdrawalAmountOutParams,
@@ -125,6 +128,30 @@ class SyntheticsReader(PriceOracle):
 
     async def get_market_info(self, params: GetMarketParams) -> ReaderUtilsMarketInfo:
         return await self._contract.get_market_info(params).get()
+
+    async def get_market_token_price(
+        self,
+        market: MarketProps,
+        index_token_price: PriceProps,
+        long_token_price: PriceProps,
+        short_token_price: PriceProps,
+        pnl_factor_type: bytes,
+        maximize: bool
+    ) -> GetMarketTokenPriceResponse:
+        return await self._contract.get_market_token_price(GetMarketTokenPriceParams(
+            data_store=self.datastore,
+            market=market,
+            index_token_price=index_token_price,
+            long_token_price=long_token_price,
+            short_token_price=short_token_price,
+            pnl_factor_type=pnl_factor_type,
+            maximize=maximize
+        )).get()
+
+    async def get_account_positions(self, address: ChecksumAddress, start: int = 0, end: int = 10) -> list[PositionProps]:
+        return await self._contract.get_account_positions(
+            (self.datastore, address, uint256(start), uint256(end)),
+        ).get()
 
     # Private Methods
 

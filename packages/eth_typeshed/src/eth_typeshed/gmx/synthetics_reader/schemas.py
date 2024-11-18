@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from eth_rpc.types import primitives, Name
 from .enums import SwapPricingType
-from .types import MarketProps, MarketUtilsMarketPrices, PriceProps, SwapPricingUtilsSwapFees
+from .types import MarketProps, MarketUtilsMarketPrices, MarketPoolValueInfoProps, PriceProps, SwapPricingUtilsSwapFees
 
 
 class ExecutionPriceParams(BaseModel):
@@ -84,3 +84,18 @@ class GetMarketParams(BaseModel):
     data_store: HexAddress
     prices: MarketUtilsMarketPrices
     market_key: HexAddress
+
+
+class GetMarketTokenPriceParams(BaseModel):
+    data_store: primitives.address
+    market: MarketProps
+    index_token_price: PriceProps
+    long_token_price: PriceProps
+    short_token_price: PriceProps
+    pnl_factor_type: primitives.bytes32
+    maximize: bool
+
+
+class GetMarketTokenPriceResponse(BaseModel):
+    market_token_price: primitives.int256
+    pool_value_info: MarketPoolValueInfoProps
