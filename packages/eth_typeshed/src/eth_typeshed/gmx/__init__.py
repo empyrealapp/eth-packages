@@ -1,5 +1,6 @@
 from ._environment import GMXEnvironment, GMXArbitrum, GMXAvalanche
 from .datastore import Datastore
+from .exchange_router import ExchangeRouter
 from .synthetics_reader import (
     SyntheticsReader,
     DepositAmountOutParams,
@@ -16,6 +17,7 @@ __all__ = [
     "GMXAvalanche",
     "Datastore",
     "DepositAmountOutParams",
+    "ExchangeRouter",
     "ExecutionPriceParams",
     "MarketProps",
     "ReaderPricingUtilsExecutionPriceResult",
