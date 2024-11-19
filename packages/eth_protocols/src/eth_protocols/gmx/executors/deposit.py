@@ -1,24 +1,28 @@
-from hexbytes import HexBytes
+from typing import Literal
 
 from eth_rpc import Block, PrivateKeyWallet
+from eth_rpc.networks import Arbitrum, Avalanche
 from eth_rpc.utils import to_checksum
 from eth_typing import HexAddress, HexStr
 from eth_typeshed.gmx.exchange_router import CreateDepositParams
 from eth_typeshed.gmx.synthetics_reader import DepositAmountOutParams
 from eth_typeshed.gmx.synthetics_reader.schemas import MarketProps, MarketUtilsMarketPrices, PriceProps
 from eth_typeshed.gmx.synthetics_reader.enums import SwapPricingType
+from hexbytes import HexBytes
 from pydantic import BaseModel, Field, PrivateAttr
 
 from ..loaders import MarketsLoader
 from ..synthetics_reader import SyntheticsReader
 from .approve import check_if_approved
-from ..gas import get_execution_fee
+from ..utils.gas import get_execution_fee
 from ..types import MarketInfo
 from ..exchange_router import ExchangeRouter
-from ..utils import determine_swap_route
+from ..utils import determine_swap_route, get_gas_limits
+from ..datastore import Datastore
 
 
 class Deposit(BaseModel):
+    network: Literal["arbitrum", "avalanche"]
     market_key: str
     initial_long_token: HexAddress
     initial_short_token: HexAddress
@@ -31,14 +35,20 @@ class Deposit(BaseModel):
     short_token_swap_path: list[str] = Field(default_factory=list)
     all_markets_info: dict[HexAddress, MarketInfo] | None = None
 
+    _datastore: Datastore = PrivateAttr()
     _reader: SyntheticsReader = PrivateAttr()
     _exchange_router: ExchangeRouter = PrivateAttr()
     _market_loader: MarketsLoader = PrivateAttr()
+
+    @property
+    def network_type(self) -> type[Arbitrum] | type[Avalanche]:
+        return Arbitrum if self.network == "arbitrum" else Avalanche
 
     def model_post_init(self, __context):
         super().model_post_init(__context)
         self._market_loader = MarketsLoader(network=self.network)
         self._exchange_router = ExchangeRouter(network=self.network)
+        self._datastore = Datastore(network=self.network)
 
     async def load(self):
         if self.max_fee_per_gas is None:
@@ -78,8 +88,7 @@ class Deposit(BaseModel):
         self,
         wallet: PrivateKeyWallet,
         value: float,
-        multicall_args: list,
-        gas_limits: dict,
+        multicall_args: list[bytes],
     ) -> HexStr:
         tx_hash = await self._exchange_router.multicall(
             multicall_args,
@@ -103,12 +112,15 @@ class Deposit(BaseModel):
         # Minimum number of GM tokens we should expect
         min_market_tokens = await self._estimate_deposit()
 
+        base_fee_per_gas = (await Block[self.network_type].latest()).base_fee_per_gas
+        assert base_fee_per_gas, "base fee must be set"
+
         # Giving a 10% buffer here
         execution_fee = int(
-            get_execution_fee(
-                self._gas_limits,
-                self._gas_limits_order_type,
-                self._connection.eth.gas_price
+            await get_execution_fee(
+                self._datastore,
+                await get_gas_limits(self._datastore, "deposit"),
+                base_fee_per_gas,
             ) * self.execution_buffer
         )
 
@@ -120,22 +132,22 @@ class Deposit(BaseModel):
         # build swap paths for long/short deposit
         self._determine_swap_paths()
 
-        arguments = (
-            user_wallet_address,
-            eth_zero_address,
-            ui_ref_address,
-            self.market_key,
-            self.initial_long_token,
-            self.initial_short_token,
-            self.long_token_swap_path,
-            self.short_token_swap_path,
-            min_market_tokens,
-            should_unwrap_native_token,
-            execution_fee,
-            callback_gas_limit
+        arguments = CreateDepositParams(
+            receiver=user_wallet_address,
+            callback_contract=eth_zero_address,
+            ui_fee_receiver=ui_ref_address,
+            market=self.market_key,
+            initial_long_token=self.initial_long_token,
+            initial_short_token=self.initial_short_token,
+            long_token_swap_path=self.long_token_swap_path,
+            short_token_swap_path=self.short_token_swap_path,
+            min_market_tokens=min_market_tokens,
+            should_unwrap_native_token=should_unwrap_native_token,
+            execution_fee=execution_fee,
+            callback_gas_limit=callback_gas_limit
         )
 
-        multicall_args: list = []
+        multicall_args: list[bytes] = []
         wnt_amount = 0
 
         # Send long side of deposit if more than 0 tokens
@@ -184,7 +196,6 @@ class Deposit(BaseModel):
             wallet,
             int(wnt_amount + execution_fee),
             multicall_args,
-            self._gas_limits
         )
 
     def _check_initial_tokens(self):

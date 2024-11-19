@@ -1,11 +1,13 @@
-from .datastore import Datastore
-from .keys import (
+from typing import Literal
+
+from ..datastore import Datastore
+from ..keys import (
     decrease_order_gas_limit_key, increase_order_gas_limit_key,
     execution_gas_fee_base_amount_key, execution_gas_fee_multiplier_key,
     single_swap_gas_limit_key, swap_order_gas_limit_key, deposit_gas_limit_key,
     withdraw_gas_limit_key
 )
-from .utils import apply_factor
+from . import apply_factor
 
 
 async def get_execution_fee(datastore: Datastore, estimated_gas_limit: int, gas_price: int) -> float:
@@ -31,7 +33,13 @@ async def get_execution_fee(datastore: Datastore, estimated_gas_limit: int, gas_
     return adjusted_gas_limit * gas_price
 
 
-async def get_gas_limits(datastore: Datastore) -> dict[str, int]:
+async def get_gas_limits(
+    datastore: Datastore,
+    name: Literal[
+        "deposit", "withdraw", "single_swap", "swap_order", "increase_order",
+        "decrease_order", "estimated_fee_base_gas_limit", "estimated_fee_multiplier_factor"
+    ],
+) -> int:
     """
     Given a Web3 contract object of the datstore, return a dictionary with the uncalled gas limits
     that correspond to various operations that will require the execution fee to calculated for.
@@ -42,15 +50,16 @@ async def get_gas_limits(datastore: Datastore) -> dict[str, int]:
         contract connection.
     """
     gas_limits: dict[str, int] = {
-        "deposit": await datastore.get_uint(deposit_gas_limit_key()),
-        "withdraw": await datastore.get_uint(withdraw_gas_limit_key()),
-        "single_swap": await datastore.get_uint(single_swap_gas_limit_key()),
-        "swap_order": await datastore.get_uint(swap_order_gas_limit_key()),
-        "increase_order": await datastore.get_uint(increase_order_gas_limit_key()),
-        "decrease_order": await datastore.get_uint(decrease_order_gas_limit_key()),
-        "estimated_fee_base_gas_limit": await datastore.get_uint(
+        "deposit": datastore.get_uint(deposit_gas_limit_key()),
+        "withdraw": datastore.get_uint(withdraw_gas_limit_key()),
+        "single_swap": datastore.get_uint(single_swap_gas_limit_key()),
+        "swap_order": datastore.get_uint(swap_order_gas_limit_key()),
+        "increase_order": datastore.get_uint(increase_order_gas_limit_key()),
+        "decrease_order": datastore.get_uint(decrease_order_gas_limit_key()),
+        "estimated_fee_base_gas_limit": datastore.get_uint(
             execution_gas_fee_base_amount_key()),
-        "estimated_fee_multiplier_factor": await datastore.get_uint(
-            execution_gas_fee_multiplier_key())}
+        "estimated_fee_multiplier_factor": datastore.get_uint(
+            execution_gas_fee_multiplier_key())
+    }
 
-    return gas_limits
+    return await gas_limits[name]
