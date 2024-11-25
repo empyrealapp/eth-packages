@@ -1,6 +1,7 @@
 from eth_rpc.types import Network
 
 from .arbitrum import Arbitrum, ArbitrumSepolia
+from .avalanche import Avalanche
 from .base import Base, BaseSepolia
 from .ethereum import Ethereum
 from .linea import Linea
@@ -12,6 +13,7 @@ Networks = {
     84532: BaseSepolia,
     42161: Arbitrum,
     421614: ArbitrumSepolia,
+    43114: Avalanche,
     23294: Sapphire,
     23295: SapphireTestnet,
     59144: Linea,
@@ -38,6 +40,7 @@ def get_network_by_chain_id(chain_id):
 __all__ = [
     "Arbitrum",
     "ArbitrumSepolia",
+    "Avalanche",
     "Base",
     "BaseSepolia",
     "Ethereum",
