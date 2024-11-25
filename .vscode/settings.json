@@ -1,3 +1,5 @@
 {
-    "python.envFile": "${workspaceFolder}/.env"
+    "python.envFile": "${workspaceFolder}/.env",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
 }

@@ -62,7 +62,7 @@ class ERC20Metadata(ProtocolBase):
 class ERC20(ERC20Metadata):
     balance_of: Annotated[
         ContractFunc[
-            Annotated[primitives.address, Name("owner")],
+            Annotated[HexAddress, Name("owner")],
             Annotated[primitives.uint256, Name("amount")],
         ],
         Name("balanceOf"),
