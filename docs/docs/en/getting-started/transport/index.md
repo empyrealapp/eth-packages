@@ -32,7 +32,7 @@ class MyPrivateNetwork(Network):
     native_currency: ClassVar[str] = "MPN"
     rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
-            http=Url("https://my-private.network"),
+            http=AnyHttpUrl("https://my-private.network"),
             http="wss://my-private.network",
         )
     )

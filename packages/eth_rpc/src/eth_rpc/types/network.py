@@ -4,7 +4,7 @@ from typing import ClassVar, Optional
 import httpx
 from eth_typing import HexAddress, HexStr
 from pydantic import AnyHttpUrl, BaseModel, Field
-from pydantic.networks import AnyWebsocketUrl, Url
+from pydantic.networks import AnyWebsocketUrl
 
 
 class BlockExplorer(BaseModel):
@@ -53,10 +53,10 @@ class Network(BaseModel):
         api_key: str | None = None,
     ):
         if http:
-            cls.rpc.default.http = Url(http)
+            cls.rpc.default.http = AnyHttpUrl(http)
             cls.http = str(cls.rpc.default.http)
         if wss:
-            cls.rpc.default.wss = Url(wss)
+            cls.rpc.default.wss = AnyWebsocketUrl(wss)
             cls.wss = str(cls.rpc.default.wss)
         if api_key:
             cls.block_explorer.api_key = api_key

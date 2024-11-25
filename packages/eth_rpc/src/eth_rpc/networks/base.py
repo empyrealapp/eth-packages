@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 from eth_rpc.types import BlockExplorer, Network, Rpcs, RpcUrl
-from pydantic.networks import Url
+from pydantic.networks import AnyHttpUrl
 
 
 class Base(Network):
@@ -10,7 +10,7 @@ class Base(Network):
     native_currency: ClassVar[str] = "ETH"
     rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
-            http=Url("https://base.llamarpc.com"),
+            http=AnyHttpUrl("https://base.llamarpc.com"),
             wss=None,
         )
     )
@@ -29,7 +29,7 @@ class BaseSepolia(Network):
     native_currency: ClassVar[str] = "ETH"
     rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
-            http=Url("https://sepolia.base.org/"),
+            http=AnyHttpUrl("https://sepolia.base.org/"),
         )
     )
     block_explorer: ClassVar[BlockExplorer] = BlockExplorer(

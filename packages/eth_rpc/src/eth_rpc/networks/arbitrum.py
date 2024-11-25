@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 from eth_rpc.types import BlockExplorer, Network, Rpcs, RpcUrl
-from pydantic.networks import Url
+from pydantic.networks import AnyHttpUrl
 
 
 class Arbitrum(Network):
@@ -10,7 +10,7 @@ class Arbitrum(Network):
     native_currency: ClassVar[str] = "ETH"
     rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
-            http=Url("https://arb1.arbitrum.io/rpc"),
+            http=AnyHttpUrl("https://arb1.arbitrum.io/rpc"),
             wss=None,
             # wss=Url("wss://test.com"),
         )
@@ -30,7 +30,7 @@ class ArbitrumSepolia(Network):
     native_currency: ClassVar[str] = "ETH"
     rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
-            http=Url("https://arbitrum-sepolia.publicnode.com"),
+            http=AnyHttpUrl("https://arbitrum-sepolia.publicnode.com"),
             wss=None,
         )
     )
