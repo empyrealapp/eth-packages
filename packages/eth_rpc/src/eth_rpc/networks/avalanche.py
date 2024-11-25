@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 from eth_rpc.types import BlockExplorer, Network, Rpcs, RpcUrl
-from pydantic.networks import Url
+from pydantic.networks import AnyHttpUrl
 
 
 class Avalanche(Network):
@@ -10,7 +10,7 @@ class Avalanche(Network):
     native_currency: ClassVar[str] = "AVAX"
     rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
-            http=Url("https://avalanche-fuji.publicnode.com"),
+            http=AnyHttpUrl("https://avalanche-fuji.publicnode.com"),
             wss=None,
             # wss=Url("wss://test.com"),
         )
