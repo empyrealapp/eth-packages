@@ -16,7 +16,6 @@ from eth_typing import HexAddress, HexStr
 from pydantic import ConfigDict, PrivateAttr, computed_field
 
 from ._request import Request
-from ._transport import _force_get_global_rpc
 from .account import Account
 from .block import Block
 from .transaction import PreparedTransaction
@@ -140,8 +139,8 @@ class PrivateKeyWallet(BaseWallet):
         # TODO: this assumes sync
         gas = self.estimate_gas(to=to, data=data).sync
         access_list = None
-        rpc = _force_get_global_rpc()
-        chain_id = rpc.chain_id.sync()
+        rpc = self._rpc()
+        chain_id = rpc.network.chain_id
 
         max_priority_fee_per_gas = max_priority_fee_per_gas or Block.priority_fee().sync
         base_fee_per_gas = Block.pending().sync.base_fee_per_gas
@@ -181,9 +180,12 @@ class PrivateKeyWallet(BaseWallet):
         )
 
     def transfer(
-        self, to: HexAddress, value: int
+        self,
+        to: HexAddress,
+        value: int,
+        data: HexStr = HexStr("0x"),
     ) -> RPCResponseModel[RawTransaction, HexStr]:
-        prepared_tx = self.prepare(to=to, value=value)
+        prepared_tx = self.prepare(to=to, value=value, data=data)
         signed_tx = self.sign_transaction(prepared_tx)
         return self.send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction))
 
@@ -191,7 +193,7 @@ class PrivateKeyWallet(BaseWallet):
         return EthAccount._sign_hash(hashed, self._account.key)
 
     async def balance(self, block_number: int | BLOCK_STRINGS = "latest") -> int:
-        return await Account[self._network].get_balance(self.address, block_number=block_number)
+        return await Account[self._network].get_balance(self.address, block_number=block_number)  # type: ignore[name-defined]
 
     @staticmethod
     def rsv_to_signature(r: int, s: int, v: int) -> HexStr:
