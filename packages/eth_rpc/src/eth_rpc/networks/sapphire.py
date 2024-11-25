@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 from eth_rpc.types import BlockExplorer, Network, Rpcs, RpcUrl
-from pydantic.networks import Url
+from pydantic.networks import AnyHttpUrl, AnyWebsocketUrl
 
 
 class Sapphire(Network):
@@ -10,8 +10,8 @@ class Sapphire(Network):
     native_currency: ClassVar[str] = "ROSE"
     rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
-            http=Url("https://sapphire.oasis.io	"),
-            wss=Url("wss://sapphire.oasis.io/ws	"),
+            http=AnyHttpUrl("https://sapphire.oasis.io"),
+            wss=AnyWebsocketUrl("wss://sapphire.oasis.io/ws"),
         )
     )
     block_explorer: ClassVar[BlockExplorer] = BlockExplorer(
@@ -29,8 +29,8 @@ class SapphireTestnet(Network):
     native_currency: ClassVar[str] = "ROSE"
     rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
-            http=Url("https://testnet.sapphire.oasis.io"),
-            wss=Url("wss://testnet.sapphire.oasis.io/ws"),
+            http=AnyHttpUrl("https://testnet.sapphire.oasis.io"),
+            wss=AnyWebsocketUrl("wss://testnet.sapphire.oasis.io/ws"),
         )
     )
     block_explorer: ClassVar[BlockExplorer] = BlockExplorer(

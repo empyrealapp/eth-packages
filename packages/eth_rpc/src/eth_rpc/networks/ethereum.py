@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 from eth_rpc.types import BlockExplorer, Network, Rpcs, RpcUrl
-from pydantic.networks import Url
+from pydantic.networks import AnyHttpUrl, AnyWebsocketUrl
 
 
 class Ethereum(Network):
@@ -10,8 +10,8 @@ class Ethereum(Network):
     native_currency: ClassVar[str] = "ETH"
     rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
-            http=Url("https://cloudflare-eth.com"),
-            wss=Url("wss://mainnet.gateway.tenderly.co"),
+            http=AnyHttpUrl("https://cloudflare-eth.com"),
+            wss=AnyWebsocketUrl("wss://mainnet.gateway.tenderly.co"),
         )
     )
     block_explorer: ClassVar[BlockExplorer] = BlockExplorer(

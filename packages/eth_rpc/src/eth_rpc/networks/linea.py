@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 from eth_rpc.types import BlockExplorer, Network, Rpcs, RpcUrl
-from pydantic.networks import Url
+from pydantic.networks import AnyHttpUrl, AnyWebsocketUrl
 
 
 class Linea(Network):
@@ -10,8 +10,8 @@ class Linea(Network):
     native_currency: ClassVar[str] = "ETH"
     rpc: ClassVar[Rpcs] = Rpcs(
         default=RpcUrl(
-            http=Url("https://rpc.linea.build"),
-            wss=Url("wss://rpc.linea.build"),
+            http=AnyHttpUrl("https://rpc.linea.build"),
+            wss=AnyWebsocketUrl("wss://rpc.linea.build"),
         )
     )
     block_explorer: ClassVar[BlockExplorer] = BlockExplorer(
