@@ -29,7 +29,7 @@ class RPCMethodBase(BaseModel, Generic[Params, Response]):
     client: Optional[httpx.AsyncClient] = None
     index: Optional[itertools.count] = None
     retries: int = 10
-    _rpc: "RPC" = PrivateAttr(None)
+    _rpc: "RPC | None" = PrivateAttr(None)
     _network: type[Network] | None = PrivateAttr(None)
 
     def set_rpc(self, rpc: "RPC") -> "RPCMethodBase":

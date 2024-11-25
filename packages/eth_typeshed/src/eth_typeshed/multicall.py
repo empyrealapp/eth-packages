@@ -3,6 +3,7 @@ from typing import Annotated, Any, Generic, Literal, TypeVar, overload
 
 from eth_abi.exceptions import InsufficientDataBytes
 from eth_rpc import ContractFunc, ProtocolBase
+from eth_rpc.networks import Network
 from eth_rpc.types import (
     BLOCK_STRINGS,
     METHOD,
@@ -54,6 +55,7 @@ class TryResult(BaseModel, Generic[T]):
 
 class Multicall(ProtocolBase):
     address: HexAddress = Field(default=MULTICALL3_ADDRESS)
+
     block_and_aggregate: Annotated[
         ContractFunc[
             MulticallRequest,
@@ -127,6 +129,7 @@ class Multicall(ProtocolBase):
         sync: bool = False,
         block_number: int | BLOCK_STRINGS = "latest",
     ) -> list[TryResult]:
+        self.try_aggregate._network = self._network
         call = await self.try_aggregate(
             TryMulticallRequest(
                 require_success=require_success,
@@ -135,7 +138,6 @@ class Multicall(ProtocolBase):
         ).call(sync=sync, block_number=block_number)
 
         return_data = call.decode()
-
         response: list[TryResult] = []
 
         for result, func in zip(return_data.results, calls):
@@ -193,3 +195,7 @@ class Multicall(ProtocolBase):
 
 
 multicall = Multicall(address=MULTICALL3_ADDRESS)
+
+
+def make_multicall(network: type[Network]):
+    return Multicall[network](address=MULTICALL3_ADDRESS)
