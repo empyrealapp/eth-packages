@@ -34,12 +34,15 @@ def object_to_type(obj):
         return _convert_type(obj["type"])
 
 
-def convert_types(types_):
+def convert_types(types_, full_struct_names: bool = True):
     lst = []
     models = []
     for type_ in types_:
         if "components" in type_:
-            py_model_name = type_["internalType"].split(".")[-1].removeprefix("struct ")
+            if full_struct_names:
+                py_model_name = ''.join(type_["internalType"].split(".")).removeprefix("struct ")
+            else:
+                py_model_name = type_["internalType"].split(".")[-1].removeprefix("struct ")
             field_name = py_model_name
             while field_name.endswith("[]"):
                 field_name = f"list[{py_model_name[:-2]}]"
@@ -55,7 +58,7 @@ def convert_types(types_):
     return (tuple[*lst], models)
 
 
-def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:  # noqa: C901
+def codegen(abi: list[dict[str, Any]], contract_name: str, full_struct_names: bool = True) -> str:  # noqa: C901
     """
     Convert an ABI to the string implementation of a ProtocolBase.
 
@@ -100,10 +103,12 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:  # noqa: C901
             elif model_dict[model_name] == model:
                 continue
             else:
-                print("Warning: Duplicate model name with different fields")
-                model_dict[model_name + "_extra"] = model
-
-        output_type, __models = convert_types(outputs)
+                print(f"Warning: Duplicate model name {model_name} with different fields")
+                count = 1
+                while model_name + f"_{count}" in model_dict:
+                    count += 1
+                model_dict[model_name + f"_{count}"] = model
+        output_type, __models = convert_types(outputs, full_struct_names=full_struct_names)
 
         for model in __models:
             model_name = model[0].replace("[]", "")
@@ -112,8 +117,11 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:  # noqa: C901
             elif model_dict[model_name] == model[1]:
                 continue
             else:
-                print("Warning: Duplicate model name with different fields")
-                model_dict[model_name + "_extra"] = model[1]
+                print(f"Warning: Duplicate model name {model_name} with different fields")
+                count = 1
+                while model_name + f"_{count}" in model_dict:
+                    count += 1
+                model_dict[model_name + f"_{count}"] = model[1]
 
         has_name_annotation: bool = False
         alias: str
@@ -149,7 +157,11 @@ def codegen(abi: list[dict[str, Any]], contract_name: str) -> str:  # noqa: C901
     for _, fields in list(model_dict.items()):
         for field in fields:
             if field["internalType"].startswith("struct"):
-                model_name = field["internalType"].split(".")[-1].replace("[]", "")
+                if full_struct_names:
+                    model_name = ''.join(field["internalType"].split(".")).replace("[]", "").removeprefix("struct ")
+                else:
+                    model_name = field["internalType"].split(".")[-1].replace("[]", "")
+
                 if model_name not in model_dict:
                     model_dict[model_name] = field["components"]
 
@@ -161,7 +173,11 @@ class {name}(Struct):
         embedded_types = []
         for field in fields:
             if (internalType := field["internalType"]).startswith("struct"):
-                type_ = internalType.split(".")[-1].replace("[]", "")
+                if full_struct_names:
+                    type_ = ''.join(internalType.split(".")).replace("[]", "").removeprefix("struct ")
+                else:
+                    type_ = internalType.split(".")[-1].replace("[]", "")
+
                 while internalType.endswith("[]"):
                     type_ = list[type_]  # type: ignore[valid-type]
                     internalType = internalType[:-2]
