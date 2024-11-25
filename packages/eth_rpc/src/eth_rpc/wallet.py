@@ -13,7 +13,7 @@ from eth_rpc.types import (
     SignedTransaction,
 )
 from eth_typing import HexAddress, HexStr
-from pydantic import ConfigDict, PrivateAttr
+from pydantic import ConfigDict, PrivateAttr, computed_field
 
 from ._request import Request
 from ._transport import _force_get_global_rpc
@@ -63,12 +63,15 @@ class MockWallet(BaseWallet):
 
 class PrivateKeyWallet(BaseWallet):
     private_key: HexStr
-    _account: LocalAccount = PrivateAttr()
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def _account(self) -> LocalAccount:
+        return EthAccount.from_key(self.private_key)
+
     def model_post_init(self, __context: Any) -> None:
-        self._account = EthAccount.from_key(self.private_key)
         return super().model_post_init(__context)
 
     @property
@@ -188,7 +191,7 @@ class PrivateKeyWallet(BaseWallet):
         return EthAccount._sign_hash(hashed, self._account.key)
 
     async def balance(self, block_number: int | BLOCK_STRINGS = "latest") -> int:
-        return await Account.get_balance(self.address, block_number=block_number)
+        return await Account[self._network].get_balance(self.address, block_number=block_number)
 
     @staticmethod
     def rsv_to_signature(r: int, s: int, v: int) -> HexStr:
