@@ -1,8 +1,8 @@
 from typing import Annotated
 
+from eth_typing import HexAddress
 from eth_rpc import ProtocolBase, ContractFunc
 from eth_rpc.types import primitives, Name, NoArgs, Struct
-
 
 class Props(Struct):
     min: primitives.uint256
@@ -274,7 +274,7 @@ class ExchangeRouter(ProtocolBase):
 
     send_tokens: Annotated[
         ContractFunc[
-            tuple[primitives.address, primitives.address, primitives.uint256],
+            tuple[HexAddress, HexAddress, primitives.uint256],
             None
         ],
         Name("sendTokens"),
