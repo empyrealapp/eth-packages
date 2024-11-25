@@ -13,12 +13,12 @@ from pydantic import BaseModel, Field, PrivateAttr
 
 from ..loaders import MarketsLoader
 from ..synthetics_reader import SyntheticsReader
-from .approve import check_if_approved
 from ..utils.gas import get_execution_fee
 from ..types import MarketInfo
 from ..exchange_router import ExchangeRouter
 from ..utils import determine_swap_route, get_gas_limits
 from ..datastore import Datastore
+from .approve import check_if_approved
 
 
 class Deposit(BaseModel):
@@ -63,6 +63,10 @@ class Deposit(BaseModel):
 
         """
         spender = self._reader._environment.synthetics_router
+
+        if not self.max_fee_per_gas:
+            await self.load()
+        assert self.max_fee_per_gas
 
         if self.long_token_amount > 0:
             await check_if_approved(
@@ -112,7 +116,8 @@ class Deposit(BaseModel):
         # Minimum number of GM tokens we should expect
         min_market_tokens = await self._estimate_deposit()
 
-        base_fee_per_gas = (await Block[self.network_type].latest()).base_fee_per_gas
+        network = self.network_type
+        base_fee_per_gas = (await Block[network].latest()).base_fee_per_gas  # type: ignore[valid-type]
         assert base_fee_per_gas, "base fee must be set"
 
         # Giving a 10% buffer here

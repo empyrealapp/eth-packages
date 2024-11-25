@@ -41,7 +41,7 @@ async def check_if_approved(
                 spender=spender,
                 amount=amount,
             )
-        ).execute(wallet, max_fee_per_gas=int(max_fee_per_gas))
+        ).execute(wallet, max_fee_per_gas=max_fee_per_gas)
 
         print("Txn submitted!")
         print("Check status: https://arbiscan.io/tx/{}".format(txn_hash))

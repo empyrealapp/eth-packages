@@ -4,7 +4,7 @@ from eth_rpc import PrivateKeyWallet
 from eth_rpc.networks import Arbitrum, Avalanche
 from eth_typeshed.gmx import GMXEnvironment, ExchangeRouter as ExchangeRouterContract
 from eth_typeshed.gmx.exchange_router import CreateDepositParams
-from eth_typing import HexAddress
+from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, Field, PrivateAttr
 from .loaders import MarketsLoader
 
@@ -27,17 +27,17 @@ class ExchangeRouter(BaseModel):
     async def load_markets(self):
         self.all_markets_info = MarketsLoader(network=self.network).get_available_markets()
 
-    def encode_send_tokens(self, token_address: HexAddress, amount: int):
+    def encode_send_tokens(self, token_address: HexAddress, amount: int) -> bytes:
         return self._contract.send_tokens(
             token_address,
-            '0xF89e77e8Dc11691C9e8757e84aaFbCD8A67d7A55',
-            amount
+            HexAddress(HexStr('0xF89e77e8Dc11691C9e8757e84aaFbCD8A67d7A55')),
+            amount,
         ).encode()
 
-    def encode_send_wnt(self, amount: int):
+    def encode_send_wnt(self, amount: int) -> bytes:
         return self._contract.send_wnt(
-            '0xF89e77e8Dc11691C9e8757e84aaFbCD8A67d7A55',
-            amount
+            HexAddress(HexStr('0xF89e77e8Dc11691C9e8757e84aaFbCD8A67d7A55')),
+            amount,
         ).encode()
 
     def encode_create_deposit(self, params: CreateDepositParams):

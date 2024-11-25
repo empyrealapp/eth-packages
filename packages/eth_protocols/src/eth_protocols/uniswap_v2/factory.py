@@ -14,12 +14,12 @@ class V2Factory(BaseModel):
     pairs: ClassVar[
         dict[tuple[Network, ChecksumAddress, ChecksumAddress], "ChecksumAddress"]
     ] = Field({})
-    _network: ClassVar[Network | None] = None
+    _network: ClassVar[type[Network] | None] = None
 
     _contract: UniswapV2Factory = PrivateAttr()
     address: HexAddress
 
-    def __class_getitem__(cls, network: Network):  # type: ignore
+    def __class_getitem__(cls, network: type[Network]):  # type: ignore
         cls._network = network
         return cls
 
@@ -28,7 +28,7 @@ class V2Factory(BaseModel):
 
     @classmethod
     async def load_pair(cls, token0: HexAddress, token1: HexAddress) -> "V2Pair":
-        network: Network = cls._network or get_current_network()
+        network: type[Network] = cls._network or get_current_network()
         token0 = to_checksum(token0)
         token1 = to_checksum(token1)
         key = (network, token0, token1)
