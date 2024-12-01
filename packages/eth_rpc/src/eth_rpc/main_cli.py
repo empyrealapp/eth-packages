@@ -42,8 +42,14 @@ def load(input_file, output, contract_name: str):
 @click.option("--output", "-o", default="abi.py")
 @click.option("--api-key", "-a", required=True)
 @click.option("--contract-name", "-c", default="AnonContract")
+@click.option("--full-struct-names", "-f", is_flag=True, required=False)
 def explorer(
-    network: str, address: HexAddress, output: str, api_key, contract_name: str
+    network: str,
+    address: HexAddress,
+    output: str,
+    api_key,
+    contract_name: str,
+    full_struct_names: bool = False,
 ):
     if network.lower() not in ["ethereum", "base", "arbitrum"]:
         click.echo("Network not yet supported.  Coming soon!")
@@ -53,7 +59,7 @@ def explorer(
 
     abi = asyncio.run(network_type.get_abi(address, api_key))
     with open(output, "w") as f:
-        f.write(codegen_cmd(abi, contract_name))
+        f.write(codegen_cmd(abi, contract_name, full_struct_names=full_struct_names))
 
 
 cli.add_command(codegen)

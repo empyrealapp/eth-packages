@@ -109,7 +109,7 @@ class RPCMethodBase(BaseModel, Generic[Params, Response]):
 
     @staticmethod
     async def _send_async(rpc: "RPC", payload: dict) -> dict:
-        result = await rpc.client.post(rpc.http, json=payload)
+        result = await rpc.client.post(rpc.http, json=payload, timeout=rpc.timeout)
         try:
             return result.json()
         except JSONDecodeError:
