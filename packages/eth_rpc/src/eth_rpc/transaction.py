@@ -149,7 +149,7 @@ class Transaction(Request, TransactionModel, Generic[Network]):
     @classmethod
     def get_receipt_by_hash(
         self, tx_hash: HexStr
-    ) -> RPCResponseModel[TransactionRequest, "Transaction[Network]"]:
+    ) -> RPCResponseModel[TransactionRequest, "TransactionReceipt[Network]"]:
         return RPCResponseModel(
             self.rpc().get_tx_receipt,
             TransactionRequest(
