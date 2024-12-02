@@ -306,7 +306,7 @@ class Event(Request, Generic[T]):
             message = err.args[0]
             if isinstance(message, bytes):
                 try:
-                    message = message.decode('utf-8')
+                    message = message.decode("utf-8")
                 except UnicodeDecodeError:
                     message = str(message)
             else:
