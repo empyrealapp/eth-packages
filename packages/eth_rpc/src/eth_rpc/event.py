@@ -304,6 +304,13 @@ class Event(Request, Generic[T]):
             )
         except ValueError as err:
             message = err.args[0]
+            if isinstance(message, bytes):
+                try:
+                    message = message.decode('utf-8')
+                except UnicodeDecodeError:
+                    message = str(message)
+            else:
+                message = str(message)
             if "Log response size exceeded." in message:
                 boundaries = re.findall("0x[0-9a-f]+", message)
                 raise LogResponseExceededError(
