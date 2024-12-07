@@ -6,7 +6,16 @@ from copy import deepcopy
 from functools import cached_property
 from inspect import isclass
 from types import GenericAlias
-from typing import Any, AsyncIterator, Generic, Literal, Optional, TypeVar, get_args, get_origin
+from typing import (
+    Any,
+    AsyncIterator,
+    Generic,
+    Literal,
+    Optional,
+    TypeVar,
+    get_args,
+    get_origin,
+)
 
 from eth_abi import decode
 from eth_abi.exceptions import InsufficientDataBytes
@@ -72,7 +81,9 @@ def load_type(type, value):
         if get_origin(type) == list:
             return [load_type(get_args(type)[0], item) for item in value]
         elif get_origin(type) == tuple:
-            return tuple(load_type(get_args(type)[i], item) for i, item in enumerate(value))
+            return tuple(
+                load_type(get_args(type)[i], item) for i, item in enumerate(value)
+            )
     return type(value)
 
 

@@ -99,6 +99,7 @@ class ClassType3(BaseModel):
 
 ClassEvent3 = Event[ClassType3](name="Class")
 
+
 @pytest.mark.event
 def test_parse_event_with_list_of_lists():
     event_bytes = encode(
