@@ -4,12 +4,22 @@ import logging
 import re
 from copy import deepcopy
 from functools import cached_property
+from inspect import isclass
 from types import GenericAlias
-from typing import Any, AsyncIterator, Generic, Literal, Optional, TypeVar, get_args
+from typing import (
+    Any,
+    AsyncIterator,
+    Generic,
+    Literal,
+    Optional,
+    TypeVar,
+    get_args,
+    get_origin,
+)
 
 from eth_abi import decode
 from eth_abi.exceptions import InsufficientDataBytes
-from eth_typing import HexAddress, HexStr
+from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import BaseModel, PrivateAttr, computed_field
 from pydantic_core import Url
 from websockets.exceptions import ConnectionClosedError
@@ -31,6 +41,7 @@ from .types import (
     Name,
     Network,
     RPCResponseModel,
+    Struct,
     SubscriptionResponse,
 )
 from .utils import is_annotation, to_topic
@@ -41,9 +52,19 @@ IGNORE = Literal[""]
 IGNORE_VAL: IGNORE = ""
 
 
+class UnindexedField(BaseModel):
+    alias: str
+    name: str
+    string_type: str
+    type: Any
+
+
 def map_type(name):
     return {
+        ChecksumAddress: "address",
         HexAddress: "address",
+        str: "string",
+        int: "uint256",
     }.get(name, name.__name__)
 
 
@@ -51,6 +72,19 @@ def map_indexed(is_indexed):
     if is_indexed:
         return " indexed "
     return ""
+
+
+def load_type(type, value):
+    if isclass(type) and issubclass(type, Struct):
+        return type.from_tuple(value)
+    if isinstance(type, GenericAlias):
+        if get_origin(type) == list:
+            return [load_type(get_args(type)[0], item) for item in value]
+        elif get_origin(type) == tuple:
+            return tuple(
+                load_type(get_args(type)[i], item) for i, item in enumerate(value)
+            )
+    return type(value)
 
 
 def convert(type, with_name: bool = False, with_indexed: bool = False):
@@ -65,8 +99,10 @@ def convert(type, with_name: bool = False, with_indexed: bool = False):
             elif isinstance(annotation, Name):
                 if with_name:
                     name = annotation.value
+    if isclass(type) and issubclass(type, Struct):
+        return type.to_tuple_type()
     if isinstance(type, GenericAlias):
-        if type.__name__ == "list":
+        if get_origin(type) == list:
             list_type = get_args(type)[0]
             converted_list_type = convert(list_type)
             if isinstance(converted_list_type, list):
@@ -183,15 +219,21 @@ class Event(Request, Generic[T]):
 
         unindexed = self.get_unindexed()
         try:
+            type_strings = [field.string_type for field in unindexed]
+            types = [field.type for field in unindexed]
             unindexed_values = decode(
-                [type_ for (_, type_) in unindexed], bytes.fromhex(data[2:])
+                type_strings, bytes.fromhex(data.removeprefix("0x"))
             )
+
+            parsed_values = []
+            for type_, value in zip(types, unindexed_values):
+                parsed_values.append(load_type(type_, value))
         except InsufficientDataBytes:
             raise LogDecodeError("Mismatched Unindexed values")
 
         return EventType(
             **indexed_dict
-            | {name: val for (name, _), val in zip(unindexed, unindexed_values)}
+            | {field.alias: val for field, val in zip(unindexed, parsed_values)}
         )
 
     @computed_field  # type: ignore[prop-decorator]
@@ -222,11 +264,12 @@ class Event(Request, Generic[T]):
                 results.append((name, map_type(_type)))
         return results
 
-    def get_unindexed(self):
+    def get_unindexed(self) -> list[UnindexedField]:
         inputs, *_ = self.__pydantic_generic_metadata__["args"]
         input_types = inputs.model_fields
         results = []
         for name, field in input_types.items():
+            alias = name
             indexed = False
             _type = field.annotation
             annotations = field.metadata
@@ -236,7 +279,13 @@ class Event(Request, Generic[T]):
                 elif isinstance(annotation, Name):
                     name = annotation.value
             if not indexed:
-                results.append((name, convert(_type)))
+                field = UnindexedField(
+                    alias=alias,
+                    name=name,
+                    string_type=convert(_type),
+                    type=_type,
+                )
+                results.append(field)
         return results
 
     def _get_logs(
@@ -349,7 +398,7 @@ class Event(Request, Generic[T]):
         This backfills events, handling LogResponseExceededError to provide all logs in a range too large for a single request
         """
         start_block = start_block or 1
-        current_number = await Block[self._network].get_number()
+        current_number = await Block[self._network].get_number()  # type: ignore[name-defined]
         end_block = end_block or (current_number - 3)  # set 3 default confirmations
 
         if start_block == "earliest":
