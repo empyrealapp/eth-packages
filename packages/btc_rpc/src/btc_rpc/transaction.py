@@ -19,20 +19,3 @@ class Transaction(Verbose2Transaction, Request):
 
     def get_lineage(self):
         pass
-
-
-if __name__ == "__main__":
-    import asyncio
-
-    async def amain():
-        tx = await Transaction.load(id="dda726e3dad9504dce5098dfab5064ecd4a7650bfe854bb2606da3152b60e427")
-
-        print("Tx:", tx)
-
-        for input in tx.inputs:
-            print("\t INPUT: ", input)
-            print("\t scrypt:", input.script_sig.asm)
-            print("\t value:", await input.value())
-            print("\n")
-
-    asyncio.run(amain())

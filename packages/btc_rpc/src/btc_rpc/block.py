@@ -88,15 +88,3 @@ class Block(BlockModel, Request):
         return f"<Block number={self.height}>"
 
     __str__ = __repr__
-
-
-if __name__ == "__main__":
-    import asyncio
-
-    async def amain():
-        block, txs = await Block.load(123456)
-        print("block", block)
-        async for tx in block.transactions:
-            print("txs", tx, tx.inputs, tx.outputs)
-
-    asyncio.run(amain())
