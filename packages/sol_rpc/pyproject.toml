@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68", "setuptools_scm[toml]>=8", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sol-rpc-py"
+requires-python = ">=3.10"
+dynamic = ["version"]
+dependencies = [
+    "httpx",
+    "pydantic",
+    "websockets",
+]
+
+# Enables the usage of setuptools_scm
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "no-local-version"
+
+[project.optional-dependencies]
+test = [
+    "pytest==8.3.2",
+    "pytest-asyncio==0.24.0",
+    "pytest-cov==5.0.0",
+    "coverage[toml]==7.3.1",
+]
+build = [
+    "build[virtualenv]==1.0.3",
+]
+dev = [
+    "tox",
+    "sol-rpc-py[lint]",
+    "sol-rpc-py[test]",
+    "sol-rpc-py[build]",
+]
+
+[tool.pytest.ini_options]
+python_paths = ["src"]
+
+[tool.mypy]
+plugins = [
+  "pydantic.mypy"
+]
