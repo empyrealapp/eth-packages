@@ -1,5 +1,6 @@
 from .command import CommandSource
-from .twitter import SimulacrumSubmission, XSource
+from .xsource import XSource, SimulacrumSubmission
+
 
 __all__ = [
     "CommandSource",
