@@ -1,8 +1,8 @@
 from typing import Annotated, Any
 
 from eth_abi import encode
-from eth_rpc import ProtocolBase, ContractFunc
-from eth_rpc.types import METHOD, primitives, Name, NoArgs
+from eth_rpc import ContractFunc, ProtocolBase
+from eth_rpc.types import METHOD, Name, NoArgs, primitives
 
 from ...models import Command, SimulacrumSubmission, Tweet
 
@@ -56,7 +56,10 @@ class XSource(ProtocolBase):
         tweet: Tweet,
         signatures: list[bytes],
         require_success: bool = True,
-    ) -> ContractFunc[SimulacrumSubmission, bool,]:
+    ) -> ContractFunc[
+        SimulacrumSubmission,
+        bool,
+    ]:
         return self.submit(
             SimulacrumSubmission(
                 source_data=tweet.to_bytes(),

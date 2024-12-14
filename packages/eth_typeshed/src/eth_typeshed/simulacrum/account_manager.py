@@ -1,9 +1,8 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field
-
 from eth_rpc import ContractFunc, ProtocolBase
 from eth_rpc.types import METHOD, Name, primitives
+from pydantic import BaseModel, Field
 
 
 class DeployArgs(BaseModel):

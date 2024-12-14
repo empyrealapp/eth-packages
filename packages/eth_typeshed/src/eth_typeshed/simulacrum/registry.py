@@ -1,7 +1,5 @@
-from eth_rpc import ContractFunc
+from eth_rpc import ContractFunc, ProtocolBase
 from eth_rpc.types import METHOD, NoArgs, primitives
-
-from eth_rpc import ProtocolBase
 
 
 class ProtocolRegistry(ProtocolBase):

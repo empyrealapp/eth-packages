@@ -7,7 +7,6 @@ from .oracle import AttestationOracle
 from .registry import ProtocolRegistry
 from .sources import CommandSource, XSource
 
-
 __all__ = [
     "AccountManager",
     "AttestationOracle",

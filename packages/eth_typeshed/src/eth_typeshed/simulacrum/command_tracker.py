@@ -1,7 +1,7 @@
 from typing import Annotated
 
-from eth_rpc import ProtocolBase, ContractFunc
-from eth_rpc.types import METHOD, primitives, Name
+from eth_rpc import ContractFunc, ProtocolBase
+from eth_rpc.types import METHOD, Name, primitives
 
 
 class CommandTracker(ProtocolBase):
