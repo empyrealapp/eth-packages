@@ -3,7 +3,7 @@ from eth_rpc.types import Network
 from .arbitrum import Arbitrum, ArbitrumSepolia
 from .avalanche import Avalanche
 from .base import Base, BaseSepolia
-from .ethereum import Ethereum
+from .ethereum import Ethereum, Sepolia
 from .linea import Linea
 from .sapphire import Sapphire, SapphireTestnet
 
@@ -11,6 +11,7 @@ Networks = {
     1: Ethereum,
     8453: Base,
     84532: BaseSepolia,
+    11155111: Sepolia,
     42161: Arbitrum,
     421614: ArbitrumSepolia,
     43114: Avalanche,
