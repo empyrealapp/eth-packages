@@ -3,7 +3,7 @@ from typing import Generic, TypeVar
 from eth_rpc.types import HexInteger, Network
 from eth_rpc.utils import RPCModel
 from eth_typing import HexAddress, HexStr
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 T = TypeVar("T", bound=BaseModel)
@@ -41,7 +41,7 @@ class EventData(BaseModel, Generic[T]):
     name: str
     log: Log
     event: T
-    network: type[Network]
+    network: type[Network] = Field(exclude=True)
 
     @property
     def tx(self):
