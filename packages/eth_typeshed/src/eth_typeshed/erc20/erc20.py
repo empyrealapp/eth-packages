@@ -130,7 +130,7 @@ class ERC20(ERC20Metadata):
         result = self._get_debug_tracecall(
             self.address,
             data=f"0x70a08231000000000000000000000000{owner.replace('0x', '')}",
-        )
+        ).sync
         storage = result[self.address.lower()]["storage"]
         for slot in storage:
             if balance in storage[slot]:
