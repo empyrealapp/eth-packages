@@ -6,7 +6,7 @@ from eth_rpc.types.args import EthCallParams, TraceArgs
 from pydantic import BaseModel, PrivateAttr
 
 from ._transport import _force_get_global_rpc
-from .types import BlockReference, Network
+from .types import BlockReference, Network, RPCResponseModel
 
 if TYPE_CHECKING:
     from .rpc.core import RPC
@@ -63,12 +63,13 @@ class Request(BaseModel):
     def _get_debug_tracecall(
         self, address, data, block_number: BlockReference = "latest"
     ):
-        return self.rpc().debug_tracecall(
+        return RPCResponseModel(
+            self.rpc().debug_tracecall,
             TraceArgs(
                 params=EthCallParams(
                     to=address,
                     data=data,
                 ),
                 block_number=block_number,
-            )
+            ),
         )
