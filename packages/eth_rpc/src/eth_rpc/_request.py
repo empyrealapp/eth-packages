@@ -6,7 +6,7 @@ from eth_rpc.types.args import EthCallParams, TraceArgs
 from pydantic import BaseModel, PrivateAttr
 
 from ._transport import _force_get_global_rpc
-from .types import BlockReference, RPCResponseModel, Network
+from .types import BlockReference, Network, RPCResponseModel
 
 if TYPE_CHECKING:
     from .rpc.core import RPC
@@ -71,5 +71,5 @@ class Request(BaseModel):
                     data=data,
                 ),
                 block_number=block_number,
-            )
+            ),
         )
