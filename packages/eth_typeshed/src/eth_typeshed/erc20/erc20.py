@@ -101,7 +101,7 @@ class ERC20(ERC20Metadata):
         response = self._get_debug_tracecall(
             self.address,
             data=f"0xdd62ed3e000000000000000000000000{owner.replace('0x', '')}000000000000000000000000{spender.replace('0x', '')}",
-        )
+        ).sync
         if not response:
             return None
         try:
