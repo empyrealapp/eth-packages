@@ -31,7 +31,7 @@ class ERC4626(ERC20):
         ],
         Name("convertToAssets"),
     ] = METHOD
-    max_deposit: Name[
+    max_deposit: Annotated[
         ContractFunc[
             Annotated[primitives.address, Name("receiver")],
             Annotated[primitives.uint256, Name("maxAssets")],
