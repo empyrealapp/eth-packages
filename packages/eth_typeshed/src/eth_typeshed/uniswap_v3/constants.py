@@ -5,8 +5,9 @@ class UniswapV3FactoryAddresses:
     class Ethereum:
         Uniswap = "0x1F98431c8aD98523631AE4a59f267346ea31F984"
 
+class UniswapV3RouterAddress:
     class Base:
-        ROUTER = "0x2626664c2603336E57B271c5C0b26F421741e481"
+        Router = "0x2626664c2603336E57B271c5C0b26F421741e481"
 
 
 MAX_TICK = 887272
