@@ -91,7 +91,7 @@ class ERC20(ERC20Metadata):
     ] = METHOD
     allowance: ContractFunc[
         OwnerSpenderRequest,
-        Annotated[primitives.bool, Name("success")],
+        Annotated[primitives.uint256, Name("result")],
     ] = METHOD
 
     def get_allowance_slot(self, owner: str, spender: str):
