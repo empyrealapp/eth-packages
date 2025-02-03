@@ -10,10 +10,15 @@ class Executor:
     def __init__(
         self,
         simulacrum_wallet_address: HexAddress,
-        executor: PrivateKeyWallet,
+        executor_wallet: PrivateKeyWallet,
+        simulacrum_executor: SimulacrumExecutor | None = None,
     ):
         self.simulacrum_wallet_address = simulacrum_wallet_address
-        self.executor = executor
+        self.executor_wallet = executor_wallet
+        self.simulacrum_executor = simulacrum_executor
+        self.executor = simulacrum_executor or SimulacrumExecutor[Base](
+            address=self.simulacrum_wallet_address
+        )
 
     async def broadcast(
         self,
@@ -23,8 +28,7 @@ class Executor:
         tx_gas: int = 100_000,
         executor_value: int = 0,
     ) -> HexStr:
-        executor = SimulacrumExecutor[Base](address=self.simulacrum_wallet_address)
-        response_tx = await executor.execute(
+        response_tx = await self.executor.execute(
             ExecuteRequest(
                 to=contract_func.address,
                 value=value,
@@ -32,5 +36,5 @@ class Executor:
                 operation=operation,
                 txGas=tx_gas,
             )
-        ).execute(wallet=self.executor, value=executor_value)
+        ).execute(wallet=self.executor_wallet, value=executor_value)
         return response_tx
