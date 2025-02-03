@@ -1,4 +1,4 @@
-from .executor import ExecutorContract
+from .executor import SimulacrumExecutor
 from .util import Executor
 
-__all__ = ["ExecutorContract", "Executor"]
+__all__ = ["SimulacrumExecutor", "Executor"]
