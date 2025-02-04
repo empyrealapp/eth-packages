@@ -1,5 +1,5 @@
 from eth_rpc import ContractFunc
-from eth_rpc.account import PrivateKeyWallet
+from eth_rpc.wallet import PrivateKeyWallet
 from eth_rpc.networks import Base
 from eth_typing import HexAddress, HexStr
 
