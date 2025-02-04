@@ -4,7 +4,7 @@ from eth_rpc import ContractFunc, Event, ProtocolBase
 from eth_rpc.types import METHOD, Name, NoArgs, Struct, primitives
 from pydantic import BaseModel, Field
 
-from ..models import Command
+from .utils import Command
 
 
 class NewBlockEventType(BaseModel):
