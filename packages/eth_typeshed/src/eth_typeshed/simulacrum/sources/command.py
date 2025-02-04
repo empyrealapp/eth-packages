@@ -3,7 +3,7 @@ from typing import Annotated, ClassVar
 from eth_rpc import ContractFunc
 from eth_rpc.types import METHOD, Name, NoArgs, primitives
 
-from ...models import BaseSource, Command
+from ...utils import BaseSource, Command
 
 
 class CommandSource(BaseSource):

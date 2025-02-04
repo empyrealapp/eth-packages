@@ -4,7 +4,7 @@ from eth_abi import encode
 from eth_rpc import ContractFunc, ProtocolBase
 from eth_rpc.types import METHOD, Name, NoArgs, primitives
 
-from ...models import Command, SimulacrumSubmission, Tweet
+from ...utils import Command, SimulacrumSubmission, Tweet
 
 
 class XSource(ProtocolBase):
