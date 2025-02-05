@@ -38,3 +38,23 @@ class Executor:
             )
         ).execute(wallet=self.executor_wallet, value=executor_value)
         return response_tx
+
+    async def create(
+        self,
+        to_address: HexAddress,
+        data: HexStr,
+        value: int = 0,
+        operation: int = 1,
+        tx_gas: int = 100_000,
+        executor_value: int = 0,
+    ) -> HexStr:
+        response_tx = await self.executor.execute(
+            ExecuteRequest(
+                to=to_address,
+                value=value,
+                data=bytes.fromhex(data[2:]),
+                operation=operation,
+                txGas=tx_gas,
+            )
+        ).execute(wallet=self.executor_wallet, value=executor_value)
+        return response_tx
