@@ -1,9 +1,10 @@
-from typing import Annotated, NamedTuple  # noqa: D100
+from typing import Annotated  # noqa: D100
 
 from eth_rpc import ContractFunc, ProtocolBase, get_current_network
 from eth_rpc.networks import Arbitrum, Ethereum
 from eth_rpc.types import METHOD, Name, Network, NoArgs, primitives
 from eth_typing import HexAddress, HexStr
+from pydantic import BaseModel
 
 
 class ChainlinkPriceOracle:
@@ -40,7 +41,7 @@ class ChainlinkPriceOracle:
             return cls.Arbitrum
 
 
-class LatestRoundData(NamedTuple):
+class LatestRoundData(BaseModel):
     round_id: Annotated[primitives.uint256, Name("roundId")]
     answer: primitives.int256
     started_at: Annotated[primitives.uint256, Name("startedAt")]
