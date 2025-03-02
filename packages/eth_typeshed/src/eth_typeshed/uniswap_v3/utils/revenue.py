@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from eth_rpc.types import BLOCK_STRINGS, primitives
@@ -13,7 +14,7 @@ def _to_uint256(num: int) -> primitives.uint256:
 
 
 async def calculate_fee_growth_inside(
-    pool: "UniswapV3Pool",
+    pool: UniswapV3Pool,
     tick_lower: primitives.int24,
     tick_upper: primitives.int24,
     block_number: int | BLOCK_STRINGS = "latest",
@@ -88,7 +89,7 @@ async def calculate_fee_growth_inside(
 
 
 async def calculate_fees(
-    pool: "UniswapV3Pool",
+    pool: UniswapV3Pool,
     tick_lower: primitives.int24,
     tick_upper: primitives.int24,
     user_liquidity: primitives.uint128,

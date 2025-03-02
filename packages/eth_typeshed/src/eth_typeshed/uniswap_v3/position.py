@@ -9,7 +9,7 @@ from eth_typeshed.multicall import Multicall, MULTICALL3_ADDRESS
 from pydantic import BaseModel, PrivateAttr, computed_field, Field
 
 from .factory import GetPoolRequest, UniswapV3Factory
-from .pool import UniswapV3Pool
+from .pool import UniswapV3Pool, Slot0, Tick
 from .utils import get_fees, liquidity_to_token_amounts
 
 
@@ -55,7 +55,7 @@ class Position(BaseModel):
 
     @computed_field  # type: ignore[prop-decorator]
     @cached_property
-    def pool(self):
+    def pool(self) -> UniswapV3Pool:
         if not self._pool_address:
             self._pool_address = (
                 UniswapV3Factory(address=self.factory_address)
@@ -95,6 +95,12 @@ class Position(BaseModel):
 
     async def get_pending_fees(self, block_number: int | BLOCK_STRINGS = "latest"):
         multicall = Multicall[self.pool._network](address=MULTICALL3_ADDRESS)
+
+        fee_growth_global0: primitives.uint256
+        fee_growth_global1: primitives.uint256
+        slot0: Slot0
+        lower_tick: Tick
+        upper_tick: Tick
         (
             fee_growth_global0,
             fee_growth_global1,
@@ -126,5 +132,5 @@ class Position(BaseModel):
         )
 
     @property
-    def range(self) -> tuple[int, int]:
+    def range(self) -> tuple[primitives.int24, primitives.int24]:
         return self.tick_lower, self.tick_upper
