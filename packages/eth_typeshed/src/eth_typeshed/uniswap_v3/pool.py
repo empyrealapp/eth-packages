@@ -5,8 +5,8 @@ from decimal import Decimal
 from typing import Annotated, cast
 
 from eth_rpc import ContractFunc, ProtocolBase
-from eth_rpc.types import METHOD, Name, NoArgs, primitives
-from eth_typeshed.multicall import multicall
+from eth_rpc.types import BLOCK_STRINGS, METHOD, Name, NoArgs, primitives
+from eth_typeshed.multicall import Multicall, MULTICALL3_ADDRESS
 from eth_typing import HexAddress
 from pydantic import BaseModel, Field, PrivateAttr
 
@@ -16,8 +16,16 @@ from .events import V3MintEvent, V3SwapEvent, V3SwapEventType
 from .utils import tick_from_bitmap, tick_to_price
 
 
+class MintRequest(BaseModel):
+    recipient: HexAddress
+    tick_lower: primitives.int24
+    tick_upper: primitives.int24
+    amount0: primitives.uint128
+    data: bytes
+
+
 class Slot0(BaseModel):
-    sqrt_price: primitives.uint160 = Field(serialization_alias="sqrtPriceX96")
+    sqrt_price_x96: primitives.uint160 = Field(serialization_alias="sqrtPriceX96")
     tick: primitives.int24
     observation_index: primitives.uint16 = Field(serialization_alias="observationIndex")
     observation_cardinality: primitives.uint16 = Field(
@@ -101,15 +109,28 @@ class UniswapV3Pool(ProtocolBase):
     fee_growth_global1: Annotated[
         ContractFunc[NoArgs, primitives.uint256], Name("feeGrowthGlobal1X128")
     ] = METHOD
+    mint: Annotated[
+        ContractFunc[MintRequest, tuple[primitives.uint256, primitives.uint256]],
+        Name("mint"),
+    ] = METHOD
 
-    async def get_price(self, token0: bool = True):
-        slot0 = await self.slot0().get()
-        _token0 = await self.token0().get()
-        _token1 = await self.token1().get()
-        token0_decimals = await ERC20(address=_token0).decimals().get()
-        token1_decimals = await ERC20(address=_token1).decimals().get()
+    async def get_price(
+        self, token0: bool = True, block_number: int | BLOCK_STRINGS = "latest"
+    ):
+        multicall = Multicall[self._network](address=MULTICALL3_ADDRESS)
+        slot0, _token0, _token1 = await multicall.execute(
+            self.slot0(),
+            self.token0(),
+            self.token1(),
+            block_number=block_number,
+        )
+        (token0_decimals, token1_decimals) = await multicall.execute(
+            ERC20(address=_token0).decimals(),
+            ERC20(address=_token1).decimals(),
+            block_number=block_number,
+        )
         return self.sqrt_price_x96_to_token_prices(
-            slot0.sqrt_price,
+            slot0.sqrt_price_x96,
             token0_decimals,
             token1_decimals,
             token0,
@@ -169,6 +190,7 @@ class UniswapV3Pool(ProtocolBase):
         return ticks
 
     async def get_ticks(self, indices: Iterable[int]) -> list[ProcessedTick]:
+        multicall = Multicall[self._network](address=MULTICALL3_ADDRESS)
         calls = []
         for tick in indices:
             calls.append(self.ticks(primitives.int24(tick)))
@@ -230,14 +252,18 @@ class UniswapV3Pool(ProtocolBase):
         min_tick, max_tick = await self.tick_range()
         return (min_tick // 60 // 256), (max_tick // 60 // 256)
 
-    async def get_initialized_ticks(self) -> list[int]:
+    async def get_initialized_ticks(
+        self, block_number: int | BLOCK_STRINGS = "latest"
+    ) -> list[int]:
+        multicall = Multicall[self._network](address=MULTICALL3_ADDRESS)
         min_bitmap, max_bitmap = await self.bitmap_range()
         tick_spacing = await self.get_tick_spacing()
         bitmaps = await multicall.execute(
             *[
                 self.tick_bitmap(primitives.int16(idx))
                 for idx in range(min_bitmap, max_bitmap + 1)
-            ]
+            ],
+            block_number=block_number,
         )
         initialized_ticks = []
         for idx, row in zip(range(min_bitmap, max_bitmap + 1), bitmaps):
@@ -250,13 +276,17 @@ class UniswapV3Pool(ProtocolBase):
             self._tick_spacing = await self.tick_spacing().get()
         return slot0.tick // self._tick_spacing * self._tick_spacing
 
-    async def liquidity_at_current_tick(self, tick: int) -> tuple[float, float]:
+    async def liquidity_at_current_tick(
+        self, tick: int, block_number: int | BLOCK_STRINGS = "latest"
+    ) -> tuple[float, float]:
+        multicall = Multicall[self._network](address=MULTICALL3_ADDRESS)
         tick_spacing, slot0, liquidity = cast(
             tuple[int, Slot0, int],
             await multicall.execute(
                 self.tick_spacing(),
                 self.slot0(),
                 self.liquidity(),
+                block_number=block_number,
             ),
         )
         bottom_tick = tick
@@ -272,9 +302,14 @@ class UniswapV3Pool(ProtocolBase):
 
         return (amount0, amount1)
 
-    async def get_all_positions(self):
+    async def get_all_positions(
+        self, start_block: int | None, stop_block: int | BLOCK_STRINGS = "latest"
+    ):
         events = []
-        async for event in V3MintEvent.set_filter(addresses=[self.address]).backfill():
+        async for event in V3MintEvent.set_filter(addresses=[self.address]).backfill(
+            start_block,
+            stop_block,
+        ):
             events.append(event.event)
         return events
 
