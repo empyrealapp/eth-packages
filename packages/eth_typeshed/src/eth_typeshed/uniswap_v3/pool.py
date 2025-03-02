@@ -6,7 +6,7 @@ from typing import Annotated, cast
 
 from eth_rpc import ContractFunc, ProtocolBase
 from eth_rpc.types import BLOCK_STRINGS, METHOD, Name, NoArgs, primitives
-from eth_typeshed.multicall import Multicall, MULTICALL3_ADDRESS
+from eth_typeshed.multicall import MULTICALL3_ADDRESS, Multicall
 from eth_typing import HexAddress
 from pydantic import BaseModel, Field, PrivateAttr
 

@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from eth_rpc.types import BLOCK_STRINGS, primitives
+from eth_typeshed.multicall import MULTICALL3_ADDRESS, Multicall
 from eth_typing import HexAddress
-from eth_typeshed.multicall import Multicall, MULTICALL3_ADDRESS
 
 if TYPE_CHECKING:
     from eth_typeshed.uniswap_v3.pool import UniswapV3Pool

@@ -4,12 +4,12 @@ from typing import Annotated
 from eth_rpc.types import BLOCK_STRINGS, Name, primitives
 from eth_typeshed.constants import Factories
 from eth_typeshed.erc20 import ERC20
+from eth_typeshed.multicall import MULTICALL3_ADDRESS, Multicall
 from eth_typing import HexAddress
-from eth_typeshed.multicall import Multicall, MULTICALL3_ADDRESS
-from pydantic import BaseModel, PrivateAttr, computed_field, Field
+from pydantic import BaseModel, Field, PrivateAttr, computed_field
 
 from .factory import GetPoolRequest, UniswapV3Factory
-from .pool import UniswapV3Pool, Slot0, Tick
+from .pool import Slot0, Tick, UniswapV3Pool
 from .utils import get_fees, liquidity_to_token_amounts
 
 
