@@ -102,16 +102,13 @@ async def calc_liquidity_and_amounts(
     if sqrtP_current <= sqrtP_low:
         # Entirely below the range -> all token0
         if not is_token0:
-            # The user gave us token1, but the position is below range -> actually that would
-            # result in 0 liquidity if we truly have only token1.
-            # We'll just do the formula for "all token0" to show it, but L = 0 if you only have token1.
+            # The user gave us token1, but the position is below range
             return (
                 primitives.uint128(0),
                 primitives.uint256(0),
                 primitives.uint256(amount_in),
             )
 
-        # If we truly are depositing token0
         X = amount_in
         L = (X * sqrtP_low * sqrtP_high) / (sqrtP_high - sqrtP_low)
         Y = 0
@@ -131,7 +128,6 @@ async def calc_liquidity_and_amounts(
                 primitives.uint256(0),
             )
 
-        # If we truly are depositing token1
         Y = amount_in
         L = Y / (sqrtP_high - sqrtP_low)
         X = 0
