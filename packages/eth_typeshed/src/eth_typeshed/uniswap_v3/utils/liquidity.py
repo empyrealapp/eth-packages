@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 from decimal import Decimal
 from typing import TYPE_CHECKING
@@ -64,7 +66,7 @@ def tick_to_price(tick):
 
 
 async def calc_liquidity_and_amounts(
-    pool: "UniswapV3Pool",
+    pool: UniswapV3Pool,
     amount_in: int,
     tick_lower: primitives.int24,
     tick_upper: primitives.int24,
