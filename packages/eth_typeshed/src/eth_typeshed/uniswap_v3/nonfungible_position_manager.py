@@ -5,12 +5,20 @@ from eth_rpc.types import METHOD, Name, primitives
 from eth_typeshed.erc20 import OwnerRequest
 from eth_typeshed.multicall import multicall
 from eth_typing import HexAddress, HexStr
+from pydantic import BaseModel
 
 from .position import OwnerTokenRequest, Position
 
 NONFUNGIBLE_POSITION_MANAGER_ADDRESS = HexAddress(
     HexStr("0xC36442b4a4522E871399CD717aBDD847Ab11FE88")
 )
+
+
+class CollectParams(BaseModel):
+    token_id: primitives.uint256
+    recipient: HexAddress
+    amount0_max: primitives.uint128
+    amount1_max: primitives.uint128
 
 
 class NonfungiblePositionManager(ProtocolBase):
@@ -31,6 +39,14 @@ class NonfungiblePositionManager(ProtocolBase):
     positions: ContractFunc[
         primitives.uint256,
         Position,
+    ] = METHOD
+
+    collect: Annotated[
+        ContractFunc[
+            CollectParams,
+            tuple[primitives.uint256, primitives.uint256],
+        ],
+        Name("collect"),
     ] = METHOD
 
     async def get_all_indices(self, owner: HexAddress) -> list[int]:

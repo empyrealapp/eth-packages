@@ -78,10 +78,8 @@ class V3Pool(DexPair):
         else:
             slot0 = self._slot0
 
-        sqrt_price = slot0.sqrt_price
-
         return self.sqrt_price_x96_to_token_prices(
-            sqrt_price,
+            slot0.sqrt_price_x96,
             self.token0.sync.decimals(),
             self.token1.sync.decimals(),
             token == self.token0.address,
