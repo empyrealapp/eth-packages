@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import re
+import time
 from copy import deepcopy
 from functools import cached_property
 from inspect import isclass
@@ -10,6 +11,7 @@ from typing import (
     Any,
     AsyncIterator,
     Generic,
+    Iterator,
     Literal,
     Optional,
     TypeVar,
@@ -87,7 +89,7 @@ def load_type(type, value):
     return type(value)
 
 
-def convert(type, with_name: bool = False, with_indexed: bool = False):
+def convert(type, with_name: bool = False, with_indexed: bool = False):  # noqa: C901
     name = ""
     indexed = False
     if is_annotation(type):
@@ -450,6 +452,13 @@ class Event(Request, Generic[T]):
             event=self,
         )
 
+    @property
+    def sync(self) -> "SyncEventWrapper[T]":
+        return SyncEventWrapper(
+            network=self._network or _force_get_default_network(),
+            event=self,
+        )
+
     @staticmethod
     async def _convert_block_string(
         block_string: BLOCK_STRINGS,
@@ -482,6 +491,108 @@ class Event(Request, Generic[T]):
                 }
             )
         )
+
+
+class SyncEventWrapper(BaseModel, Generic[T]):
+    network: type[Network]
+    event: Event[T]
+
+    def __getitem__(self, network: type[Network]):
+        self.network = network
+        return self
+
+    def get_logs(
+        self,
+        start_block: BlockReference | int,
+        end_block: BlockReference | int,
+    ) -> Iterator[EventData[T]]:
+        cur_end = end_block
+        try:
+            response = self.event._get_logs(
+                start_block,
+                cur_end,
+                self.event.addresses_filter,
+                topic1=self.event.topic1_filter,
+                topic2=self.event.topic2_filter,
+                topic3=self.event.topic3_filter,
+            ).sync
+        except ValueError as err:
+            message = err.args[0]
+            if isinstance(message, bytes):
+                try:
+                    message = message.decode("utf-8")
+                except UnicodeDecodeError:
+                    message = str(message)
+            else:
+                message = str(message)
+            if "Log response size exceeded." in message:
+                boundaries = re.findall("0x[0-9a-f]+", message)
+                raise LogResponseExceededError(
+                    err.args[0], int(boundaries[0], 16), int(boundaries[1], 16)
+                )
+            elif (
+                "Your app has exceeded its compute units per second capacity" in message
+            ):
+                raise RateLimitingError(message)
+            raise err
+
+        for result in response:
+            # TODO: this is just a placeholder
+            if len(result.topics) != (len(self.event.get_indexed()) + 1):
+                # this happens when an event has the same topic0, but different indexed events so it doesn't match up to the expected ABI
+                continue
+
+            event_data = EventData[T](
+                name=self.event.name,
+                log=result,
+                event=self.event.process(
+                    result.topics,
+                    result.data,
+                ),
+                network=self.network,
+            )
+            yield event_data
+
+    def backfill(
+        self,
+        start_block: int | None = None,
+        end_block: int | None = None,
+        step_size: Optional[int] = None,
+    ) -> Iterator[EventData[T]]:
+        """
+        This backfills events, handling LogResponseExceededError to provide all logs in a range too large for a single request
+        """
+        start_block = start_block or 1
+        current_number = Block[self.network].get_number().sync  # type: ignore[name-defined]
+        end_block = end_block or (current_number - 3)  # set 3 default confirmations
+
+        if start_block == "earliest":
+            cur_start = 0
+        else:
+            cur_start = start_block
+
+        if step_size:
+            cur_end = cur_start + step_size
+        else:
+            cur_end = end_block
+        while cur_start <= end_block:
+            try:
+                for log in self.get_logs(
+                    start_block=cur_start,
+                    end_block=min(cur_end, end_block),
+                ):
+                    yield log
+            except LogResponseExceededError as err:
+                cur_end = err.recommended_end
+                continue
+            except RateLimitingError:
+                time.sleep(3)
+                continue
+            cur_start = cur_end + 1
+            if step_size:
+                cur_end += step_size
+            else:
+                cur_end = end_block
 
 
 class AsyncSubscribeCallable(BaseModel, Generic[T]):
