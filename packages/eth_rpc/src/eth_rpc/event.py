@@ -2,10 +2,10 @@ import asyncio
 import json
 import logging
 import re
+import time
 from copy import deepcopy
 from functools import cached_property
 from inspect import isclass
-import time
 from types import GenericAlias
 from typing import (
     Any,
