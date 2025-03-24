@@ -453,8 +453,8 @@ class Event(Request, Generic[T]):
         )
 
     @property
-    def sync(self) -> "SyncEventCallable[T]":
-        return SyncEventCallable(
+    def sync(self) -> "SyncEventWrapper[T]":
+        return SyncEventWrapper(
             network=self._network or _force_get_default_network(),
             event=self,
         )
@@ -493,7 +493,7 @@ class Event(Request, Generic[T]):
         )
 
 
-class SyncEventCallable(BaseModel, Generic[T]):
+class SyncEventWrapper(BaseModel, Generic[T]):
     network: type[Network]
     event: Event[T]
 
@@ -563,7 +563,7 @@ class SyncEventCallable(BaseModel, Generic[T]):
         This backfills events, handling LogResponseExceededError to provide all logs in a range too large for a single request
         """
         start_block = start_block or 1
-        current_number = Block[self._network].get_number().sync  # type: ignore[name-defined]
+        current_number = Block[self.network].get_number().sync  # type: ignore[name-defined]
         end_block = end_block or (current_number - 3)  # set 3 default confirmations
 
         if start_block == "earliest":
