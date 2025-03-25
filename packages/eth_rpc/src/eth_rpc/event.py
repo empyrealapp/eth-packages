@@ -23,7 +23,9 @@ from eth_abi import decode
 from eth_abi.exceptions import InsufficientDataBytes
 from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import BaseModel, PrivateAttr, computed_field
+from pydantic.networks import AnyWebsocketUrl
 from pydantic_core import Url
+from websockets.sync.client import ClientConnection, connect as sync_connect
 from websockets.exceptions import ConnectionClosedError
 from websockets.legacy.client import WebSocketClientProtocol, connect
 
@@ -395,13 +397,14 @@ class Event(Request, Generic[T]):
         start_block: int | None = None,
         end_block: int | None = None,
         step_size: Optional[int] = None,
+        confirmations: int = 2,
     ) -> AsyncIterator[EventData[T]]:
         """
         This backfills events, handling LogResponseExceededError to provide all logs in a range too large for a single request
         """
         start_block = start_block or 1
         current_number = await Block[self._network].get_number()  # type: ignore[name-defined]
-        end_block = end_block or (current_number - 3)  # set 3 default confirmations
+        end_block = end_block or (current_number - confirmations)
 
         if start_block == "earliest":
             cur_start = 0
@@ -501,6 +504,86 @@ class SyncEventWrapper(BaseModel, Generic[T]):
         self.network = network
         return self
 
+    def subscribe(  # noqa: C901
+        self,
+    ) -> Iterator[EventData[T]]:
+        # TODO: sometimes the topics match, but the indexed fields are different
+
+        if not (wss_uri := self.network.wss):
+            raise ValueError("No wss set for network")
+
+        w3_connection = sync_connect(
+            (
+                wss_uri.unicode_string()
+                if isinstance(wss_uri, AnyWebsocketUrl)
+                else wss_uri
+            ),
+            max_queue=10000,
+        )
+        try:
+            topics: list[HexStr | list[HexStr] | None] = []
+            if self.event.topic1_filter != IGNORE_VAL:
+                topics.append(self.event.topic1_filter)
+                if self.event.topic2_filter != IGNORE_VAL:
+                    topics.append(self.event.topic2_filter)
+                    if self.event.topic3_filter != IGNORE_VAL:
+                        topics.append(self.event.topic3_filter)
+
+            self._send_subscription_request(
+                w3_connection,
+                False,
+                self.event.addresses_filter,
+                [
+                    self.event.get_topic0,
+                    *topics,
+                ],
+            )
+            subscription_response: SubscriptionResponse = json.loads(
+                w3_connection.recv()
+            )
+            if not subscription_response.get("result"):
+                raise ValueError(subscription_response)
+        except Exception as e:
+            raise e
+
+        while True:
+            try:
+                message = w3_connection.recv(timeout=32.0)
+                message_json: JsonResponseWssResponse = json.loads(message)
+                if "params" not in message_json:
+                    raise ValueError(message_json)
+
+                result_dict: EvmDataDict = message_json["params"]["result"]
+                result = Log.model_validate(result_dict)
+                yield EventData(
+                    name=self.event.name,
+                    log=result,
+                    event=self.event.process(
+                        result.topics,
+                        result.data,
+                    ),
+                    network=self.network,
+                )
+            except asyncio.exceptions.TimeoutError:
+                pass
+            except (TypeError, LogDecodeError):
+                logger.warning("Mistmatched type: %s", result_dict)
+            except (
+                ConnectionClosedError,
+                ConnectionResetError,
+                OSError,  # No route to host
+                asyncio.exceptions.IncompleteReadError,  # TODO: should this be handled differently?
+            ) as err:
+                logger.error("connection terminated unexpectedly: %s", err)
+                time.sleep(1)
+                # we're in an iterator, so make a new connection and continue listening
+                break
+            except Exception as err:
+                logger.error("connection error: %s", err)
+                time.sleep(1)
+                # we're in an iterator, so make a new connection and continue listening
+                break
+
     def get_logs(
         self,
         start_block: BlockReference | int,
@@ -558,13 +641,14 @@ class SyncEventWrapper(BaseModel, Generic[T]):
         start_block: int | None = None,
         end_block: int | None = None,
         step_size: Optional[int] = None,
+        confirmations: int = 2,
     ) -> Iterator[EventData[T]]:
         """
         This backfills events, handling LogResponseExceededError to provide all logs in a range too large for a single request
         """
         start_block = start_block or 1
         current_number = Block[self.network].get_number().sync  # type: ignore[name-defined]
-        end_block = end_block or (current_number - 3)  # set 3 default confirmations
+        end_block = end_block or (current_number - confirmations)
 
         if start_block == "earliest":
             cur_start = 0
@@ -593,6 +677,31 @@ class SyncEventWrapper(BaseModel, Generic[T]):
                 cur_end += step_size
             else:
                 cur_end = end_block
+
+    @staticmethod
+    def _send_subscription_request(
+        w3_connection: ClientConnection,
+        pending: bool,
+        addresses: list[HexAddress],
+        topics: list[HexStr | list[HexStr] | None],
+    ):
+        # this only handles a list of topic0s being subscribed together
+        subscription_type = "newPendingTransactions" if pending else "logs"
+        w3_connection.send(
+            json.dumps(
+                {
+                    "id": 1,
+                    "method": "eth_subscribe",
+                    "params": [
+                        subscription_type,
+                        {
+                            "address": addresses,
+                            "topics": topics,
+                        },
+                    ],
+                }
+            )
+        )
 
 
 class AsyncSubscribeCallable(BaseModel, Generic[T]):
