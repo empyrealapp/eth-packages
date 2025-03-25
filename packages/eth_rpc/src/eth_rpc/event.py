@@ -25,9 +25,10 @@ from eth_typing import ChecksumAddress, HexAddress, HexStr
 from pydantic import BaseModel, PrivateAttr, computed_field
 from pydantic.networks import AnyWebsocketUrl
 from pydantic_core import Url
-from websockets.sync.client import ClientConnection, connect as sync_connect
 from websockets.exceptions import ConnectionClosedError
 from websockets.legacy.client import WebSocketClientProtocol, connect
+from websockets.sync.client import ClientConnection
+from websockets.sync.client import connect as sync_connect
 
 from ._request import Request
 from ._transport import _force_get_default_network, get_current_network
