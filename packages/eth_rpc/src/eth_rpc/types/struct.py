@@ -55,10 +55,10 @@ class Struct(BaseModel):
 
     @classmethod
     def cast(cls, type_, args):
-        if get_origin(type_) == list:
+        if get_origin(type_) is list:
             (type_,) = get_args(type_)
             return [cls.cast(type_, arg) for arg in args]
-        elif get_origin(type_) == tuple:
+        elif get_origin(type_) is tuple:
             tuple_types = get_args(type_)
             return tuple(cls.cast(type_, arg) for type_, arg in zip(tuple_types, args))
         elif isclass(type_) and issubclass(type_, Struct):
@@ -120,9 +120,9 @@ class Struct(BaseModel):
 
     @classmethod
     def _get_nested_types(cls, type_) -> list:
-        if get_origin(type_) == list:
+        if get_origin(type_) is list:
             return cls._get_nested_types(get_args(type_)[0])
-        elif get_origin(type_) == tuple:
+        elif get_origin(type_) is tuple:
             args = get_args(type_)
             return [
                 item
@@ -142,10 +142,10 @@ class Struct(BaseModel):
             type_ = field_data.annotation
 
             if isinstance(type_, GenericAlias):
-                if get_origin(type_) == list:
+                if get_origin(type_) is list:
                     (arg,) = get_args(type_)
                     type_str = f"{cls.transform(arg)}[]"
-                elif get_origin(type_) == tuple:
+                elif get_origin(type_) is tuple:
                     args = get_args(type_)
                     type_str = f"({','.join([cls.transform(arg) for arg in args])})"
             else:
@@ -155,3 +155,18 @@ class Struct(BaseModel):
             f'{cls.struct_name()}({type_string.rstrip(",")})'.encode("utf-8")
         )
         return encoded_typestr + b"".join(set(nested_types))
+
+    def to_tuple(self):
+        """returns the struct as a tuple of all values, handling nested tuples"""
+        values = []
+        for value in self.model_dump().values():
+            if isinstance(value, Struct):
+                values.append(value.to_tuple())
+            elif isinstance(value, list):
+                values.append([
+                    item.to_tuple() if isinstance(item, Struct) else item
+                    for item in value
+                ])
+            else:
+                values.append(value)
+        return tuple(values)

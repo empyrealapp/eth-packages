@@ -21,9 +21,9 @@ class EIP712Model(Struct):
 
     @classmethod
     def _get_nested_types(cls, type_) -> list:
-        if get_origin(type_) == list:
+        if get_origin(type_) is list:
             return cls._get_nested_types(get_args(type_)[0])
-        elif get_origin(type_) == tuple:
+        elif get_origin(type_) is tuple:
             args = get_args(type_)
             return [
                 item
@@ -45,10 +45,10 @@ class EIP712Model(Struct):
             type_ = field_data.annotation
 
             if isinstance(type_, GenericAlias):
-                if get_origin(type_) == list:
+                if get_origin(type_) is list:
                     (arg,) = get_args(type_)
                     type_str = f"{cls.transform(arg)}[]"
-                elif get_origin(type_) == tuple:
+                elif get_origin(type_) is tuple:
                     args = get_args(type_)
                     type_str = f"({','.join([cls.transform(arg) for arg in args])})"
             else:

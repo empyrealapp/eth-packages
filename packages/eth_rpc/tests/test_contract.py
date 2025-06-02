@@ -179,3 +179,25 @@ def test_decode_basemodel() -> None:
     )
     decoded = response.decode()
     assert decoded == my_struct
+
+
+@pytest.mark.unit
+def test_encode_call() -> None:
+    class MyStruct(Struct):
+        x: int
+        y: bool
+
+    class MyArgs(BaseModel):
+        data: MyStruct
+        other: int
+
+    func = FuncSignature[
+        MyArgs,
+        primitives.uint256,
+    ](name="allowance")
+
+    signature = func.get_identifier()
+    assert func.encode_call(inputs=MyArgs(data=MyStruct(x=1, y=True), other=2)) == f"{signature}{encode(
+        ("(int,bool)", "uint256"),
+        [(1, True), 2],
+    ).hex()}"
