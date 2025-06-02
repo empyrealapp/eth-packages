@@ -183,21 +183,35 @@ def test_decode_basemodel() -> None:
 
 @pytest.mark.unit
 def test_encode_call() -> None:
-    class MyStruct(Struct):
+    class SubStruct(Struct):
         x: int
         y: bool
 
+    class MyStruct(Struct):
+        data: SubStruct
+        other: int
+
     class MyArgs(BaseModel):
         data: MyStruct
-        other: int
+        other: str
 
     func = FuncSignature[
         MyArgs,
         primitives.uint256,
     ](name="allowance")
 
+    # test against hard coding the nested struct
+    func2 = FuncSignature[
+        tuple[tuple[tuple[int, bool], int], str],
+        primitives.uint256,
+    ](name="allowance")
+
     signature = func.get_identifier()
-    assert func.encode_call(inputs=MyArgs(data=MyStruct(x=1, y=True), other=2)) == f"{signature}{encode(
-        ("(int,bool)", "uint256"),
-        [(1, True), 2],
+    encoding = func.encode_call(inputs=MyArgs(data=MyStruct(data=SubStruct(x=1, y=True), other=2), other="other"))
+    assert encoding == f"{signature}{encode(
+        ("((uint256,bool),uint256)", "string"),
+        [((1, True), 2), "other"],
     ).hex()}"
+
+    encoding2 = func2.encode_call(inputs=(((1, True), 2), "other"))
+    assert encoding == encoding2
