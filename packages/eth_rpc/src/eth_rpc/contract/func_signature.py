@@ -125,7 +125,9 @@ class FuncSignature(Request, Generic[T, U]):
                 for field_value in inputs.model_dump().values():
                     if isinstance(field_value, dict):
                         values.append(convert_nested_dict(field_value))
-                    elif isinstance(field_value, list) and all(isinstance(x, dict) for x in field_value):
+                    elif isinstance(field_value, list) and all(
+                        isinstance(x, dict) for x in field_value
+                    ):
                         values.append([convert_nested_dict(x) for x in field_value])
                     else:
                         values.append(field_value)

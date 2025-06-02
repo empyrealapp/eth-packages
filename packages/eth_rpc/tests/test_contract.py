@@ -207,11 +207,18 @@ def test_encode_call() -> None:
     ](name="allowance")
 
     signature = func.get_identifier()
-    encoding = func.encode_call(inputs=MyArgs(data=MyStruct(data=SubStruct(x=1, y=True), other=2), other="other"))
-    assert encoding == f"{signature}{encode(
+    encoding = func.encode_call(
+        inputs=MyArgs(
+            data=MyStruct(data=SubStruct(x=1, y=True), other=2), other="other"
+        )
+    )
+    assert (
+        encoding
+        == f"{signature}{encode(
         ("((uint256,bool),uint256)", "string"),
         [((1, True), 2), "other"],
     ).hex()}"
+    )
 
     encoding2 = func2.encode_call(inputs=(((1, True), 2), "other"))
     assert encoding == encoding2

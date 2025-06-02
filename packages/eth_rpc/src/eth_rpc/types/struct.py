@@ -163,10 +163,12 @@ class Struct(BaseModel):
             if isinstance(value, Struct):
                 values.append(value.to_tuple())
             elif isinstance(value, list):
-                values.append([
-                    item.to_tuple() if isinstance(item, Struct) else item
-                    for item in value
-                ])
+                values.append(
+                    [
+                        item.to_tuple() if isinstance(item, Struct) else item
+                        for item in value
+                    ]
+                )
             else:
                 values.append(value)
         return tuple(values)
