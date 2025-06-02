@@ -218,4 +218,4 @@ def test_encode_call() -> None:
     ).hex()
 
     encoding2 = func2.encode_call(inputs=(((1, True), 2), "other"))
-    assert encoding == encoding2 == manual_encoding == f"{signature}{manual_encoding}"
+    assert encoding == encoding2 == f"{signature}{manual_encoding}"
