@@ -1,6 +1,6 @@
 from inspect import isclass
 from types import GenericAlias
-from typing import Generic, TypeVar, cast, get_args, get_origin
+from typing import Any, Generic, TypeVar, cast, get_args, get_origin
 
 from eth_abi import decode, encode
 from eth_hash.auto import keccak as keccak_256
@@ -21,6 +21,12 @@ T = TypeVar(
     | HexAddress,
 )
 U = TypeVar("U")
+
+
+def convert_nested_dict(d: Any) -> Any:
+    if isinstance(d, dict):
+        return tuple(convert_nested_dict(v) for v in d.values())
+    return d
 
 
 class FuncSignature(Request, Generic[T, U]):
@@ -114,9 +120,20 @@ class FuncSignature(Request, Generic[T, U]):
             if isinstance(inputs, Struct):
                 input_data = inputs.to_bytes().hex()
             else:
+                # Convert Struct fields to tuples while keeping other fields as-is
+                values = []
+                for field_value in inputs.model_dump().values():
+                    if isinstance(field_value, dict):
+                        values.append(convert_nested_dict(field_value))
+                    elif isinstance(field_value, list) and all(
+                        isinstance(x, dict) for x in field_value
+                    ):
+                        values.append([convert_nested_dict(x) for x in field_value])
+                    else:
+                        values.append(field_value)
                 input_data = encode(
                     self.get_inputs(),
-                    list(inputs.model_dump().values()),
+                    list(values),
                 ).hex()
         elif isinstance(inputs, tuple):
             input_data = encode(
