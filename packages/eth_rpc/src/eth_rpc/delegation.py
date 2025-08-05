@@ -94,8 +94,7 @@ def prepare_delegation_transaction(
 
 def sponsor_delegation(
     sponsor_wallet: BaseWallet,
-    delegatee_address: HexAddress,
-    delegatee_private_key: HexStr,
+    delegate_wallet: BaseWallet,
     target_address: HexAddress,
     chain_id: int,
     nonce: int,
@@ -104,12 +103,11 @@ def sponsor_delegation(
 ) -> PreparedTransaction:
     """
     Create a sponsored delegation transaction where the sponsor pays gas
-    for a delegated call from the delegatee.
+    for a delegated call from the delegate.
 
     Args:
         sponsor_wallet: Wallet that will pay for gas
-        delegatee_address: Address that will be delegated to
-        delegatee_private_key: Private key of delegatee to sign authorization
+        delegate_wallet: Wallet that will be delegated to (signs authorization)
         target_address: Target address for the delegated call
         chain_id: Chain ID for the authorization
         nonce: Nonce for the authorization
@@ -121,9 +119,9 @@ def sponsor_delegation(
     """
     auth_item = create_authorization_item(
         chain_id=chain_id,
-        address=delegatee_address,
+        address=delegate_wallet.address,
         nonce=nonce,
-        private_key=delegatee_private_key,
+        private_key=delegate_wallet.private_key,
     )
 
     return prepare_delegation_transaction(
