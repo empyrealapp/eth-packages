@@ -7,7 +7,27 @@ from eth_rpc.utils.event_receipt import (
     get_single_event_from_receipt,
     get_single_event_from_tx_hash,
 )
-from eth_typeshed.erc20 import ApprovalEvent, TransferEvent
+from typing import Annotated
+
+from eth_rpc import Event
+from eth_rpc.types import Indexed, primitives
+from pydantic import BaseModel
+
+
+class TransferEventType(BaseModel):
+    sender: Annotated[primitives.address, Indexed]
+    recipient: Annotated[primitives.address, Indexed]
+    amount: primitives.uint256
+
+
+class ApprovalEventType(BaseModel):
+    owner: Annotated[primitives.address, Indexed]
+    spender: Annotated[primitives.address, Indexed]
+    value: primitives.uint256
+
+
+TransferEvent = Event[TransferEventType](name="Transfer")
+ApprovalEvent = Event[ApprovalEventType](name="Approval")
 from eth_typing import HexStr
 
 TRANSFER_TX_HASH = HexStr(
