@@ -57,7 +57,7 @@ def main():
     
     print("\n1. Setting up wallets...")
     sponsor_wallet = PrivateKeyWallet.create_new()
-    delegate_wallet = PrivateKeyWallet(HexStr(delegate_private_key))
+    delegate_wallet = PrivateKeyWallet(private_key=HexStr(delegate_private_key))
     
     print(f"   Sponsor wallet: {sponsor_wallet.address}")
     print(f"   Delegate wallet: {delegate_wallet.address}")
@@ -66,7 +66,7 @@ def main():
     print(f"   Counter contract: {counter_address}")
     
     print("\n2. Creating Counter contract instance...")
-    counter = Counter(counter_address)
+    counter = Counter(address=counter_address)
     print(f"   Counter.increment function: {counter.increment}")
     
     print("\n3. Preparing increment call...")
@@ -77,13 +77,13 @@ def main():
     print("\n4. Creating sponsored delegation transaction...")
     print("   This transaction will:")
     print("   - Be paid for by the sponsor wallet")
-    print("   - Temporarily delegate the delegate's account to the Counter contract")
-    print("   - Call the increment method on behalf of the delegate")
+    print("   - Set the delegate's account code to the Counter contract")
+    print("   - Execute the increment method within the same transaction")
     
     sponsored_tx = sponsor_delegation(
         sponsor_wallet=sponsor_wallet,
         delegate_wallet=delegate_wallet,
-        target_address=counter_address,
+        contract_address=counter_address,
         chain_id=1,  # Ethereum mainnet
         nonce=0,     # Delegate's authorization nonce
         value=0,     # No ETH transfer
@@ -107,10 +107,10 @@ def main():
     print(f"\n6. Transaction ready for execution:")
     print("   The sponsor can now sign and submit this transaction.")
     print("   When executed:")
-    print("   - The delegate's account will temporarily become the Counter contract")
-    print("   - The increment() method will be called")
+    print("   - The delegate's account code will be set to the Counter contract")
+    print("   - The increment() method will be executed on the delegate's account")
     print("   - The sponsor pays all gas fees")
-    print("   - The delegate's counter will be incremented")
+    print("   - The delegate's counter state will be incremented")
     
     print(f"\n🎉 EIP-7702 delegation workflow complete!")
     print("   Transaction is ready to be signed by sponsor and submitted to the network.")
