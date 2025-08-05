@@ -1,11 +1,9 @@
+import os
+
 import pytest
-from unittest.mock import MagicMock
-
-from eth_typing import HexAddress, HexStr
-from pydantic import BaseModel
-
-from eth_rpc.event import Event
-from eth_rpc.models import EventData, Log, TransactionReceipt
+from eth_rpc import set_alchemy_key
+from eth_rpc.networks import Ethereum
+from eth_rpc.transaction import Transaction
 from eth_rpc.utils.event_receipt import (
     EventReceiptUtility,
     get_events_from_receipt,
@@ -13,260 +11,147 @@ from eth_rpc.utils.event_receipt import (
     get_single_event_from_receipt,
     get_single_event_from_tx_hash,
 )
+from eth_typeshed.erc20 import ApprovalEvent, TransferEvent
+from eth_typing import HexStr
+
+TRANSFER_TX_HASH = HexStr(
+    "0xc1b74e10a88ad2bc610432a182ae6d8200bd684704c44dfd0b915b86d4554211"
+)
+APPROVAL_TX_HASH = HexStr(
+    "0x353bbe9c19982849849227f8745a7fb633502bbabde3068f2aeb3295083bc78e"
+)
 
 
-class MockTransferEvent(BaseModel):
-    from_: HexAddress
-    to: HexAddress
-    value: int
+@pytest.fixture(scope="session", autouse=True)
+def setup_alchemy():
+    """Set up Alchemy API key for all tests."""
+    set_alchemy_key(os.environ["ALCHEMY_KEY"])
 
 
-class MockApprovalEvent(BaseModel):
-    owner: HexAddress
-    spender: HexAddress
-    value: int
+@pytest.fixture(scope="session")
+async def transfer_receipt():
+    """Get real transaction receipt with Transfer events."""
+    return await Transaction[Ethereum].get_receipt_by_hash(TRANSFER_TX_HASH)
 
 
-@pytest.fixture
-def mock_transfer_log():
-    return Log(
-        transaction_hash=HexStr("0x123"),
-        address=HexAddress(
-            "0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
-        ),
-        block_hash=HexStr("0x456"),
-        block_number=12345,
-        data=HexStr(
-            "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"
-        ),
-        log_index=0,
-        removed=False,
-        topics=[
-            HexStr(
-                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
-            ),  # Transfer topic0
-            HexStr(
-                "0x000000000000000000000000a0b86a33e6441e8e421b7b0b4b8b8b8b8b8b8b8b"
-            ),  # from
-            HexStr(
-                "0x000000000000000000000000b0b86a33e6441e8e421b7b0b4b8b8b8b8b8b8b8b"
-            ),  # to
-        ],
-        transaction_index=1,
-    )
+@pytest.fixture(scope="session")
+async def approval_receipt():
+    """Get real transaction receipt with Approval events."""
+    return await Transaction[Ethereum].get_receipt_by_hash(APPROVAL_TX_HASH)
 
 
-@pytest.fixture
-def mock_approval_log():
-    return Log(
-        transaction_hash=HexStr("0x123"),
-        address=HexAddress(
-            "0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
-        ),
-        block_hash=HexStr("0x456"),
-        block_number=12345,
-        data=HexStr(
-            "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"
-        ),
-        log_index=1,
-        removed=False,
-        topics=[
-            HexStr(
-                "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"
-            ),  # Approval topic0
-            HexStr(
-                "0x000000000000000000000000a0b86a33e6441e8e421b7b0b4b8b8b8b8b8b8b8b"
-            ),  # owner
-            HexStr(
-                "0x000000000000000000000000c0b86a33e6441e8e421b7b0b4b8b8b8b8b8b8b8b"
-            ),  # spender
-        ],
-        transaction_index=1,
-    )
+@pytest.mark.asyncio(scope="session")
+async def test_get_events_from_receipt_transfer_events(transfer_receipt):
+    """Test extracting Transfer events from real transaction receipt."""
+    events = [TransferEvent]
+    result = await EventReceiptUtility.get_events_from_receipt(events, transfer_receipt)
+
+    assert len(result) > 0
+    assert all(event_data.name == "Transfer" for event_data in result)
+    assert all(hasattr(event_data.event, "sender") for event_data in result)
+    assert all(hasattr(event_data.event, "recipient") for event_data in result)
+    assert all(hasattr(event_data.event, "amount") for event_data in result)
 
 
-@pytest.fixture
-def mock_receipt(mock_transfer_log, mock_approval_log):
-    return TransactionReceipt(
-        transaction_hash=HexStr("0x123"),
-        block_hash=HexStr("0x456"),
-        block_number=12345,
-        logs=[mock_transfer_log, mock_approval_log],
-        contract_address=None,
-        effective_gas_price=20000000000,
-        cumulative_gas_used=21000,
-        from_=HexAddress(
-            "0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
-        ),
-        gas_used=21000,
-        logs_bloom=0,
-        status=1,
-        to=HexAddress(
-            "0xB0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
-        ),
-        transaction_index=1,
-        type=2,
-    )
+@pytest.mark.asyncio(scope="session")
+async def test_get_events_from_receipt_approval_events(approval_receipt):
+    """Test extracting Approval events from real transaction receipt."""
+    events = [ApprovalEvent]
+    result = await EventReceiptUtility.get_events_from_receipt(events, approval_receipt)
+
+    assert len(result) == 1
+    assert result[0].name == "Approval"
+    assert hasattr(result[0].event, "owner")
+    assert hasattr(result[0].event, "spender")
+    assert hasattr(result[0].event, "value")
 
 
-@pytest.fixture
-def mock_transfer_event():
-    event = Event[MockTransferEvent](name="Transfer")
-    event.match = MagicMock(return_value=True)
-    event.process_log = MagicMock(
-        return_value=EventData(
-            name="Transfer",
-            log=MagicMock(),
-            event=MockTransferEvent(
-                from_=HexAddress(
-                    "0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
-                ),
-                to=HexAddress(
-                    "0xB0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
-                ),
-                value=1000000000000000000,
-            ),
-            network=MagicMock(),
-        )
-    )
-    return event
-
-
-@pytest.fixture
-def mock_approval_event():
-    event = Event[MockApprovalEvent](name="Approval")
-    event.match = MagicMock(
-        return_value=False
-    )  # Won't match transfer logs
-    return event
-
-
-@pytest.mark.asyncio
-async def test_get_events_from_receipt_single_match(
-    mock_receipt, mock_transfer_event
-):
-    """Test extracting events from receipt with single matching event."""
-    events = [mock_transfer_event]
-
-    result = await EventReceiptUtility.get_events_from_receipt(events, mock_receipt)
-
-    assert len(result) == 2  # Should match both logs since mock returns True
-    assert all(isinstance(event_data, EventData) for event_data in result)
-    assert mock_transfer_event.match.call_count == 2  # Called for each log
-
-
-@pytest.mark.asyncio
-async def test_get_events_from_receipt_no_matches(
-    mock_receipt, mock_approval_event
-):
-    """Test extracting events from receipt with no matching events."""
-    events = [mock_approval_event]
-
-    result = await EventReceiptUtility.get_events_from_receipt(events, mock_receipt)
+@pytest.mark.asyncio(scope="session")
+async def test_get_events_from_receipt_no_matches(transfer_receipt):
+    """Test extracting events with no matches."""
+    events = [ApprovalEvent]
+    result = await EventReceiptUtility.get_events_from_receipt(events, transfer_receipt)
 
     assert len(result) == 0
-    assert mock_approval_event.match.call_count == 2  # Called for each log
 
 
-@pytest.mark.asyncio
-async def test_get_events_from_receipt_multiple_event_types(
-    mock_receipt, mock_transfer_event, mock_approval_event
-):
-    """Test extracting events from receipt with multiple event types."""
-    events = [mock_transfer_event, mock_approval_event]
+@pytest.mark.asyncio(scope="session")
+async def test_get_events_from_receipt_multiple_event_types(transfer_receipt):
+    """Test extracting multiple event types from receipt."""
+    events = [TransferEvent, ApprovalEvent]
+    result = await EventReceiptUtility.get_events_from_receipt(events, transfer_receipt)
 
-    result = await EventReceiptUtility.get_events_from_receipt(events, mock_receipt)
-
-    assert len(result) == 2  # Only transfer events match
-    assert mock_transfer_event.match.call_count == 2
-    assert mock_approval_event.match.call_count == 2
+    assert len(result) > 0
+    assert all(event_data.name == "Transfer" for event_data in result)
 
 
-@pytest.mark.asyncio
-async def test_get_events_from_tx_hash(
-    mock_receipt, mock_transfer_event, monkeypatch
-):
+@pytest.mark.asyncio(scope="session")
+async def test_get_events_from_tx_hash():
     """Test extracting events from transaction hash."""
-    async def mock_get_receipt(tx_hash):
-        return mock_receipt
+    events = [TransferEvent]
+    result = await EventReceiptUtility.get_events_from_tx_hash(events, TRANSFER_TX_HASH)
 
-    monkeypatch.setattr(
-        "eth_rpc.utils.event_receipt.Transaction.get_receipt_by_hash",
-        mock_get_receipt,
-    )
-
-    events = [mock_transfer_event]
-    tx_hash = HexStr("0x123")
-
-    result = await EventReceiptUtility.get_events_from_tx_hash(events, tx_hash)
-
-    assert len(result) == 2
-    assert all(isinstance(event_data, EventData) for event_data in result)
+    assert len(result) > 0
+    assert all(event_data.name == "Transfer" for event_data in result)
 
 
-@pytest.mark.asyncio
-async def test_get_events_from_tx_hash_no_receipt(
-    mock_transfer_event, monkeypatch
-):
-    """Test extracting events from transaction hash when receipt is None."""
-    async def mock_get_receipt(tx_hash):
-        return None
-
-    monkeypatch.setattr(
-        "eth_rpc.utils.event_receipt.Transaction.get_receipt_by_hash",
-        mock_get_receipt,
-    )
-
-    events = [mock_transfer_event]
-    tx_hash = HexStr("0x123")
-
-    result = await EventReceiptUtility.get_events_from_tx_hash(events, tx_hash)
-
-    assert len(result) == 0
-
-
-@pytest.mark.asyncio
-async def test_get_single_event_from_receipt(mock_receipt, mock_transfer_event):
+@pytest.mark.asyncio(scope="session")
+async def test_get_single_event_from_receipt(transfer_receipt):
     """Test extracting single event from receipt."""
     result = await EventReceiptUtility.get_single_event_from_receipt(
-        mock_transfer_event, mock_receipt
+        TransferEvent, transfer_receipt
     )
 
     assert result is not None
-    assert isinstance(result, EventData)
+    assert result.name == "Transfer"
 
 
-@pytest.mark.asyncio
-async def test_get_single_event_from_receipt_no_match(
-    mock_receipt, mock_approval_event
-):
-    """Test extracting single event from receipt with no matches."""
+@pytest.mark.asyncio(scope="session")
+async def test_get_single_event_from_receipt_no_match(transfer_receipt):
+    """Test extracting single event with no matches."""
     result = await EventReceiptUtility.get_single_event_from_receipt(
-        mock_approval_event, mock_receipt
+        ApprovalEvent, transfer_receipt
     )
 
     assert result is None
 
 
-@pytest.mark.asyncio
-async def test_convenience_functions(mock_receipt, mock_transfer_event):
-    """Test that convenience functions work correctly."""
-    result1 = await get_events_from_receipt([mock_transfer_event], mock_receipt)
-    assert len(result1) == 2
+@pytest.mark.asyncio(scope="session")
+async def test_get_single_event_from_tx_hash():
+    """Test extracting single event from transaction hash."""
+    result = await EventReceiptUtility.get_single_event_from_tx_hash(
+        ApprovalEvent, APPROVAL_TX_HASH
+    )
 
-    result2 = await get_single_event_from_receipt(mock_transfer_event, mock_receipt)
+    assert result is not None
+    assert result.name == "Approval"
+
+
+@pytest.mark.asyncio(scope="session")
+async def test_convenience_functions(transfer_receipt):
+    """Test that convenience functions work correctly."""
+    result1 = await get_events_from_receipt([TransferEvent], transfer_receipt)
+    assert len(result1) > 0
+
+    result2 = await get_single_event_from_receipt(TransferEvent, transfer_receipt)
     assert result2 is not None
 
 
-@pytest.mark.asyncio
-async def test_process_log_exception_handling(
-    mock_receipt, mock_transfer_event
-):
-    """Test that exceptions during process_log are handled gracefully."""
-    mock_transfer_event.process_log.side_effect = Exception("Decode error")
+@pytest.mark.asyncio(scope="session")
+async def test_get_events_from_tx_hash_invalid_hash():
+    """Test handling of invalid transaction hash."""
+    invalid_hash = HexStr("0x" + "0" * 64)
+    events = [TransferEvent]
 
-    result = await EventReceiptUtility.get_events_from_receipt(
-        [mock_transfer_event], mock_receipt
-    )
-
+    result = await EventReceiptUtility.get_events_from_tx_hash(events, invalid_hash)
     assert len(result) == 0
+
+
+@pytest.mark.asyncio(scope="session")
+async def test_convenience_functions_from_tx_hash():
+    """Test convenience functions with transaction hash."""
+    result1 = await get_events_from_tx_hash([TransferEvent], TRANSFER_TX_HASH)
+    assert len(result1) > 0
+
+    result2 = await get_single_event_from_tx_hash(ApprovalEvent, APPROVAL_TX_HASH)
+    assert result2 is not None
