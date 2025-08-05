@@ -1,10 +1,11 @@
-from typing import Optional, TypeVar
+from typing import TYPE_CHECKING, Optional, TypeVar
 
 from eth_typing import HexStr
 
-from ..event import Event
-from ..models import EventData, TransactionReceipt
-from ..transaction import Transaction
+if TYPE_CHECKING:
+    from ..event import Event
+    from ..models import EventData, TransactionReceipt
+    from ..transaction import Transaction
 
 T = TypeVar("T")
 
@@ -19,8 +20,8 @@ class EventReceiptUtility:
 
     @staticmethod
     async def get_events_from_receipt(
-        events: list[Event[T]], receipt: TransactionReceipt
-    ) -> list[EventData[T]]:
+        events: list["Event[T]"], receipt: "TransactionReceipt"
+    ) -> list["EventData[T]"]:
         """
         Extract and decode events from a transaction receipt.
 
@@ -46,8 +47,8 @@ class EventReceiptUtility:
 
     @staticmethod
     async def get_events_from_tx_hash(
-        events: list[Event[T]], tx_hash: HexStr
-    ) -> list[EventData[T]]:
+        events: list["Event[T]"], tx_hash: HexStr
+    ) -> list["EventData[T]"]:
         """
         Extract and decode events from a transaction hash.
 
@@ -58,6 +59,8 @@ class EventReceiptUtility:
         Returns:
             List of decoded EventData objects for matched events
         """
+        from ..transaction import Transaction
+        
         receipt = await Transaction.get_receipt_by_hash(tx_hash)
         if not receipt:
             return []
@@ -66,8 +69,8 @@ class EventReceiptUtility:
 
     @staticmethod
     async def get_single_event_from_receipt(
-        event: Event[T], receipt: TransactionReceipt
-    ) -> Optional[EventData[T]]:
+        event: "Event[T]", receipt: "TransactionReceipt"
+    ) -> Optional["EventData[T]"]:
         """
         Extract and decode a single event type from a transaction receipt.
 
@@ -83,8 +86,8 @@ class EventReceiptUtility:
 
     @staticmethod
     async def get_single_event_from_tx_hash(
-        event: Event[T], tx_hash: HexStr
-    ) -> Optional[EventData[T]]:
+        event: "Event[T]", tx_hash: HexStr
+    ) -> Optional["EventData[T]"]:
         """
         Extract and decode a single event type from a transaction hash.
 
@@ -100,8 +103,8 @@ class EventReceiptUtility:
 
 
 async def get_events_from_receipt(
-    events: list[Event[T]], receipt: TransactionReceipt
-) -> list[EventData[T]]:
+    events: list["Event[T]"], receipt: "TransactionReceipt"
+) -> list["EventData[T]"]:
     """
     Convenience function to extract and decode events from a transaction receipt.
     """
@@ -109,8 +112,8 @@ async def get_events_from_receipt(
 
 
 async def get_events_from_tx_hash(
-    events: list[Event[T]], tx_hash: HexStr
-) -> list[EventData[T]]:
+    events: list["Event[T]"], tx_hash: HexStr
+) -> list["EventData[T]"]:
     """
     Convenience function to extract and decode events from a transaction hash.
     """
@@ -118,8 +121,8 @@ async def get_events_from_tx_hash(
 
 
 async def get_single_event_from_receipt(
-    event: Event[T], receipt: TransactionReceipt
-) -> Optional[EventData[T]]:
+    event: "Event[T]", receipt: "TransactionReceipt"
+) -> Optional["EventData[T]"]:
     """
     Convenience function to extract and decode a single event from a transaction receipt.
     """
@@ -127,8 +130,8 @@ async def get_single_event_from_receipt(
 
 
 async def get_single_event_from_tx_hash(
-    event: Event[T], tx_hash: HexStr
-) -> Optional[EventData[T]]:
+    event: "Event[T]", tx_hash: HexStr
+) -> Optional["EventData[T]"]:
     """
     Convenience function to extract and decode a single event from a transaction hash.
     """
