@@ -101,7 +101,9 @@ def mock_receipt(mock_transfer_log, mock_approval_log):
         gas_used=21000,
         logs_bloom=0,
         status=1,
-        to=HexAddress("0xB0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"),
+        to=HexAddress(
+            "0xB0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
+        ),
         transaction_index=1,
         type=2,
     )
@@ -116,8 +118,12 @@ def mock_transfer_event():
             name="Transfer",
             log=MagicMock(),
             event=MockTransferEvent(
-                from_=HexAddress("0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"),
-                to=HexAddress("0xB0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"),
+                from_=HexAddress(
+                    "0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
+                ),
+                to=HexAddress(
+                    "0xB0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
+                ),
                 value=1000000000000000000,
             ),
             network=MagicMock(),
@@ -129,12 +135,16 @@ def mock_transfer_event():
 @pytest.fixture
 def mock_approval_event():
     event = Event[MockApprovalEvent](name="Approval")
-    event.match = MagicMock(return_value=False)  # Won't match transfer logs
+    event.match = MagicMock(
+        return_value=False
+    )  # Won't match transfer logs
     return event
 
 
 @pytest.mark.asyncio
-async def test_get_events_from_receipt_single_match(mock_receipt, mock_transfer_event):
+async def test_get_events_from_receipt_single_match(
+    mock_receipt, mock_transfer_event
+):
     """Test extracting events from receipt with single matching event."""
     events = [mock_transfer_event]
 
@@ -146,7 +156,9 @@ async def test_get_events_from_receipt_single_match(mock_receipt, mock_transfer_
 
 
 @pytest.mark.asyncio
-async def test_get_events_from_receipt_no_matches(mock_receipt, mock_approval_event):
+async def test_get_events_from_receipt_no_matches(
+    mock_receipt, mock_approval_event
+):
     """Test extracting events from receipt with no matching events."""
     events = [mock_approval_event]
 
@@ -171,13 +183,16 @@ async def test_get_events_from_receipt_multiple_event_types(
 
 
 @pytest.mark.asyncio
-async def test_get_events_from_tx_hash(mock_receipt, mock_transfer_event, monkeypatch):
+async def test_get_events_from_tx_hash(
+    mock_receipt, mock_transfer_event, monkeypatch
+):
     """Test extracting events from transaction hash."""
     async def mock_get_receipt(tx_hash):
         return mock_receipt
 
     monkeypatch.setattr(
-        "eth_rpc.utils.event_receipt.Transaction.get_receipt_by_hash", mock_get_receipt
+        "eth_rpc.utils.event_receipt.Transaction.get_receipt_by_hash",
+        mock_get_receipt,
     )
 
     events = [mock_transfer_event]
@@ -190,13 +205,16 @@ async def test_get_events_from_tx_hash(mock_receipt, mock_transfer_event, monkey
 
 
 @pytest.mark.asyncio
-async def test_get_events_from_tx_hash_no_receipt(mock_transfer_event, monkeypatch):
+async def test_get_events_from_tx_hash_no_receipt(
+    mock_transfer_event, monkeypatch
+):
     """Test extracting events from transaction hash when receipt is None."""
     async def mock_get_receipt(tx_hash):
         return None
 
     monkeypatch.setattr(
-        "eth_rpc.utils.event_receipt.Transaction.get_receipt_by_hash", mock_get_receipt
+        "eth_rpc.utils.event_receipt.Transaction.get_receipt_by_hash",
+        mock_get_receipt,
     )
 
     events = [mock_transfer_event]
@@ -219,7 +237,9 @@ async def test_get_single_event_from_receipt(mock_receipt, mock_transfer_event):
 
 
 @pytest.mark.asyncio
-async def test_get_single_event_from_receipt_no_match(mock_receipt, mock_approval_event):
+async def test_get_single_event_from_receipt_no_match(
+    mock_receipt, mock_approval_event
+):
     """Test extracting single event from receipt with no matches."""
     result = await EventReceiptUtility.get_single_event_from_receipt(
         mock_approval_event, mock_receipt
@@ -239,7 +259,9 @@ async def test_convenience_functions(mock_receipt, mock_transfer_event):
 
 
 @pytest.mark.asyncio
-async def test_process_log_exception_handling(mock_receipt, mock_transfer_event):
+async def test_process_log_exception_handling(
+    mock_receipt, mock_transfer_event
+):
     """Test that exceptions during process_log are handled gracefully."""
     mock_transfer_event.process_log.side_effect = Exception("Decode error")
 
