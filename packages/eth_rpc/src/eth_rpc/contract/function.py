@@ -21,6 +21,7 @@ from pydantic import BaseModel
 from .._transport import _force_get_global_rpc
 from ..block import Block
 from ..constants import ADDRESS_ZERO
+from ..delegation import sponsor_delegation
 from ..rpc.core import RPC
 from ..transaction import PreparedTransaction
 from ..utils import run
@@ -530,8 +531,23 @@ class ContractFunc(Generic[T, U]):
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
         use_access_list: bool = False,
+        delegate_wallet: Optional["BaseWallet"] = None,
+        chain_id: Optional[int] = None,
+        gas: Optional[int] = None,
         sync: bool = True,
     ) -> HexStr:
+        # If delegate_wallet is provided, use sponsored delegation
+        if delegate_wallet is not None:
+            return await self._execute_sponsored(
+                sponsor_wallet=wallet,
+                delegate_wallet=delegate_wallet,
+                chain_id=chain_id,
+                nonce=nonce,
+                value=value,
+                gas=gas or 100000,
+                sync=sync,
+            )
+        
         if sync is True:
             prepared_tx = self.prepare(
                 wallet,
@@ -575,6 +591,9 @@ class ContractFunc(Generic[T, U]):
         max_fee_per_gas: Optional[int] = ...,
         max_priority_fee_per_gas: Optional[int] = ...,
         use_access_list: bool = ...,
+        delegate_wallet: Optional["BaseWallet"] = ...,
+        chain_id: Optional[int] = ...,
+        gas: Optional[int] = ...,
     ) -> HexStr: ...
 
     @overload
@@ -588,6 +607,9 @@ class ContractFunc(Generic[T, U]):
         max_fee_per_gas: Optional[int] = ...,
         max_priority_fee_per_gas: Optional[int] = ...,
         use_access_list: bool = ...,
+        delegate_wallet: Optional["BaseWallet"] = ...,
+        chain_id: Optional[int] = ...,
+        gas: Optional[int] = ...,
     ) -> Awaitable[HexStr]: ...
 
     def execute(
@@ -600,6 +622,9 @@ class ContractFunc(Generic[T, U]):
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
         use_access_list: bool = False,
+        delegate_wallet: Optional["BaseWallet"] = None,
+        chain_id: Optional[int] = None,
+        gas: Optional[int] = None,
         sync: bool = False,
     ) -> MaybeAwaitable[HexStr]:
         return run(
@@ -611,6 +636,88 @@ class ContractFunc(Generic[T, U]):
             max_fee_per_gas=max_fee_per_gas,
             max_priority_fee_per_gas=max_priority_fee_per_gas,
             use_access_list=use_access_list,
+            delegate_wallet=delegate_wallet,
+            chain_id=chain_id,
+            gas=gas,
+            sync=sync,
+        )
+
+    async def _execute_sponsored(
+        self,
+        sponsor_wallet: "BaseWallet",
+        delegate_wallet: "BaseWallet",
+        *,
+        chain_id: Optional[int] = None,
+        nonce: Optional[int] = None,
+        value: int = 0,
+        gas: int = 100000,
+        sync: bool = False,
+    ) -> HexStr:
+        sponsored_tx = await sponsor_delegation(
+            sponsor_wallet=sponsor_wallet,
+            delegate_wallet=delegate_wallet,
+            contract_address=self.address,
+            chain_id=chain_id,
+            nonce=nonce,
+            value=value,
+            data=self.data,
+            gas=gas,
+        )
+        signed_tx = sponsor_wallet.sign_transaction(sponsored_tx)
+        if sync:
+            return (
+                sponsor_wallet[self._network]
+                .send_raw_transaction(HexStr("0x" + signed_tx.raw_transaction))
+                .sync
+            )
+        return await sponsor_wallet[self._network].send_raw_transaction(
+            HexStr("0x" + signed_tx.raw_transaction)
+        )
+
+    @overload
+    def execute_sponsored(
+        self,
+        sponsor_wallet: "BaseWallet",
+        delegate_wallet: "BaseWallet",
+        *,
+        sync: Literal[True],
+        chain_id: Optional[int] = ...,
+        nonce: Optional[int] = ...,
+        value: int = ...,
+        gas: int = ...,
+    ) -> HexStr: ...
+
+    @overload
+    def execute_sponsored(
+        self,
+        sponsor_wallet: "BaseWallet",
+        delegate_wallet: "BaseWallet",
+        *,
+        chain_id: Optional[int] = ...,
+        nonce: Optional[int] = ...,
+        value: int = ...,
+        gas: int = ...,
+    ) -> Awaitable[HexStr]: ...
+
+    def execute_sponsored(
+        self,
+        sponsor_wallet: "BaseWallet",
+        delegate_wallet: "BaseWallet",
+        *,
+        chain_id: Optional[int] = None,
+        nonce: Optional[int] = None,
+        value: int = 0,
+        gas: int = 100000,
+        sync: bool = False,
+    ) -> MaybeAwaitable[HexStr]:
+        return run(
+            self._execute_sponsored,
+            sponsor_wallet,
+            delegate_wallet,
+            chain_id=chain_id,
+            nonce=nonce,
+            value=value,
+            gas=gas,
             sync=sync,
         )
 
@@ -710,6 +817,9 @@ class ContractFuncSync(ContractFunc[T, U]):
         max_fee_per_gas: Optional[int] = None,
         max_priority_fee_per_gas: Optional[int] = None,
         use_access_list: bool = False,
+        delegate_wallet: Optional[BaseWallet] = None,
+        chain_id: Optional[int] = None,
+        gas: Optional[int] = None,
     ) -> HexStr:
         return super().execute(
             wallet,
@@ -718,5 +828,28 @@ class ContractFuncSync(ContractFunc[T, U]):
             max_fee_per_gas=max_fee_per_gas,
             max_priority_fee_per_gas=max_priority_fee_per_gas,
             use_access_list=use_access_list,
+            delegate_wallet=delegate_wallet,
+            chain_id=chain_id,
+            gas=gas,
+            sync=self.SYNC,
+        )
+
+    def execute_sponsored(  # type: ignore
+        self,
+        sponsor_wallet: BaseWallet,
+        delegate_wallet: BaseWallet,
+        *,
+        chain_id: Optional[int] = None,
+        nonce: Optional[int] = None,
+        value: int = 0,
+        gas: int = 100000,
+    ) -> HexStr:
+        return super().execute_sponsored(
+            sponsor_wallet,
+            delegate_wallet,
+            chain_id=chain_id,
+            nonce=nonce,
+            value=value,
+            gas=gas,
             sync=self.SYNC,
         )
