@@ -13,6 +13,7 @@ from .account import Account
 from .block import Block
 from .codegen import codegen
 from .contract import Contract, ContractFunc, EthResponse, FuncSignature, ProtocolBase
+from .delegation import create_authorization_item, prepare_delegation_transaction, sponsor_delegation
 from .event import Event
 from .log import Log
 from .models import EventData
@@ -47,12 +48,15 @@ __all__ = [
     "add_middleware",
     "codegen",
     "configure_rpc_from_env",
+    "create_authorization_item",
     "get_current_network",
     "get_selected_wallet",
+    "prepare_delegation_transaction",
     "set_alchemy_key",
     "set_default_network",
-    "set_selected_wallet",
-    "set_transport",
     "set_rpc_timeout",
     "set_rpc_url",
+    "set_selected_wallet",
+    "set_transport",
+    "sponsor_delegation",
 ]
