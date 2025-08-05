@@ -6,14 +6,14 @@ This example demonstrates how to use EIP-7702 delegation utilities to sponsor
 a delegated call to a Counter contract's increment method.
 
 Usage:
-    export DELEGATE_PRIVATE_KEY="0x..."
+    export SPONSOR_PRIVATE_KEY="0x..."
     python example_eip7702.py
 
 The workflow:
-1. Sponsor wallet pays gas for the transaction
-2. Delegate wallet authorizes the delegation via EIP-7702
-3. Counter contract's increment method is called on behalf of the delegate
-4. The delegate's account code is temporarily set to the Counter contract
+1. Sponsor wallet (with existing funds) pays gas for the transaction
+2. Delegate wallet (randomly created) authorizes setting its code to the Counter contract via EIP-7702
+3. Counter contract's increment method is executed on the delegate's account
+4. The delegate's account code is set to the Counter contract during execution
 """
 
 import sys
@@ -49,18 +49,19 @@ def main():
     print("🔗 EIP-7702 Delegation Example: Counter Contract")
     print("=" * 50)
     
-    delegate_private_key = os.getenv("DELEGATE_PRIVATE_KEY")
-    if not delegate_private_key:
-        print("❌ Error: DELEGATE_PRIVATE_KEY environment variable not set")
-        print("Usage: export DELEGATE_PRIVATE_KEY='0x...' && python example_eip7702.py")
+    sponsor_private_key = os.getenv("SPONSOR_PRIVATE_KEY")
+    
+    if not sponsor_private_key:
+        print("❌ Error: SPONSOR_PRIVATE_KEY environment variable not set")
+        print("Usage: export SPONSOR_PRIVATE_KEY='0x...' && python example_eip7702.py")
         sys.exit(1)
     
     print("\n1. Setting up wallets...")
-    sponsor_wallet = PrivateKeyWallet.create_new()
-    delegate_wallet = PrivateKeyWallet(private_key=HexStr(delegate_private_key))
+    sponsor_wallet = PrivateKeyWallet(private_key=HexStr(sponsor_private_key))
+    delegate_wallet = PrivateKeyWallet.create_new()
     
-    print(f"   Sponsor wallet: {sponsor_wallet.address}")
-    print(f"   Delegate wallet: {delegate_wallet.address}")
+    print(f"   Sponsor wallet: {sponsor_wallet.address} (has funds, pays gas fees)")
+    print(f"   Delegate wallet: {delegate_wallet.address} (randomly created, authorizes code setting)")
     
     counter_address = HexAddress("0x1234567890123456789012345678901234567890")
     print(f"   Counter contract: {counter_address}")
@@ -76,7 +77,7 @@ def main():
     # Create sponsored delegation transaction
     print("\n4. Creating sponsored delegation transaction...")
     print("   This transaction will:")
-    print("   - Be paid for by the sponsor wallet")
+    print("   - Be paid for by the sponsor wallet (which has ETH for gas)")
     print("   - Set the delegate's account code to the Counter contract")
     print("   - Execute the increment method within the same transaction")
     
