@@ -7,6 +7,7 @@ from typing import Generic, Optional, cast
 from eth_rpc.models import AccessList, PendingTransaction
 from eth_rpc.models import Transaction as TransactionModel
 from eth_rpc.models import TransactionReceipt as TransactionReceiptModel
+from eth_rpc.types.transaction import AuthorizationItem
 from eth_rpc.types.args import (
     GetTransactionByBlockHash,
     GetTransactionByBlockNumber,
@@ -55,6 +56,7 @@ class PreparedTransaction(BaseModel):
     to: HexAddress
     value: int
     access_list: Optional[list[AccessList]] = None
+    authorization_list: Optional[list[AuthorizationItem]] = None
     chain_id: int
 
     def model_dump(self, *args, exclude_none=True, by_alias=True, **kwargs):
@@ -64,7 +66,9 @@ class PreparedTransaction(BaseModel):
 
     @model_validator(mode="after")
     def validate_xor(self):
-        if self.max_fee_per_gas is not None:
+        if self.authorization_list is not None:
+            self.type = 4
+        elif self.max_fee_per_gas is not None:
             self.type = 2
         else:
             self.type = 1
