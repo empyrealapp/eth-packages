@@ -60,7 +60,7 @@ class EventReceiptUtility:
             List of decoded EventData objects for matched events
         """
         from ..transaction import Transaction
-        
+
         receipt = await Transaction.get_receipt_by_hash(tx_hash)
         if not receipt:
             return []
