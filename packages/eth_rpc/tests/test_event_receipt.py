@@ -1,5 +1,9 @@
+from typing import Annotated
+
 import pytest
+from eth_rpc import Event
 from eth_rpc.models import Log, TransactionReceipt
+from eth_rpc.types import Indexed, primitives
 from eth_rpc.utils.event_receipt import (
     EventReceiptUtility,
     get_events_from_receipt,
@@ -7,10 +11,6 @@ from eth_rpc.utils.event_receipt import (
     get_single_event_from_receipt,
     get_single_event_from_tx_hash,
 )
-from typing import Annotated
-
-from eth_rpc import Event
-from eth_rpc.types import Indexed, primitives
 from pydantic import BaseModel
 
 
