@@ -31,10 +31,14 @@ class MockApprovalEvent(BaseModel):
 def mock_transfer_log():
     return Log(
         transaction_hash=HexStr("0x123"),
-        address=HexAddress("0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"),
+        address=HexAddress(
+            "0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
+        ),
         block_hash=HexStr("0x456"),
         block_number=12345,
-        data=HexStr("0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"),
+        data=HexStr(
+            "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"
+        ),
         log_index=0,
         removed=False,
         topics=[
@@ -56,10 +60,14 @@ def mock_transfer_log():
 def mock_approval_log():
     return Log(
         transaction_hash=HexStr("0x123"),
-        address=HexAddress("0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"),
+        address=HexAddress(
+            "0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
+        ),
         block_hash=HexStr("0x456"),
         block_number=12345,
-        data=HexStr("0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"),
+        data=HexStr(
+            "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"
+        ),
         log_index=1,
         removed=False,
         topics=[
@@ -87,7 +95,9 @@ def mock_receipt(mock_transfer_log, mock_approval_log):
         contract_address=None,
         effective_gas_price=20000000000,
         cumulative_gas_used=21000,
-        from_=HexAddress("0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"),
+        from_=HexAddress(
+            "0xA0b86a33E6441e8e421b7b0b4b8b8b8b8b8b8b8b"
+        ),
         gas_used=21000,
         logs_bloom=0,
         status=1,
