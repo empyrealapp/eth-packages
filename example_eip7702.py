@@ -16,16 +16,19 @@ The workflow:
 4. The delegate's account code is set to the Counter contract during execution
 """
 
+import asyncio
 import sys
 import os
+from typing import Annotated
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages/eth_rpc/src"))
 
 from eth_rpc.contract import ProtocolBase, ContractFunc
 from eth_rpc.delegation import sponsor_delegation
 from eth_rpc.wallet import PrivateKeyWallet
-from eth_rpc.types import NoArgs
+from eth_rpc.types import METHOD, Name, NoArgs
 from eth_typing import HexAddress, HexStr
+from eth_rpc.networks import Sepolia
 
 
 class Counter(ProtocolBase):
@@ -41,10 +44,15 @@ class Counter(ProtocolBase):
         }
     }
     """
-    increment: ContractFunc[NoArgs, None] = "increment"
+    increment: ContractFunc[NoArgs, None] = METHOD
+    number: ContractFunc[NoArgs, int] = METHOD
+    last_to_ever_update: Annotated[
+        ContractFunc[NoArgs, HexAddress],
+        Name("lastToEverUpdate"),
+    ] = METHOD
 
 
-def main():
+async def main():
     """Demonstrate EIP-7702 delegation workflow with Counter contract"""
     print("🔗 EIP-7702 Delegation Example: Counter Contract")
     print("=" * 50)
@@ -57,7 +65,7 @@ def main():
         sys.exit(1)
     
     print("\n1. Setting up wallets...")
-    sponsor_wallet = PrivateKeyWallet(private_key=HexStr(sponsor_private_key))
+    sponsor_wallet = PrivateKeyWallet[Sepolia](private_key=HexStr(sponsor_private_key))
     delegate_wallet = PrivateKeyWallet.create_new()
     
     print(f"   Sponsor wallet: {sponsor_wallet.address} (has funds, pays gas fees)")
@@ -67,7 +75,7 @@ def main():
     print(f"   Counter contract: {counter_address}")
     
     print("\n2. Creating Counter contract instance...")
-    counter = Counter(address=counter_address)
+    counter = Counter[Sepolia](address=counter_address)
     print(f"   Counter.increment function: {counter.increment}")
     
     print("\n3. Preparing increment call...")
@@ -80,13 +88,12 @@ def main():
     print("   - Be paid for by the sponsor wallet (which has ETH for gas)")
     print("   - Set the delegate's account code to the Counter contract")
     print("   - Execute the increment method within the same transaction")
+    print("   - Automatically handle network-aware nonce lookup")
     
-    sponsored_tx = sponsor_delegation(
+    sponsored_tx = await sponsor_delegation(
         sponsor_wallet=sponsor_wallet,
         delegate_wallet=delegate_wallet,
         contract_address=counter_address,
-        chain_id=1,  # Ethereum mainnet
-        nonce=0,     # Delegate's authorization nonce
         value=0,     # No ETH transfer
         data=increment_call_data,  # Counter.increment() call
     )
@@ -116,12 +123,15 @@ def main():
     print(f"\n🎉 EIP-7702 delegation workflow complete!")
     print("   Transaction is ready to be signed by sponsor and submitted to the network.")
     
-    return sponsored_tx
+    signed_tx = sponsor_wallet.sign_transaction(sponsored_tx)
+    await sponsor_wallet.send_raw_transaction(
+        HexStr("0x" + signed_tx.raw_transaction),
+    )
 
 
 if __name__ == "__main__":
     try:
-        main()
+        asyncio.run(main())
     except Exception as e:
         print(f"\n❌ Example failed: {e}")
         import traceback

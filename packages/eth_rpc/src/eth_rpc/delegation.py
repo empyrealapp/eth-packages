@@ -46,7 +46,7 @@ def create_authorization_item(
     )
 
 
-def prepare_delegation_transaction(
+async def prepare_delegation_transaction(
     wallet: BaseWallet,
     to: HexAddress,
     authorization_list: list[AuthorizationItem],
@@ -55,7 +55,7 @@ def prepare_delegation_transaction(
     gas: int = 100000,
     max_fee_per_gas: int = 20000000000,
     max_priority_fee_per_gas: int = 1000000000,
-    nonce: int = 0,
+    nonce: Optional[int] = None,
 ) -> PreparedTransaction:
     """
     Prepare an EIP-7702 delegation transaction.
@@ -69,12 +69,15 @@ def prepare_delegation_transaction(
         gas: Gas limit (auto-estimated if None)
         max_fee_per_gas: Maximum fee per gas
         max_priority_fee_per_gas: Maximum priority fee per gas
-        nonce: Transaction nonce (auto-determined if None)
+        nonce: Transaction nonce (auto-detected from wallet if None)
 
     Returns:
         PreparedTransaction with type 4 and authorization list
     """
     from .types import HexInteger
+    
+    if nonce is None:
+        nonce = await wallet[wallet._network].get_nonce()
     
     base_tx = PreparedTransaction(
         data=data,
@@ -92,12 +95,12 @@ def prepare_delegation_transaction(
     return base_tx
 
 
-def sponsor_delegation(
+async def sponsor_delegation(
     sponsor_wallet: BaseWallet,
     delegate_wallet: BaseWallet,
     contract_address: HexAddress,
-    chain_id: int,
-    nonce: int,
+    chain_id: Optional[int] = None,
+    nonce: Optional[int] = None,
     value: int = 0,
     data: HexStr = HexStr("0x"),
     gas: int = 100000,
@@ -105,13 +108,15 @@ def sponsor_delegation(
     """
     Create a sponsored delegation transaction where the sponsor pays gas
     for setting the delegate's code to a contract and executing contract functions.
+    
+    Automatically handles network-aware nonce lookup and sponsor == delegate cases.
 
     Args:
         sponsor_wallet: Wallet that will pay for gas
         delegate_wallet: Wallet that will have its code set to the contract
         contract_address: Contract address to set as the delegate's code
-        chain_id: Chain ID for the authorization
-        nonce: Nonce for the authorization
+        chain_id: Chain ID for the authorization (auto-detected from sponsor wallet if None)
+        nonce: Delegate's current nonce for authorization (auto-detected if None)
         value: ETH value to send
         data: Transaction data (contract function calls)
         gas: Gas limit for the transaction (default: 100000)
@@ -119,18 +124,32 @@ def sponsor_delegation(
     Returns:
         PreparedTransaction ready to be signed by sponsor
     """
+    if chain_id is None:
+        rpc = sponsor_wallet._rpc()
+        chain_id = rpc.network.chain_id
+    
+    if nonce is None:
+        nonce = await delegate_wallet[sponsor_wallet._network].get_nonce()
+    
+    sponsor_is_delegate = sponsor_wallet.address == delegate_wallet.address
+    if sponsor_is_delegate:
+        auth_nonce = nonce + 1
+    else:
+        auth_nonce = nonce
+    
     auth_item = create_authorization_item(
         chain_id=chain_id,
         contract_address=contract_address,
-        nonce=nonce,
+        nonce=auth_nonce,
         private_key=delegate_wallet.private_key,
     )
 
-    return prepare_delegation_transaction(
+    return await prepare_delegation_transaction(
         wallet=sponsor_wallet,
         to=delegate_wallet.address,
         authorization_list=[auth_item],
         value=value,
         data=data,
         gas=gas,
+        nonce=nonce if sponsor_is_delegate else None,
     )
