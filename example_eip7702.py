@@ -23,6 +23,7 @@ from typing import Annotated
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages/eth_rpc/src"))
 
+from eth_rpc import TransactionReceipt
 from eth_rpc.contract import ProtocolBase, ContractFunc
 from eth_rpc.delegation import sponsor_delegation
 from eth_rpc.wallet import PrivateKeyWallet
@@ -34,13 +35,15 @@ from eth_rpc.networks import Sepolia
 class Counter(ProtocolBase):
     """
     Example Counter contract with increment method.
-    
+
     Solidity equivalent:
     contract Counter {
         uint256 public count;
-        
+        address public lastToEverUpdate;
+
         function increment() external {
             count++;
+            lastToEverUpdate = msg.sender;
         }
     }
     """
@@ -56,28 +59,28 @@ async def main():
     """Demonstrate EIP-7702 delegation workflow with Counter contract"""
     print("🔗 EIP-7702 Delegation Example: Counter Contract")
     print("=" * 50)
-    
+
     sponsor_private_key = os.getenv("SPONSOR_PRIVATE_KEY")
-    
+
     if not sponsor_private_key:
         print("❌ Error: SPONSOR_PRIVATE_KEY environment variable not set")
         print("Usage: export SPONSOR_PRIVATE_KEY='0x...' && python example_eip7702.py")
         sys.exit(1)
-    
+
     print("\n1. Setting up wallets...")
     sponsor_wallet = PrivateKeyWallet[Sepolia](private_key=HexStr(sponsor_private_key))
     delegate_wallet = PrivateKeyWallet.create_new()
-    
+
     print(f"   Sponsor wallet: {sponsor_wallet.address} (has funds, pays gas fees)")
     print(f"   Delegate wallet: {delegate_wallet.address} (randomly created, authorizes code setting)")
-    
-    counter_address = HexAddress("0x1234567890123456789012345678901234567890")
+
+    counter_address = HexAddress("0x0271297dcc0CceA3640bbaf34801025E6F63F448")
     print(f"   Counter contract: {counter_address}")
-    
+
     print("\n2. Creating Counter contract instance...")
     counter = Counter[Sepolia](address=counter_address)
     print(f"   Counter.increment function: {counter.increment}")
-    
+
     print("\n3. Preparing increment call...")
     increment_call_data = counter.increment().data
     print(f"   Increment call data: {increment_call_data}")
@@ -127,6 +130,23 @@ async def main():
     await sponsor_wallet.send_raw_transaction(
         HexStr("0x" + signed_tx.raw_transaction),
     )
+    print(f"   Transaction sent to the network: 0x{signed_tx.hash}")
+
+    print("Waiting for transaction to be mined...")
+    while True:
+        receipt = await TransactionReceipt[Sepolia].get_by_hash(f'0x{signed_tx.hash}')
+        print(receipt)
+        if receipt:
+            if receipt.status == 1:
+                print("Transaction mined successfully")
+                break
+            if receipt.status == 0:
+                raise Exception(f"Transaction failed: {receipt.status}")
+        await asyncio.sleep(4)
+
+    counter = Counter[Sepolia](address=delegate_wallet.address)
+    print(f"   Counter.number: {await counter.number().get()}")
+    print(f"   Counter.last_to_ever_update: {await counter.last_to_ever_update().get()}")
 
 
 if __name__ == "__main__":
