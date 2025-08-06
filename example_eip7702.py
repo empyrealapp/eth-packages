@@ -17,19 +17,19 @@ The workflow:
 """
 
 import asyncio
-import sys
 import os
+import sys
 from typing import Annotated
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages/eth_rpc/src"))
 
 from eth_rpc import TransactionReceipt
-from eth_rpc.contract import ProtocolBase, ContractFunc
+from eth_rpc.contract import ContractFunc, ProtocolBase
 from eth_rpc.delegation import sponsor_delegation
-from eth_rpc.wallet import PrivateKeyWallet
-from eth_rpc.types import METHOD, Name, NoArgs
-from eth_typing import HexAddress, HexStr
 from eth_rpc.networks import Sepolia
+from eth_rpc.types import METHOD, Name, NoArgs
+from eth_rpc.wallet import PrivateKeyWallet
+from eth_typing import HexAddress, HexStr
 
 
 class Counter(ProtocolBase):

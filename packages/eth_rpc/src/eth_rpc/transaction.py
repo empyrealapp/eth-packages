@@ -7,13 +7,13 @@ from typing import Generic, Optional, cast
 from eth_rpc.models import AccessList, PendingTransaction
 from eth_rpc.models import Transaction as TransactionModel
 from eth_rpc.models import TransactionReceipt as TransactionReceiptModel
-from eth_rpc.types.transaction import AuthorizationItem
 from eth_rpc.types.args import (
     GetTransactionByBlockHash,
     GetTransactionByBlockNumber,
     RawTransaction,
     TransactionRequest,
 )
+from eth_rpc.types.transaction import AuthorizationItem
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict, model_validator
 from pydantic.alias_generators import to_camel

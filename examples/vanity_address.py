@@ -18,6 +18,7 @@ WARNING: This is for educational purposes. In production:
 """
 
 import time
+
 from eth_rpc.wallet import PrivateKeyWallet
 
 

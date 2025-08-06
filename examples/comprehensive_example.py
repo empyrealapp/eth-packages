@@ -23,8 +23,8 @@ import os
 from datetime import datetime
 from typing import Dict, List
 
-from eth_rpc import Block, Transaction, set_alchemy_key, get_current_network, EventData
-from eth_rpc.networks import Ethereum, Arbitrum, Base
+from eth_rpc import Block, EventData, Transaction, get_current_network, set_alchemy_key
+from eth_rpc.networks import Arbitrum, Base, Ethereum
 from eth_rpc.wallet import PrivateKeyWallet
 from eth_typeshed.erc20 import ERC20, TransferEvent, TransferEventType
 from eth_typeshed.multicall import multicall
