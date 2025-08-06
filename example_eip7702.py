@@ -118,7 +118,6 @@ async def main():
     print("Waiting for transaction to be mined...")
     while True:
         receipt = await TransactionReceipt[Sepolia].get_by_hash(tx_hash)
-        print(receipt)
         if receipt:
             if receipt.status == 1:
                 print("Transaction mined successfully")
