@@ -93,49 +93,31 @@ async def main():
     print("   - Execute the increment method within the same transaction")
     print("   - Automatically handle network-aware nonce lookup")
     
-    sponsored_tx = await sponsor_delegation(
-        sponsor_wallet=sponsor_wallet,
+    print("   Using the enhanced execute method with delegation...")
+    tx_hash = await counter.increment().execute(
+        wallet=sponsor_wallet,
         delegate_wallet=delegate_wallet,
-        contract_address=counter_address,
-        value=0,     # No ETH transfer
-        data=increment_call_data,  # Counter.increment() call
     )
+    print(f"   ✅ Transaction sent using enhanced execute method: {tx_hash}")
     
-    print(f"   ✅ Created EIP-7702 delegation transaction:")
-    print(f"      Type: {sponsored_tx.type} (EIP-7702)")
-    print(f"      To: {sponsored_tx.to}")
-    print(f"      Data: {sponsored_tx.data}")
-    print(f"      Authorization list: {len(sponsored_tx.authorization_list)} item(s)")
+    print(f"\n5. Demonstrating simple wallet delegation (without contract data)...")
+    print("   Using the wallet delegation utility method...")
     
-    auth_item = sponsored_tx.authorization_list[0]
-    print(f"\n5. Authorization details:")
-    print(f"   Chain ID: {auth_item.chain_id}")
-    print(f"   Delegate address: {auth_item.address}")
-    print(f"   Nonce: {auth_item.nonce}")
-    print(f"   Signature (r): {auth_item.r[:10]}...")
-    print(f"   Signature (s): {auth_item.s[:10]}...")
+    simple_delegate = PrivateKeyWallet.create_new()
+    print(f"   New delegate wallet: {simple_delegate.address}")
     
-    print(f"\n6. Transaction ready for execution:")
-    print("   The sponsor can now sign and submit this transaction.")
-    print("   When executed:")
-    print("   - The delegate's account code will be set to the Counter contract")
-    print("   - The increment() method will be executed on the delegate's account")
-    print("   - The sponsor pays all gas fees")
-    print("   - The delegate's counter state will be incremented")
+    delegation_tx_hash = await simple_delegate.delegate_to_contract(
+        sponsor_wallet=sponsor_wallet,
+        contract_address=counter_address,
+    )
+    print(f"   Delegation transaction sent: {delegation_tx_hash}")
     
     print(f"\n🎉 EIP-7702 delegation workflow complete!")
-    print("   Transaction is ready to be signed by sponsor and submitted to the network.")
-    
-    signed_tx = sponsor_wallet.sign_transaction(sponsored_tx)
-    await sponsor_wallet.send_raw_transaction(
-        HexStr("0x" + signed_tx.raw_transaction),
-    )
-    print(f"   Transaction sent to the network: 0x{signed_tx.hash}")
+    print("   Both utility methods successfully demonstrated.")
 
     print("Waiting for transaction to be mined...")
     while True:
-        receipt = await TransactionReceipt[Sepolia].get_by_hash(f'0x{signed_tx.hash}')
-        print(receipt)
+        receipt = await TransactionReceipt[Sepolia].get_by_hash(tx_hash)
         if receipt:
             if receipt.status == 1:
                 print("Transaction mined successfully")
