@@ -66,20 +66,64 @@ def codegen(
     abi: list[dict[str, Any]], contract_name: str, full_struct_names: bool = True
 ) -> str:  # noqa: C901
     """
-    Convert an ABI to the string implementation of a ProtocolBase.
-
-    Make sure to convert it to snakecase and use the Annotated[type, Name("name")] syntax for the contract func
-
-    For Example:
-    [{"inputs":[],"name":"WETH","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}]
-
-    would convert to:
-
-    from eth_rpc import ProtocolBase, ContractFunc
-    from eth_rpc.types import primitives, NoArgs, Struct
-
-    class WETH(ProtocolBase):
-        WETH: ContractFunc[NoArgs, primitives.address]
+    Generate a type-safe ProtocolBase contract class from an ABI.
+    
+    This function converts a contract's ABI (Application Binary Interface) into
+    a Python class that provides full type safety and IDE support for contract
+    interactions.
+    
+    Key features:
+    - Converts function names to snake_case Python conventions
+    - Generates proper type annotations for inputs and outputs
+    - Handles complex types like structs and arrays
+    - Creates Annotated types with Name metadata for custom function names
+    - Supports both simple and complex return types
+    
+    Args:
+        abi: List of ABI function definitions from the contract
+        contract_name: Name for the generated Python class
+        full_struct_names: If True, use full struct names including contract prefix.
+                          If False, use only the struct name without prefix.
+    
+    Returns:
+        String containing the complete Python class definition ready to be
+        written to a file or executed.
+    
+    Example:
+        Input ABI:
+        ```json
+        [{
+            "inputs": [],
+            "name": "WETH",
+            "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+            "stateMutability": "view",
+            "type": "function"
+        }]
+        ```
+        
+        Generated output:
+        ```python
+        from typing import Annotated
+        from eth_rpc import ProtocolBase, ContractFunc
+        from eth_rpc.types import primitives, Name, NoArgs, Struct
+        
+        class WETH(ProtocolBase):
+            WETH: ContractFunc[NoArgs, primitives.address]
+        ```
+    
+    The generated class can be used like:
+        ```python
+        contract = WETH[Ethereum](address="0x...")
+        weth_address = await contract.WETH().get()
+        ```
+    
+    Note:
+        This function handles complex scenarios including:
+        - Struct types with nested components
+        - Array types (both fixed and dynamic)
+        - Multiple return values as tuples
+        - Function name conflicts and snake_case conversion
+        - Duplicate struct definitions across functions
     """
     # Begin building the class string
     imports = [

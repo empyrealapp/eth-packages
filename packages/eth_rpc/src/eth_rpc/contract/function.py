@@ -341,7 +341,35 @@ class ContractFunc(Generic[T, U]):
         state_diff: dict[HexAddress, Any] = {},
         sync: bool = False,
     ) -> U:
-        """shorthand for call().decode()"""
+        """
+        Execute a contract call and return the decoded result directly.
+        
+        This is a convenience method that combines call() and decode() into
+        a single operation, making it easier to get typed return values from
+        contract functions.
+        
+        Equivalent to: (await contract.method().call()).decode()
+        
+        Args:
+            from_: Address to simulate the call from (affects msg.sender)
+            block_number: Block number or tag to execute the call at
+            value: ETH value to send with the call (in wei)
+            state_diff: State overrides for simulation (advanced usage)
+            sync: Whether to execute synchronously
+            
+        Returns:
+            Decoded return value with proper typing
+            
+        Example:
+            ```python
+            balance: int = await token.balance_of(user_address).get()
+            
+            reserves: tuple[int, int] = await pair.get_reserves().get()
+            reserve0, reserve1 = reserves
+            
+            old_balance = await token.balance_of(user).get(block_number=17000000)
+            ```
+        """
         return (
             await self._call(
                 from_=from_,
@@ -536,6 +564,57 @@ class ContractFunc(Generic[T, U]):
         gas: Optional[int] = None,
         sync: bool = True,
     ) -> HexStr:
+        """
+        Execute a contract function as a blockchain transaction.
+        
+        This method handles the complete transaction lifecycle:
+        1. **Gas Estimation**: Automatically estimates gas requirements
+        2. **Fee Calculation**: Determines optimal gas fees (EIP-1559 or legacy)
+        3. **Transaction Preparation**: Creates a properly formatted transaction
+        4. **Signing**: Signs the transaction with the provided wallet
+        5. **Broadcasting**: Submits the transaction to the network
+        
+        Args:
+            wallet: Wallet to sign and send the transaction
+            nonce: Transaction nonce (auto-determined if not provided)
+            value: ETH value to send with transaction (in wei)
+            gas_price: Legacy gas price (for pre-EIP-1559 transactions)
+            max_fee_per_gas: Maximum total fee per gas (EIP-1559)
+            max_priority_fee_per_gas: Maximum priority fee per gas (EIP-1559)
+            use_access_list: Whether to include an access list for gas optimization
+            delegate_wallet: Optional delegate wallet for sponsored transactions
+            chain_id: Chain ID override (usually auto-detected)
+            gas: Gas limit override (usually auto-estimated)
+            sync: Whether to execute synchronously
+            
+        Returns:
+            Transaction hash of the submitted transaction
+            
+        Example:
+            ```python
+            from eth_rpc.wallet import PrivateKeyWallet
+            
+            wallet = PrivateKeyWallet(private_key=os.environ["PRIVATE_KEY"])
+            
+            tx_hash = await token.transfer(recipient, amount).execute(wallet)
+            
+            tx_hash = await token.approve(spender, amount).execute(
+                wallet,
+                max_fee_per_gas=50_000_000_000,  # 50 gwei
+                max_priority_fee_per_gas=2_000_000_000,  # 2 gwei
+            )
+            
+            tx = await Transaction[Ethereum].get_by_hash(tx_hash)
+            receipt = await tx.wait_for_receipt()
+            print(f"Transaction confirmed in block {receipt.block_number}")
+            ```
+        
+        Note:
+            - Gas estimation includes a 25% buffer by default
+            - EIP-1559 transactions are used by default on supported networks
+            - Access lists can reduce gas costs for complex transactions
+            - Sponsored transactions allow gasless execution for end users
+        """
         # If delegate_wallet is provided, use sponsored delegation
         if delegate_wallet is not None:
             return await self._execute_sponsored(

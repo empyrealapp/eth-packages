@@ -120,6 +120,48 @@ def convert(type, with_name: bool = False, with_indexed: bool = False):  # noqa:
 
 
 class Event(Request, Generic[T]):
+    """
+    Generic event class for processing and subscribing to blockchain events.
+    
+    Event[T] provides a type-safe way to work with smart contract events,
+    offering both historical data retrieval and real-time event streaming.
+    
+    Key features:
+    - **Type Safety**: Full typing support for event data structures
+    - **Flexible Filtering**: Filter by addresses, indexed parameters, and block ranges
+    - **Real-time Streaming**: Subscribe to live events via WebSocket
+    - **Historical Analysis**: Backfill events over large block ranges with automatic chunking
+    - **Automatic Decoding**: Converts raw log data to typed Python objects
+    
+    Example:
+        ```python
+        class TransferEventType(BaseModel):
+            sender: Annotated[HexAddress, Indexed]
+            recipient: Annotated[HexAddress, Indexed] 
+            amount: primitives.uint256
+        
+        transfer_event = Event[TransferEventType](name="Transfer")
+        
+        async for event in transfer_event.set_filter(
+            addresses=[token_address]
+        ).subscribe():
+            print(f"Transfer: {event.event.amount}")
+        
+        async for event in transfer_event.backfill(
+            start_block=18000000,
+            end_block=18001000
+        ):
+            process_transfer(event.event)
+        ```
+    
+    Attributes:
+        name: Event name as defined in the contract ABI
+        anonymous: Whether this is an anonymous event (no topic0)
+        topic1_filter: Filter for first indexed parameter
+        topic2_filter: Filter for second indexed parameter  
+        topic3_filter: Filter for third indexed parameter
+        addresses_filter: List of contract addresses to monitor
+    """
     name: str
     anonymous: bool = False
 
@@ -212,6 +254,41 @@ class Event(Request, Generic[T]):
         )
 
     def process(self, topics: list[HexStr], data: HexStr) -> T:
+        """
+        Decode raw log data into a typed event object.
+        
+        This method handles the complex process of converting raw blockchain
+        log data (topics and data) into a properly typed Python object.
+        
+        The decoding process:
+        1. **Indexed Parameters**: Extracted from log topics (limited to 3 indexed params)
+        2. **Non-indexed Parameters**: Decoded from the log data using ABI decoding
+        3. **Type Conversion**: Raw values converted to appropriate Python types
+        4. **Object Construction**: Final event object created with all parameters
+        
+        Args:
+            topics: List of log topics (topic0 is event signature, topic1-3 are indexed params)
+            data: Hex-encoded log data containing non-indexed parameters
+            
+        Returns:
+            Typed event object with all decoded parameters
+            
+        Raises:
+            LogDecodeError: If topics/data don't match expected event structure
+            
+        Example:
+            ```python
+            topics = [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",  # Transfer signature
+                "0x000000000000000000000000a0b86a33e6441b8e776f1c0b8e8e8e8e8e8e8e8e",  # from address
+                "0x000000000000000000000000b1c86a33e6441b8e776f1c0b8e8e8e8e8e8e8e8e"   # to address
+            ]
+            data = "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"  # amount
+            
+            transfer = transfer_event.process(topics, data)
+            print(f"Transfer: {transfer.amount} from {transfer.sender} to {transfer.recipient}")
+            ```
+        """
         EventType, *_ = self.__pydantic_generic_metadata__["args"]
         indexed = self.get_indexed()
         try:
@@ -401,7 +478,52 @@ class Event(Request, Generic[T]):
         confirmations: int = 2,
     ) -> AsyncIterator[EventData[T]]:
         """
-        This backfills events, handling LogResponseExceededError to provide all logs in a range too large for a single request
+        Retrieve historical events over a block range with automatic chunking.
+        
+        This method handles large block ranges by automatically splitting them
+        into smaller chunks when RPC providers return "response too large" errors.
+        It provides a robust way to analyze historical blockchain data.
+        
+        Key features:
+        - **Automatic Chunking**: Splits large ranges when RPC limits are hit
+        - **Rate Limit Handling**: Automatically retries on rate limit errors
+        - **Confirmation Safety**: Excludes recent blocks to avoid reorgs
+        - **Memory Efficient**: Yields events as they're processed (streaming)
+        
+        Args:
+            start_block: Starting block number (default: 1)
+            end_block: Ending block number (default: latest - confirmations)
+            step_size: Fixed chunk size for processing (optional)
+            confirmations: Number of blocks to exclude from tip to avoid reorgs
+            
+        Yields:
+            EventData[T]: Decoded event data with log information and network context
+            
+        Example:
+            ```python
+            async for event in transfer_event.set_filter(
+                addresses=[usdc_address]
+            ).backfill(
+                start_block=18000000,
+                end_block=18001000
+            ):
+                if event.event.amount > 1000000 * 10**6:  # > $1M
+                    print(f"Large transfer: ${event.event.amount / 10**6:,.2f}")
+            
+            async for event in transfer_event.backfill(
+                start_block=17000000,
+                end_block=18000000,
+                step_size=10000  # Process 10k blocks at a time
+            ):
+                await store_event_in_database(event)
+            ```
+        
+        Note:
+            This method automatically handles:
+            - RPC response size limits by reducing chunk size
+            - Rate limiting with exponential backoff
+            - Network errors with retry logic
+            - Block reorganizations by using confirmations
         """
         start_block = start_block or 1
         current_number = await Block[self._network].get_number()  # type: ignore[name-defined]
