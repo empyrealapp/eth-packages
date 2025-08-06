@@ -1,11 +1,11 @@
 from typing import Optional
 
-from eth_typing import HexAddress, HexStr
 from eth_account import Account as EthAccount
+from eth_typing import HexAddress, HexStr
 
+from .transaction import PreparedTransaction
 from .types import HexInteger
 from .types.transaction import AuthorizationItem
-from .transaction import PreparedTransaction
 from .wallet import BaseWallet
 
 
