@@ -547,7 +547,7 @@ class ContractFunc(Generic[T, U]):
                 gas=gas or 100000,
                 sync=sync,
             )
-        
+
         if sync is True:
             prepared_tx = self.prepare(
                 wallet,

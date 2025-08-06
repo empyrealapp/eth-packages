@@ -75,10 +75,10 @@ async def prepare_delegation_transaction(
         PreparedTransaction with type 4 and authorization list
     """
     from .types import HexInteger
-    
+
     if nonce is None:
         nonce = await wallet[wallet._network].get_nonce()
-    
+
     base_tx = PreparedTransaction(
         data=data,
         to=to,
@@ -108,7 +108,7 @@ async def sponsor_delegation(
     """
     Create a sponsored delegation transaction where the sponsor pays gas
     for setting the delegate's code to a contract and executing contract functions.
-    
+
     Automatically handles network-aware nonce lookup and sponsor == delegate cases.
 
     Args:
@@ -127,16 +127,16 @@ async def sponsor_delegation(
     if chain_id is None:
         rpc = sponsor_wallet._rpc()
         chain_id = rpc.network.chain_id
-    
+
     if nonce is None:
         nonce = await delegate_wallet[sponsor_wallet._network].get_nonce()
-    
+
     sponsor_is_delegate = sponsor_wallet.address == delegate_wallet.address
     if sponsor_is_delegate:
         auth_nonce = nonce + 1
     else:
         auth_nonce = nonce
-    
+
     auth_item = create_authorization_item(
         chain_id=chain_id,
         contract_address=contract_address,
