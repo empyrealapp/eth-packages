@@ -60,7 +60,7 @@ class BaseWallet(Request, ABC):
     ) -> HexStr:
         """
         Simple delegation method for setting this wallet's code to a contract.
-        
+
         Args:
             sponsor_wallet: Wallet that will pay for gas
             contract_address: Contract address to set as this wallet's code
@@ -68,12 +68,12 @@ class BaseWallet(Request, ABC):
             nonce: This wallet's current nonce for authorization (auto-detected if None)
             value: ETH value to send
             gas: Gas limit for the transaction
-            
+
         Returns:
             Transaction hash
         """
         from .delegation import sponsor_delegation
-        
+
         sponsored_tx = await sponsor_delegation(
             sponsor_wallet=sponsor_wallet,
             delegate_wallet=self,
