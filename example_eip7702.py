@@ -17,19 +17,19 @@ The workflow:
 """
 
 import asyncio
-import sys
 import os
+import sys
 from typing import Annotated
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages/eth_rpc/src"))
 
 from eth_rpc import TransactionReceipt
-from eth_rpc.contract import ProtocolBase, ContractFunc
+from eth_rpc.contract import ContractFunc, ProtocolBase
 from eth_rpc.delegation import sponsor_delegation
-from eth_rpc.wallet import PrivateKeyWallet
-from eth_rpc.types import METHOD, Name, NoArgs
-from eth_typing import HexAddress, HexStr
 from eth_rpc.networks import Sepolia
+from eth_rpc.types import METHOD, Name, NoArgs
+from eth_rpc.wallet import PrivateKeyWallet
+from eth_typing import HexAddress, HexStr
 
 
 class Counter(ProtocolBase):
@@ -47,6 +47,7 @@ class Counter(ProtocolBase):
         }
     }
     """
+
     increment: ContractFunc[NoArgs, None] = METHOD
     number: ContractFunc[NoArgs, int] = METHOD
     last_to_ever_update: Annotated[
@@ -72,7 +73,9 @@ async def main():
     delegate_wallet = PrivateKeyWallet.create_new()
 
     print(f"   Sponsor wallet: {sponsor_wallet.address} (has funds, pays gas fees)")
-    print(f"   Delegate wallet: {delegate_wallet.address} (randomly created, authorizes code setting)")
+    print(
+        f"   Delegate wallet: {delegate_wallet.address} (randomly created, authorizes code setting)"
+    )
 
     counter_address = HexAddress("0x0271297dcc0CceA3640bbaf34801025E6F63F448")
     print(f"   Counter contract: {counter_address}")
@@ -84,7 +87,7 @@ async def main():
     print("\n3. Preparing increment call...")
     increment_call_data = counter.increment().data
     print(f"   Increment call data: {increment_call_data}")
-    
+
     # Create sponsored delegation transaction
     print("\n4. Creating sponsored delegation transaction...")
     print("   This transaction will:")
@@ -92,26 +95,26 @@ async def main():
     print("   - Set the delegate's account code to the Counter contract")
     print("   - Execute the increment method within the same transaction")
     print("   - Automatically handle network-aware nonce lookup")
-    
+
     print("   Using the enhanced execute method with delegation...")
     tx_hash = await counter.increment().execute(
         wallet=sponsor_wallet,
         delegate_wallet=delegate_wallet,
     )
     print(f"   ✅ Transaction sent using enhanced execute method: {tx_hash}")
-    
+
     print(f"\n5. Demonstrating simple wallet delegation (without contract data)...")
     print("   Using the wallet delegation utility method...")
-    
+
     simple_delegate = PrivateKeyWallet.create_new()
     print(f"   New delegate wallet: {simple_delegate.address}")
-    
+
     delegation_tx_hash = await simple_delegate.delegate_to_contract(
         sponsor_wallet=sponsor_wallet,
         contract_address=counter_address,
     )
     print(f"   Delegation transaction sent: {delegation_tx_hash}")
-    
+
     print(f"\n🎉 EIP-7702 delegation workflow complete!")
     print("   Both utility methods successfully demonstrated.")
 
@@ -128,7 +131,9 @@ async def main():
 
     counter = Counter[Sepolia](address=delegate_wallet.address)
     print(f"   Counter.number: {await counter.number().get()}")
-    print(f"   Counter.last_to_ever_update: {await counter.last_to_ever_update().get()}")
+    print(
+        f"   Counter.last_to_ever_update: {await counter.last_to_ever_update().get()}"
+    )
 
 
 if __name__ == "__main__":
@@ -137,5 +142,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n❌ Example failed: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

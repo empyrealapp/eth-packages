@@ -7,13 +7,13 @@ from typing import Generic, Optional, cast
 from eth_rpc.models import AccessList, PendingTransaction
 from eth_rpc.models import Transaction as TransactionModel
 from eth_rpc.models import TransactionReceipt as TransactionReceiptModel
-from eth_rpc.types.transaction import AuthorizationItem
 from eth_rpc.types.args import (
     GetTransactionByBlockHash,
     GetTransactionByBlockNumber,
     RawTransaction,
     TransactionRequest,
 )
+from eth_rpc.types.transaction import AuthorizationItem
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict, model_validator
 from pydantic.alias_generators import to_camel
@@ -100,22 +100,23 @@ class TransactionReceipt(Request, TransactionReceiptModel, Generic[Network]):
     ) -> "TransactionReceipt[Network]":
         """
         Wait until a transaction is finalized by polling for its receipt.
-        
+
         Args:
             tx_hash: The transaction hash to wait for
             sleep_time: Time to sleep between polling attempts (default: 4.0 seconds)
             timeout: Maximum time to wait before giving up (default: None for no timeout)
-            
+
         Returns:
             The finalized transaction receipt
-            
+
         Raises:
             Exception: If the transaction fails (status == 0)
             asyncio.TimeoutError: If timeout is reached before finalization
         """
         import time
+
         start_time = time.time() if timeout else None
-        
+
         while True:
             receipt = await cls.get_by_hash(tx_hash)
             if receipt:
@@ -123,10 +124,12 @@ class TransactionReceipt(Request, TransactionReceiptModel, Generic[Network]):
                     return receipt
                 elif receipt.status == 0:
                     raise Exception(f"Transaction failed: {receipt.status}")
-            
+
             if timeout and start_time and (time.time() - start_time) > timeout:
-                raise asyncio.TimeoutError(f"Transaction {tx_hash} not finalized within {timeout} seconds")
-                
+                raise asyncio.TimeoutError(
+                    f"Transaction {tx_hash} not finalized within {timeout} seconds"
+                )
+
             await asyncio.sleep(sleep_time)
 
     @classmethod

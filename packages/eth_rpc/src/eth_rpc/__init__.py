@@ -13,7 +13,11 @@ from .account import Account
 from .block import Block
 from .codegen import codegen
 from .contract import Contract, ContractFunc, EthResponse, FuncSignature, ProtocolBase
-from .delegation import create_authorization_item, prepare_delegation_transaction, sponsor_delegation
+from .delegation import (
+    create_authorization_item,
+    prepare_delegation_transaction,
+    sponsor_delegation,
+)
 from .event import Event
 from .log import Log
 from .models import EventData
