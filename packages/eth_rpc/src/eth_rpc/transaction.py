@@ -13,6 +13,7 @@ from eth_rpc.types.args import (
     RawTransaction,
     TransactionRequest,
 )
+from eth_rpc.types.transaction import AuthorizationItem
 from eth_typing import HexAddress, HexStr
 from pydantic import BaseModel, ConfigDict, model_validator
 from pydantic.alias_generators import to_camel
@@ -55,6 +56,7 @@ class PreparedTransaction(BaseModel):
     to: HexAddress
     value: int
     access_list: Optional[list[AccessList]] = None
+    authorization_list: Optional[list[AuthorizationItem]] = None
     chain_id: int
 
     def model_dump(self, *args, exclude_none=True, by_alias=True, **kwargs):
@@ -64,7 +66,9 @@ class PreparedTransaction(BaseModel):
 
     @model_validator(mode="after")
     def validate_xor(self):
-        if self.max_fee_per_gas is not None:
+        if self.authorization_list is not None:
+            self.type = 4
+        elif self.max_fee_per_gas is not None:
             self.type = 2
         else:
             self.type = 1
@@ -86,6 +90,47 @@ class TransactionReceipt(Request, TransactionReceiptModel, Generic[Network]):
                 tx_hash=tx_hash,
             ),
         )
+
+    @classmethod
+    async def wait_until_finalized(
+        cls,
+        tx_hash: HexStr,
+        sleep_time: float = 4.0,
+        timeout: Optional[float] = None,
+    ) -> "TransactionReceipt[Network]":
+        """
+        Wait until a transaction is finalized by polling for its receipt.
+
+        Args:
+            tx_hash: The transaction hash to wait for
+            sleep_time: Time to sleep between polling attempts (default: 4.0 seconds)
+            timeout: Maximum time to wait before giving up (default: None for no timeout)
+
+        Returns:
+            The finalized transaction receipt
+
+        Raises:
+            Exception: If the transaction fails (status == 0)
+            asyncio.TimeoutError: If timeout is reached before finalization
+        """
+        import time
+
+        start_time = time.time() if timeout else None
+
+        while True:
+            receipt = await cls.get_by_hash(tx_hash)
+            if receipt:
+                if receipt.status == 1:
+                    return receipt
+                elif receipt.status == 0:
+                    raise Exception(f"Transaction failed: {receipt.status}")
+
+            if timeout and start_time and (time.time() - start_time) > timeout:
+                raise asyncio.TimeoutError(
+                    f"Transaction {tx_hash} not finalized within {timeout} seconds"
+                )
+
+            await asyncio.sleep(sleep_time)
 
     @classmethod
     def get_block_receipts(

@@ -1,6 +1,7 @@
 from typing import Optional
 
 from eth_rpc.types import HexInteger
+from eth_rpc.types.transaction import AuthorizationItem
 from eth_typing import HexStr
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
@@ -17,6 +18,7 @@ class BaseTransaction(BaseModel):
 
     hash: HexStr
     access_list: Optional[list[AccessList]] = None
+    authorization_list: Optional[list[AuthorizationItem]] = None
     chain_id: Optional[HexInteger] = None
     from_: HexStr = Field(alias="from")
     gas: HexInteger
