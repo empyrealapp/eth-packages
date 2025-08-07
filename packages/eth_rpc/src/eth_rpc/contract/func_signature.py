@@ -102,6 +102,8 @@ class FuncSignature(Request, Generic[T, U]):
     def _encode(cls, value):
         if isinstance(value, tuple):
             return tuple(cls._encode(val) for val in value)
+        elif isinstance(value, dict):
+            return tuple(cls._encode(val) for val in value.values())
         elif isinstance(value, list):
             return [cls._encode(val) for val in value]
         elif isinstance(value, BaseModel):
