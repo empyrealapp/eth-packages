@@ -26,7 +26,7 @@ ApprovalEvent = Event[ApprovalEventType](name="Approval")
 
 
 subscriber = EventSubscriber[TransferEventType | ApprovalEventType](
-    step_size=1000,
+    step_size=500,
     events=[TransferEvent, ApprovalEvent],
 )
 
