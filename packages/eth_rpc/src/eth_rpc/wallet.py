@@ -53,6 +53,7 @@ class BaseWallet(Request, ABC):
         sponsor_wallet: "BaseWallet",
         contract_address: HexAddress,
         *,
+        data: HexStr = HexStr("0x"),
         chain_id: Optional[int] = None,
         nonce: Optional[int] = None,
         value: int = 0,
@@ -81,7 +82,7 @@ class BaseWallet(Request, ABC):
             chain_id=chain_id,
             nonce=nonce,
             value=value,
-            data=HexStr("0x"),
+            data=data,
             gas=gas,
         )
         signed_tx = sponsor_wallet.sign_transaction(sponsored_tx)
