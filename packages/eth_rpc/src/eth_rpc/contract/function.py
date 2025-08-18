@@ -111,6 +111,7 @@ class ContractFunc(Generic[T, U]):
         block_number: HexInteger | Literal["latest", "pending"] = "latest",
         sync: bool = False,
         buffer: float = 1.25,
+        value: int = 0,
     ) -> HexInteger:
         query: RPCResponseModel[CallWithBlockArgs, HexInteger] = RPCResponseModel(
             self._rpc().estimate_gas,
@@ -119,6 +120,7 @@ class ContractFunc(Generic[T, U]):
                     from_=from_,
                     to=self.address,
                     data=self.data,
+                    value=value,
                 ),
                 block_number=block_number,
             ),
