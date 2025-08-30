@@ -845,7 +845,11 @@ class AsyncSubscribeCallable(BaseModel, Generic[T]):
             raise ValueError("No wss set for network")
 
         async for w3_connection in connect(
-            wss_uri.unicode_string() if isinstance(wss_uri, AnyWebsocketUrl) else wss_uri,
+            (
+                wss_uri.unicode_string()
+                if isinstance(wss_uri, AnyWebsocketUrl)
+                else wss_uri
+            ),
             ping_interval=60,
             ping_timeout=60,
             max_queue=10000,
