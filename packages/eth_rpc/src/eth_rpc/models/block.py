@@ -29,7 +29,7 @@ class Block(RPCModel):
     parent_hash: HexStr
     receipts_root: HexStr
     sha3_uncles: HexStr
-    size: HexInteger
+    size: HexInteger | None = None
     state_root: HexStr
     timestamp: Annotated[datetime, PlainSerializer(convert_datetime_to_iso_8601)]
     total_difficulty: Optional[HexInteger] = None
