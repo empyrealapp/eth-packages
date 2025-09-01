@@ -89,9 +89,7 @@ class EIP712Model(Struct):
                     )
                     values.append(encoding)
                 else:
-                    values.append(
-                        keccak(encode([f'{arg_name}[]'], [value]))
-                    )
+                    values.append(keccak(encode([f'{arg_name}[]'], [value])))
             elif isclass(type_) and issubclass(type_, EIP712Model):
                 types.append("bytes32")
                 values.append(value.hash())
