@@ -134,6 +134,7 @@ class ContractFunc(Generic[T, U]):
         self,
         *,
         sync: Literal[True],
+        value: int = 0,
         from_: Optional[HexAddress] = ...,
         block_number: HexInteger | Literal["latest", "pending"] = ...,
     ) -> HexInteger: ...
@@ -142,6 +143,7 @@ class ContractFunc(Generic[T, U]):
     def estimate_gas(
         self,
         *,
+        value: int = 0,
         sync: Literal[False] = ...,
         from_: Optional[HexAddress] = ...,
         block_number: HexInteger | Literal["latest", "pending"] = ...,
@@ -150,6 +152,7 @@ class ContractFunc(Generic[T, U]):
     def estimate_gas(
         self,
         *,
+        value: int = 0,
         from_: Optional[HexAddress] = None,
         block_number: HexInteger | Literal["latest", "pending"] = "latest",
         sync: bool = False,
@@ -435,7 +438,9 @@ class ContractFunc(Generic[T, U]):
         sync: bool = False,
         buffer: float = 1.25,
     ) -> PreparedTransaction:
-        gas = await self._estimate_gas(from_=wallet.address, sync=sync, buffer=buffer)
+        gas = await self._estimate_gas(
+            from_=wallet.address, sync=sync, buffer=buffer, value=value
+        )
         if use_access_list:
             if sync:
                 access_list_response = self.access_list(
