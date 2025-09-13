@@ -26,6 +26,8 @@ U = TypeVar("U")
 def convert_nested_dict(d: Any) -> Any:
     if isinstance(d, dict):
         return tuple(convert_nested_dict(v) for v in d.values())
+    elif isinstance(d, list):
+        return [convert_nested_dict(v) for v in d]
     return d
 
 
