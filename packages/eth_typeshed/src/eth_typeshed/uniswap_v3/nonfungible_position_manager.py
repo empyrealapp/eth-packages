@@ -1,11 +1,10 @@
 from typing import Annotated
 
 from eth_rpc import ContractFunc, ProtocolBase
-from eth_rpc.types import METHOD, Name, primitives
+from eth_rpc.types import METHOD, Name, Struct, primitives
 from eth_typeshed.erc20 import OwnerRequest
 from eth_typeshed.multicall import multicall
 from eth_typing import HexAddress, HexStr
-from pydantic import BaseModel
 
 from .position import OwnerTokenRequest, Position
 
@@ -14,11 +13,44 @@ NONFUNGIBLE_POSITION_MANAGER_ADDRESS = HexAddress(
 )
 
 
-class CollectParams(BaseModel):
+class CollectParams(Struct):
     token_id: primitives.uint256
     recipient: HexAddress
     amount0_max: primitives.uint128
     amount1_max: primitives.uint128
+
+
+class DecreaseLiquidityParams(Struct):
+    token_id: primitives.uint256
+    liquidity: primitives.uint128
+    amount0_min: primitives.uint256
+    amount1_min: primitives.uint256
+    deadline: primitives.uint256
+
+
+class MintParams(Struct):
+    """Parameters for minting a new Uniswap V3 position."""
+
+    token0: HexAddress
+    token1: HexAddress
+    fee: primitives.uint24
+    tickLower: primitives.int24
+    tickUpper: primitives.int24
+    amount0Desired: primitives.uint256
+    amount1Desired: primitives.uint256
+    amount0Min: primitives.uint256
+    amount1Min: primitives.uint256
+    recipient: HexAddress
+    deadline: primitives.uint256
+
+
+class MintResult(BaseModel):
+    """Result from minting a new position."""
+
+    token_id: primitives.uint256
+    liquidity: primitives.uint128
+    amount0: primitives.uint256
+    amount1: primitives.uint256
 
 
 class NonfungiblePositionManager(ProtocolBase):
@@ -29,6 +61,7 @@ class NonfungiblePositionManager(ProtocolBase):
         ],
         Name("balanceOf"),
     ] = METHOD
+
     token_of_owner_by_index: Annotated[
         ContractFunc[
             OwnerTokenRequest,
@@ -36,17 +69,65 @@ class NonfungiblePositionManager(ProtocolBase):
         ],
         Name("tokenOfOwnerByIndex"),
     ] = METHOD
+
     positions: ContractFunc[
         primitives.uint256,
         Position,
     ] = METHOD
 
-    collect: Annotated[
+    collect: ContractFunc[
+        CollectParams,
+        tuple[primitives.uint256, primitives.uint256],
+    ] = METHOD
+
+    mint: ContractFunc[
+        MintParams,
+        MintResult,
+    ] = METHOD
+
+    decrease_liquidity: Annotated[
         ContractFunc[
-            CollectParams,
+            DecreaseLiquidityParams,
             tuple[primitives.uint256, primitives.uint256],
         ],
-        Name("collect"),
+        Name("decreaseLiquidity"),
+    ] = METHOD
+
+    refund_eth: Annotated[
+        ContractFunc[
+            NoArgs,
+            None,
+        ],
+        Name("refundETH"),
+    ] = METHOD
+
+    unwrap_weth: Annotated[
+        ContractFunc[
+            tuple[primitives.uint256, primitives.address],  # (min, recipient)
+            None,
+        ],
+        Name("unwrapWETH9"),
+    ] = METHOD
+
+    sweep_token: Annotated[
+        ContractFunc[
+            tuple[HexAddress, primitives.uint256, HexAddress],  # (token, min, recipient)
+            None,
+        ],
+        Name("sweepToken"),
+    ] = METHOD
+
+    refund_eth: Annotated[
+        ContractFunc[
+            NoArgs,
+            None,
+        ],
+        Name("refundETH"),
+    ] = METHOD
+
+    multicall: ContractFunc[
+        list[bytes],
+        list[bytes],
     ] = METHOD
 
     async def get_all_indices(self, owner: HexAddress) -> list[int]:
