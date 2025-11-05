@@ -117,6 +117,14 @@ class NonfungiblePositionManager(ProtocolBase):
         Name("sweepToken"),
     ] = METHOD
 
+    refund_eth: Annotated[
+        ContractFunc[
+            NoArgs,
+            None,
+        ],
+        Name("refundETH"),
+    ] = METHOD
+
     multicall: ContractFunc[
         list[bytes],
         list[bytes],
