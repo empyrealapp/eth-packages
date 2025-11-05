@@ -103,7 +103,7 @@ class NonfungiblePositionManager(ProtocolBase):
 
     unwrap_weth: Annotated[
         ContractFunc[
-            tuple[primitives.uint256, primitives.address],
+            tuple[primitives.uint256, primitives.address],  # (min, recipient)
             None,
         ],
         Name("unwrapWETH9"),
@@ -111,7 +111,7 @@ class NonfungiblePositionManager(ProtocolBase):
 
     sweep_token: Annotated[
         ContractFunc[
-            tuple[HexAddress, primitives.uint256, HexAddress],
+            tuple[HexAddress, primitives.uint256, HexAddress],  # (token, min, recipient)
             None,
         ],
         Name("sweepToken"),
