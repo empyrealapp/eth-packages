@@ -88,7 +88,7 @@ class NonfungiblePositionManager(ProtocolBase):
     decrease_liquidity: Annotated[
         ContractFunc[
             DecreaseLiquidityParams,
-            None,
+            tuple[primitives.uint256, primitives.uint256],
         ],
         Name("decreaseLiquidity"),
     ] = METHOD
