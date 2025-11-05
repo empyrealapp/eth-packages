@@ -101,6 +101,27 @@ class NonfungiblePositionManager(ProtocolBase):
         Name("refundETH"),
     ] = METHOD
 
+    unwrap_weth: Annotated[
+        ContractFunc[
+            tuple[primitives.uint256, primitives.address],
+            None,
+        ],
+        Name("unwrapWETH9"),
+    ] = METHOD
+
+    sweep_token: Annotated[
+        ContractFunc[
+            tuple[HexAddress, primitives.uint256, HexAddress],
+            None,
+        ],
+        Name("sweepToken"),
+    ] = METHOD
+
+    multicall: ContractFunc[
+        list[bytes],
+        list[bytes],
+    ] = METHOD
+
     async def get_all_indices(self, owner: HexAddress) -> list[int]:
         balance = await self.balance_of(OwnerRequest(owner=owner)).get()
         calls = []
