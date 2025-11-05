@@ -2,11 +2,12 @@ from functools import cached_property
 from typing import Annotated
 
 from eth_rpc.types import BLOCK_STRINGS, Name, primitives
+from eth_rpc.networks import Arbitrum, Network
 from eth_typeshed.constants import Factories
 from eth_typeshed.erc20 import ERC20
 from eth_typeshed.multicall import MULTICALL3_ADDRESS, Multicall
 from eth_typing import HexAddress
-from pydantic import BaseModel, Field, PrivateAttr, computed_field
+from pydantic import BaseModel, PrivateAttr, computed_field
 
 from .factory import GetPoolRequest, UniswapV3Factory
 from .pool import Slot0, Tick, UniswapV3Pool
@@ -19,8 +20,9 @@ class OwnerTokenRequest(BaseModel):
 
 
 class Position(BaseModel):
+    _network: Network = PrivateAttr(default=Arbitrum)
     _pool_address: HexAddress | None = PrivateAttr(default=None)
-    factory_address: HexAddress = Field(default=Factories.Ethereum.UniswapV3)
+    _factory_address: HexAddress = PrivateAttr(default=Factories.Arbitrum.UniswapV3)
 
     nonce: primitives.uint96
     operator: primitives.address
@@ -55,10 +57,15 @@ class Position(BaseModel):
 
     @computed_field  # type: ignore[prop-decorator]
     @cached_property
-    def pool(self) -> UniswapV3Pool:
+    def pool(self) -> UniswapV3Pool | None:
         if not self._pool_address:
-            self._pool_address = (
-                UniswapV3Factory(address=self.factory_address)
+            return None
+        return UniswapV3Pool[self._network](address=self._pool_address)
+    
+    async def fetch_pool(self):
+        if not self._pool_address:
+            self._pool_address = await (
+                UniswapV3Factory[self._network](address=self._factory_address)
                 .get_pool(
                     GetPoolRequest(
                         token_a=self.token0,
@@ -68,11 +75,19 @@ class Position(BaseModel):
                 )
                 .get()
             )
-        return UniswapV3Pool(address=self._pool_address)
+        return UniswapV3Pool[self._network](address=self._pool_address)
 
     async def token_amounts(self):
         slot0 = await self.pool.slot0().get()
         sqrt_price_x96 = slot0.sqrt_price_x96
+        return liquidity_to_token_amounts(
+            self.liquidity,
+            sqrt_price_x96,
+            self.tick_lower,
+            self.tick_upper,
+        )
+
+    def token_amounts_at_price(self, sqrt_price_x96: int) -> tuple[float, float]:
         return liquidity_to_token_amounts(
             self.liquidity,
             sqrt_price_x96,
@@ -94,7 +109,7 @@ class Position(BaseModel):
         return [lower, upper]
 
     async def get_pending_fees(self, block_number: int | BLOCK_STRINGS = "latest"):
-        multicall = Multicall[self.pool._network](address=MULTICALL3_ADDRESS)
+        multicall = Multicall[self._network](address=MULTICALL3_ADDRESS)
 
         fee_growth_global0: primitives.uint256
         fee_growth_global1: primitives.uint256
